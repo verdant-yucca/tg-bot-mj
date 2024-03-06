@@ -10,16 +10,32 @@ export const setupBot = (token: string) => {
 
   stage
     .command(commands.start.command, ctx => ctx.scene.enter('startScene'))
+    .command(commands.createPicture.command, ctx => ctx.scene.enter('generateByTextScene'))
     .command(commands.exit.command, ctx => exitOfBot(ctx))
-    .on('message', ctx => ctx.replyWithHTML('Hi'));
+    .on('message', ctx => {
+      //@ts-ignore
+      if (ctx.update.message?.text === commands.createPicture.command) {
+        ctx.scene.enter('generateByTextScene')
+      } else {
+        ctx.replyWithHTML('Hi');
+      }
+    });
 
   bot.use((ctx, next) => logger(ctx, next));
   bot.use(session(), stage.middleware());
 
   bot
     .command(commands.start.command, ctx => ctx.scene.enter('startScene'))
+    .command(commands.createPicture.command, ctx => ctx.scene.enter('generateByTextScene'))
     .command(commands.exit.command, ctx => exitOfBot(ctx))
-    .on('message', ctx => ctx.replyWithHTML('Hi'));
+      .on('message', ctx => {
+        //@ts-ignore
+        if (ctx.update.message?.text === commands.createPicture.command) {
+          ctx.scene.enter('generateByTextScene')
+        } else {
+          ctx.replyWithHTML('Hi');
+        }
+      });
 
   bot.launch();
 

@@ -4,7 +4,7 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc && copyfiles --error --up 1 src/static/*.* dist/src",
+    "build": "rimraf build && tsc -p tsconfig.json",
     "prod": "ts-node --files -C typescript dist/index.js",
     "start": "nodemon --watch 'src/**/*.ts' --exec 'ts-node --files index.ts' index.ts",
     "start:windows": "nodemon index.ts",

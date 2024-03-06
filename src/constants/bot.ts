@@ -4,6 +4,11 @@ export const commands = {
     title: 'Start bot',
     description: 'use /start to Start the bot'
   },
+  createPicture: {
+    command: '🎨 Создать картину',
+    title: '🎨 Создать картину',
+    description: ''
+  },
   exit: {
     command: 'exit',
     title: 'Exit bot',
