@@ -4,7 +4,7 @@ import { IStateData, ITGData } from '../../types';
 import { API } from '../../api';
 import { getMainMenu } from '../../constants/buttons';
 
-export const stepStart = async (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
+export const startSceneStep = async (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
     try {
         if (typeof ctx.from === 'undefined' || ctx.from?.is_bot) {
             ctx.replyWithHTML(notAccessMsg);
@@ -22,20 +22,20 @@ export const stepStart = async (ctx: Scenes.WizardContext<Scenes.WizardSessionDa
             avatarPath = file.file_path;
         }
 
-        const { jwt, user } = await API.auth.tgAuth({
-            chatId: id.toString(),
-            languageCode: language_code,
-            username: username || `${first_name}_${id}`,
-            firstName: first_name,
-            lastName: last_name || '',
-            avatarPath
-        });
-
-        state.jwt = jwt;
-        state.user = user;
+        // const { jwt, user } = await API.auth.tgAuth({
+        //     chatId: id.toString(),
+        //     languageCode: language_code,
+        //     username: username || `${first_name}_${id}`,
+        //     firstName: first_name,
+        //     lastName: last_name || '',
+        //     avatarPath
+        // });
+        //
+        // state.jwt = jwt;
+        // state.user = user;
 
         // ctx.replyWithHTML(greetingsMsg(state.user.firstName));
-        ctx.reply(greetingsMsg(state.user.firstName), getMainMenu());
+        ctx.reply(greetingsMsg(first_name), getMainMenu());
         return ctx.scene.leave();
     } catch (err) {
         console.error('Error msg', err.message);

@@ -1,8 +1,28 @@
 import { Scenes } from 'telegraf';
-import { stepStart, generateByTextStep1, generateByTextStep2, generateByTextStep3 } from '../../views';
+import { startSceneStep, enterYourTextStep1, generateImageByTextStep2, generateMoreOrUpscaleStep } from '../../views';
 
-const startScene = new Scenes.WizardScene<Scenes.WizardContext>('startScene', stepStart);
-const generateByTextScene = new Scenes.WizardScene<Scenes.WizardContext>('generateByTextScene', generateByTextStep1, generateByTextStep2, generateByTextStep3);
+const startScene = new Scenes.WizardScene<Scenes.WizardContext>('startScene', startSceneStep);
+const generateByTextScene = new Scenes.WizardScene<Scenes.WizardContext>(
+  'generateByTextScene',
+  enterYourTextStep1,
+  generateImageByTextStep2
+);
 
+const generateByImageAndTextScene = new Scenes.WizardScene<Scenes.WizardContext>(
+  'generateByImageAndTextScene',
+  () => {}
+);
+const generateByBlandImageScene = new Scenes.WizardScene<Scenes.WizardContext>('generateByBlandImageScene', () => {});
 
-export const stage = new Scenes.Stage<Scenes.WizardContext>([startScene, generateByTextScene]);
+const generateMoreOrUpscaleScene = new Scenes.WizardScene<Scenes.WizardContext>(
+  'generateMoreOrUpscaleScene',
+  generateMoreOrUpscaleStep
+);
+
+export const stage = new Scenes.Stage<Scenes.WizardContext>([
+  startScene,
+  generateByTextScene,
+  generateByImageAndTextScene,
+  generateByBlandImageScene,
+  generateMoreOrUpscaleScene
+]);

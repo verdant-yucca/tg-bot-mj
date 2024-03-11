@@ -9,6 +9,16 @@ export const commands = {
     title: '🎨 Создать картину',
     description: ''
   },
+  experiment: {
+    command: '🔮 Экспериментировать',
+    title: '🔮 Экспериментировать',
+    description: ''
+  },
+  stylingImage: {
+    command: '🖌 Стилизовать изображение',
+    title: '🖌 Стилизовать изображение',
+    description: ''
+  },
   exit: {
     command: 'exit',
     title: 'Exit bot',

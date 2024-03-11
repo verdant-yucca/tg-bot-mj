@@ -4,41 +4,41 @@ import { commands } from '../../constants/bot';
 import { stage } from './scenes';
 import { exitOfBot } from '../../utils/telegramHelpers';
 import { logger } from '../../middlewares';
+import { Midjourney } from 'midjourney';
+
+export var client;
+export var bot;
 
 export const setupBot = (token: string) => {
-  const bot = new Telegraf<Scenes.WizardContext>(token);
+    bot = new Telegraf<Scenes.WizardContext>(token);
+    client = new Midjourney({
+        ServerId: <string>process.env.SERVER_ID,
+        ChannelId: <string>process.env.CHANNEL_ID,
+        SalaiToken: <string>process.env.SALAI_TOKEN,
+        // Debug: true,
+        Ws: true //enable ws is required for remix mode (and custom zoom)
+    });
+    client.init();
+    stage
+        .command(commands.start.command, ctx => ctx.scene.enter('startScene'))
+        .hears(commands.createPicture.command, ctx => ctx.scene.enter('generateByTextScene'))
+        .hears(commands.experiment.command, ctx => ctx.scene.enter('generateByBlandImageScene'))
+        .hears(commands.stylingImage.command, ctx => ctx.scene.enter('generateByImageAndTextScene'))
+        .command(commands.exit.command, ctx => exitOfBot(ctx));
 
-  stage
-    .command(commands.start.command, ctx => ctx.scene.enter('startScene'))
-    .hears(commands.createPicture.command, ctx => ctx.scene.enter('generateByTextScene'))
-    .command(commands.exit.command, ctx => exitOfBot(ctx))
-    // .on('message', ctx => {
-    //   //@ts-ignore
-    //   if (ctx.update.message?.text === commands.createPicture.command) {
-    //     ctx.scene.enter('generateByTextScene')
-    //   } else {
-    //     ctx.replyWithHTML('Hi');
-    //   }
-    // });
+    bot.use((ctx, next) => logger(ctx, next));
+    bot.use(session());
+    bot.use(stage.middleware());
 
-  bot.use((ctx, next) => logger(ctx, next));
-  bot.use(session(), stage.middleware());
+    bot
+        .command(commands.start.command, ctx => ctx.scene.enter('startScene'))
+        .hears(commands.createPicture.command, ctx => ctx.scene.enter('generateByTextScene'))
+        .hears(commands.experiment.command, ctx => ctx.scene.enter('generateByBlandImageScene'))
+        .hears(commands.stylingImage.command, ctx => ctx.scene.enter('generateByImageAndTextScene'))
+        .command(commands.exit.command, ctx => exitOfBot(ctx));
 
-  bot
-    .command(commands.start.command, ctx => ctx.scene.enter('startScene'))
-    .hears(commands.createPicture.command, ctx => ctx.scene.enter('generateByTextScene'))
-    .command(commands.exit.command, ctx => exitOfBot(ctx))
-      // .on('message', ctx => {
-      //   //@ts-ignore
-      //   if (ctx.update.message?.text === commands.createPicture.command) {
-      //     ctx.scene.enter('generateByTextScene')
-      //   } else {
-      //     ctx.replyWithHTML('Hi');
-      //   }
-      // });
+    bot.launch();
 
-  bot.launch();
-
-  process.once('SIGINT', () => bot.stop('SIGINT'));
-  process.once('SIGTERM', () => bot.stop('SIGTERM'));
+    process.once('SIGINT', () => bot.stop('SIGINT'));
+    process.once('SIGTERM', () => bot.stop('SIGTERM'));
 };
