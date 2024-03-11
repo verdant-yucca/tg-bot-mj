@@ -20,7 +20,7 @@ export const generateMoreOrUpscaleAwaitStep = (ctx: Scenes.WizardContext<Scenes.
     }
 };
 
-export const generateMoreOrUpscaleStep = (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
+export const generateMoreOrUpscaleStep = async (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
     try {
         //@ts-ignore
         const result = ctx.session.result;
@@ -28,6 +28,14 @@ export const generateMoreOrUpscaleStep = (ctx: Scenes.WizardContext<Scenes.Wizar
         const prompt = ctx.session.prompt;
         //@ts-ignore
         const custom = ctx.update?.callback_query?.data || '' as string;
+
+        const waitMessage = await ctx.replyWithDocument({
+            url: 'https://i.yapx.ru/XFv9d.gif',
+            filename: 'XFv9d.gif'
+        }, {
+            caption: `Генерация займёт 0-10 минут. Пожалуйста, ожидайте.
+Выполнено: 0%`
+        });
 
         const id = (result?.id || '') as string;
         const flags = (result?.flags || 0) as number;
@@ -37,11 +45,16 @@ export const generateMoreOrUpscaleStep = (ctx: Scenes.WizardContext<Scenes.Wizar
                 flags: flags,
                 customId: custom,
                 loading: (uri: string, progress: string) => {
-                    ctx.reply(`progress: ${progress}`);
+                    ctx.telegram.editMessageCaption(waitMessage.chat.id, waitMessage.message_id, '0', `Download photo...`);
                 }
-            }).then(Upscale => {
+            }).then(async Upscale => {
                     if (!Upscale) return;
-                    ctx.replyWithPhoto({ url: Upscale.uri });
+                    ctx.telegram.editMessageCaption(waitMessage.chat.id, waitMessage.message_id, '0', `Download photo...`);
+                    ctx.replyWithPhoto({ url: Upscale.uri }).then(resultMessage => {
+                        ctx.deleteMessage(waitMessage.message_id);
+                        const chatId = process.env.GROUP_ID as string;
+                        ctx.telegram.forwardMessage(chatId, resultMessage.chat.id, resultMessage.message_id);
+                    });
                     ctx.scene.leave();
                     // const zoomout = Upscale?.options?.find((o) => o.label === 'Custom Zoom').custom as string;
                     // client.Custom({
@@ -66,7 +79,10 @@ export const generateMoreOrUpscaleStep = (ctx: Scenes.WizardContext<Scenes.Wizar
                 customId: custom,
                 content: prompt, //remix mode require content
                 loading: (uri: string, progress: string) => {
-                    ctx.reply(`progress: ${progress}`);
+                    ctx.telegram.editMessageCaption(waitMessage.chat.id, waitMessage.message_id, '0', `
+                        Генерация займёт 0-10 минут. Пожалуйста, ожидайте.
+Выполнено: ${progress}
+                    `);
                 }
             }).then(Variation => {
                 if (!Variation) {
@@ -77,7 +93,9 @@ export const generateMoreOrUpscaleStep = (ctx: Scenes.WizardContext<Scenes.Wizar
                 //U1 U2 U3 U4 V1 V2 V3 V4  "Vary (Strong)" ...
                 const buttons = getButtonsForFourPhoto(Variation);
 
-                ctx.replyWithPhoto({ url: Variation.uri }, Markup.inlineKeyboard(buttons));
+                ctx.replyWithPhoto({ url: Variation.uri }, Markup.inlineKeyboard(buttons)).then(() => {
+                    ctx.deleteMessage(waitMessage.message_id);
+                });
                 //@ts-ignore
                 ctx.session.result = Variation;
                 //@ts-ignore

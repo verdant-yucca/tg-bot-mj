@@ -21,14 +21,27 @@ export const enterYourTextStep1 = (ctx: Scenes.WizardContext<Scenes.WizardSessio
 };
 export const generateImageByTextStep2 = async (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
     try {
-        ctx.replyWithHTML('Генерация изображения займёт около 30 секунд. Ожидайте.');
-
+        //https://i.yapx.ru/XFv9d.gif
+        const waitMessage = await ctx.replyWithDocument({
+            url: 'https://i.yapx.ru/XFv9d.gif',
+            filename: 'XFv9d.gif'
+        }, {
+            caption: `Генерация займёт 0-10 минут. Пожалуйста, ожидайте.
+Выполнено: 0%`
+        });
+        // const waitMessage = await ctx.reply(`
+        //     Генерация займёт 0-10 минут. Пожалуйста, ожидайте.
+        //     Выполнено: 0%
+        // `);
         //@ts-ignore
         const prompt: string = ctx.update.message.text;
         client.Imagine(
             prompt,
             (uri: string, progress: string) => {
-                ctx.reply(`progress: ${progress}`);
+                ctx.telegram.editMessageCaption(waitMessage.chat.id, waitMessage.message_id, '0', `
+                        Генерация займёт 0-10 минут. Пожалуйста, ожидайте.
+Выполнено: ${progress}
+                    `);
             }
         ).then(Imagine => {
             if (!Imagine) {
@@ -36,10 +49,17 @@ export const generateImageByTextStep2 = async (ctx: Scenes.WizardContext<Scenes.
                 ctx.scene.leave();
                 return;
             }
-
+            ctx.telegram.editMessageCaption(waitMessage.chat.id, waitMessage.message_id, '0', `
+                        Генерация займёт 0-10 минут. Пожалуйста, ожидайте.
+Выполнено: 100%
+Download photo...
+                    `);
             //U1 U2 U3 U4 V1 V2 V3 V4  "Vary (Strong)" ...
             const buttons = getButtonsForFourPhoto(Imagine);
-            ctx.replyWithPhoto({ url: Imagine.uri }, Markup.inlineKeyboard(buttons));
+            ctx.replyWithPhoto({ url: Imagine.uri }, Markup.inlineKeyboard(buttons)).then(() => {
+                ctx.deleteMessage(waitMessage.message_id);
+            });
+            
             //@ts-ignore
             ctx.session.result = Imagine;
             //@ts-ignore

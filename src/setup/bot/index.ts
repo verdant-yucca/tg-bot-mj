@@ -33,6 +33,7 @@ export const setupBot = (token: string) => {
 
     bot
         .command(commands.start.command, ctx => ctx.scene.enter('startScene'))
+        .command('getgroupid', ctx => console.log(ctx))
         .hears(commands.createPicture.command, ctx => ctx.scene.enter('generateByTextScene'))
         .hears(commands.experiment.command, ctx => ctx.scene.enter('generateByBlandImageScene'))
         .hears(commands.stylingImage.command, ctx => ctx.scene.enter('generateByImageAndTextScene'))

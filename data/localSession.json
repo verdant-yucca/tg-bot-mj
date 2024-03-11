@@ -9,73 +9,73 @@
           "cursor": 1
         },
         "result": {
-          "id": "1216583092400033822",
+          "id": "1216710202573852714",
           "flags": 0,
-          "content": "**mr fish and here wife crazyfrog** - <@1215196036746973224> (fast)",
-          "hash": "26d2a2c0-c602-4af3-99bd-dab603daaebd",
+          "content": "**some picture** - <@1215196036746973224> (relaxed)",
+          "hash": "b8f341d2-a48a-495d-8189-f766bca5ba6f",
           "progress": "done",
-          "uri": "https://cdn.discordapp.com/attachments/1215917479436750859/1216583091817152542/323deadshot323_mr_fish_and_here_wife_crazyfrog_26d2a2c0-c602-4af3-99bd-dab603daaebd.png?ex=6600ea4c&is=65ee754c&hm=f593af67feaa2bfaeca2dfc06f31f0be50ae06683e192f27ddf2b4da93f02929&",
-          "proxy_url": "https://media.discordapp.net/attachments/1215917479436750859/1216583091817152542/323deadshot323_mr_fish_and_here_wife_crazyfrog_26d2a2c0-c602-4af3-99bd-dab603daaebd.png?ex=6600ea4c&is=65ee754c&hm=f593af67feaa2bfaeca2dfc06f31f0be50ae06683e192f27ddf2b4da93f02929&",
+          "uri": "https://cdn.discordapp.com/attachments/1215917479436750859/1216710202250756146/323deadshot323_some_picture_b8f341d2-a48a-495d-8189-f766bca5ba6f.png?ex=660160ad&is=65eeebad&hm=fbf56b246994feb87da81d582cebd65a0fc4536d4bb06cf9cb05e4e50155bf72&",
+          "proxy_url": "https://media.discordapp.net/attachments/1215917479436750859/1216710202250756146/323deadshot323_some_picture_b8f341d2-a48a-495d-8189-f766bca5ba6f.png?ex=660160ad&is=65eeebad&hm=fbf56b246994feb87da81d582cebd65a0fc4536d4bb06cf9cb05e4e50155bf72&",
           "options": [
             {
               "type": 2,
               "style": 2,
               "label": "U1",
-              "custom": "MJ::JOB::upsample::1::26d2a2c0-c602-4af3-99bd-dab603daaebd"
+              "custom": "MJ::JOB::upsample::1::b8f341d2-a48a-495d-8189-f766bca5ba6f"
             },
             {
               "type": 2,
               "style": 2,
               "label": "U2",
-              "custom": "MJ::JOB::upsample::2::26d2a2c0-c602-4af3-99bd-dab603daaebd"
+              "custom": "MJ::JOB::upsample::2::b8f341d2-a48a-495d-8189-f766bca5ba6f"
             },
             {
               "type": 2,
               "style": 2,
               "label": "U3",
-              "custom": "MJ::JOB::upsample::3::26d2a2c0-c602-4af3-99bd-dab603daaebd"
+              "custom": "MJ::JOB::upsample::3::b8f341d2-a48a-495d-8189-f766bca5ba6f"
             },
             {
               "type": 2,
               "style": 2,
               "label": "U4",
-              "custom": "MJ::JOB::upsample::4::26d2a2c0-c602-4af3-99bd-dab603daaebd"
+              "custom": "MJ::JOB::upsample::4::b8f341d2-a48a-495d-8189-f766bca5ba6f"
             },
             {
               "type": 2,
               "style": 2,
               "label": "🔄",
-              "custom": "MJ::JOB::reroll::0::26d2a2c0-c602-4af3-99bd-dab603daaebd::SOLO"
+              "custom": "MJ::JOB::reroll::0::b8f341d2-a48a-495d-8189-f766bca5ba6f::SOLO"
             },
             {
               "type": 2,
               "style": 2,
               "label": "V1",
-              "custom": "MJ::JOB::variation::1::26d2a2c0-c602-4af3-99bd-dab603daaebd"
+              "custom": "MJ::JOB::variation::1::b8f341d2-a48a-495d-8189-f766bca5ba6f"
             },
             {
               "type": 2,
               "style": 2,
               "label": "V2",
-              "custom": "MJ::JOB::variation::2::26d2a2c0-c602-4af3-99bd-dab603daaebd"
+              "custom": "MJ::JOB::variation::2::b8f341d2-a48a-495d-8189-f766bca5ba6f"
             },
             {
               "type": 2,
               "style": 2,
               "label": "V3",
-              "custom": "MJ::JOB::variation::3::26d2a2c0-c602-4af3-99bd-dab603daaebd"
+              "custom": "MJ::JOB::variation::3::b8f341d2-a48a-495d-8189-f766bca5ba6f"
             },
             {
               "type": 2,
               "style": 2,
               "label": "V4",
-              "custom": "MJ::JOB::variation::4::26d2a2c0-c602-4af3-99bd-dab603daaebd"
+              "custom": "MJ::JOB::variation::4::b8f341d2-a48a-495d-8189-f766bca5ba6f"
             }
           ],
           "width": 2048,
           "height": 2048
         },
-        "prompt": "mr fish and here wife crazyfrog",
+        "prompt": "some picture",
         "withoutFirstStep": true
       }
     },
@@ -152,6 +152,18 @@
         },
         "prompt": "catdog",
         "withoutFirstStep": true
+      }
+    },
+    {
+      "id": "-1001940959482:1087968824",
+      "data": {
+        "__scenes": {}
+      }
+    },
+    {
+      "id": "-1001940959482:1343412914",
+      "data": {
+        "__scenes": {}
       }
     }
   ]
