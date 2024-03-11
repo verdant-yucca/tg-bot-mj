@@ -1,5 +1,4 @@
 import { Scenes } from 'telegraf';
-import { Message } from 'telegraf/typings/core/types/typegram';
 
 export interface ITGData {
     id: number;
@@ -19,7 +18,7 @@ export interface IBackToStepData {
     ctx: Scenes.WizardContext<Scenes.WizardSessionData>;
     indexStep: number;
     value: string | number;
-    handle: (ctx: Scenes.WizardContext<Scenes.WizardSessionData>, value: string | number) => Promise<Message['TextMessage']>;
+    handle: (ctx: Scenes.WizardContext<Scenes.WizardSessionData>, value: string | number) => Promise<any>;
 }
 
 export interface ReplyMarkup {
