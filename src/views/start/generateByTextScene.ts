@@ -41,10 +41,11 @@ export const generateImageByTextStep2 = async (ctx: Scenes.WizardContext<Scenes.
             const buttons = getButtonsForFourPhoto(Imagine);
             ctx.replyWithPhoto({ url: Imagine.uri }, Markup.inlineKeyboard(buttons));
             //@ts-ignore
-            ctx.session.state = {
-                result: Imagine,
-                prompt
-            };
+            ctx.session.result = Imagine;
+            //@ts-ignore
+            ctx.session.prompt = prompt;
+            //@ts-ignore
+            ctx.session.withoutFirstStep = true;
             ctx.scene.leave();
             ctx.scene.enter('generateMoreOrUpscaleScene');
         });

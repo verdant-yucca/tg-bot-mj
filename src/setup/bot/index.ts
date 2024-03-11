@@ -1,10 +1,11 @@
-import { Telegraf, Scenes, session } from 'telegraf';
+import { Telegraf, Scenes } from 'telegraf';
 
 import { commands } from '../../constants/bot';
 import { stage } from './scenes';
 import { exitOfBot } from '../../utils/telegramHelpers';
 import { logger } from '../../middlewares';
 import { Midjourney } from 'midjourney';
+import sessionLocal from 'telegraf-session-local';
 
 export var client;
 export var bot;
@@ -27,7 +28,7 @@ export const setupBot = (token: string) => {
         .command(commands.exit.command, ctx => exitOfBot(ctx));
 
     bot.use((ctx, next) => logger(ctx, next));
-    bot.use(session());
+    bot.use(new sessionLocal({ database: 'data/localSession.json' }).middleware());
     bot.use(stage.middleware());
 
     bot

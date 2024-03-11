@@ -5,8 +5,8 @@
   "scripts": {
     "build": "rimraf build && tsc -p tsconfig.json",
     "prod": "ts-node --files -C typescript dist/index.js",
-    "start": "nodemon --watch 'src/**/*.ts' --exec 'ts-node --files index.ts' index.ts",
-    "start:windows": "nodemon index.ts"
+    "start": "nodemon --ignore data/ --watch 'src/**/*.ts' --exec 'ts-node --files index.ts' index.ts",
+    "start:windows": "nodemon --ignore data/ index.ts"
   },
   "keywords": [],
   "author": "",
@@ -24,6 +24,7 @@
     "midjourney": "^4.3.17",
     "node-xlsx": "^0.21.2",
     "telegraf": "^4.16.2",
+    "telegraf-session-local": "^2.1.1",
     "tslint-config-prettier": "^1.18.0",
     "uuid": "^9.0.0"
   },
