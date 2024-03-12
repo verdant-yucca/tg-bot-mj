@@ -17,7 +17,7 @@ export const enterYourTextStep1 = (ctx: Scenes.WizardContext<Scenes.WizardSessio
 
             if (avatars.total_count > 0) {
                 const fileId = avatars.photos[0][0].file_id;
-                const file = await ctx.telegram.getFileLink(fileId).then(url => {
+                ctx.telegram.getFileLink(fileId).then(url => {
                         console.log('url', url);
                         state.avatarPath = url.toString();
 
