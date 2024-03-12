@@ -26,6 +26,12 @@ export const setupBot = (token: string) => {
         .hears(commands.stylingAvatar.command, ctx => ctx.scene.enter('stylingAvatarByTextScene'))
         .hears(commands.experiment.command, ctx => ctx.scene.enter('generateByBlandImageScene'))
         .hears(commands.stylingImage.command, ctx => ctx.scene.enter('generateByImageAndTextScene'))
+        .hears('📞 Help', ctx => {
+            ctx.replyWithHTML(`В результате ты увидишь изображение с кнопками. 
+Кнопки U1, U2, U3, U4 позволяют выбрать результат, после нажатия тебе отправится это изображение. 
+Кнопки V1, V2, V3, V4 позволяют сгенерировать ещё 4 картинки по выбранному варианту. 
+Кнопка обновления позволяет сгенерировать результат ещё раз исходя из исходного запроса. `);
+        })
         .command(commands.exit.command, ctx => exitOfBot(ctx));
 
     bot.use((ctx, next) => logger(ctx, next));
@@ -34,10 +40,16 @@ export const setupBot = (token: string) => {
 
     bot
         .command(commands.start.command, ctx => ctx.scene.enter('startScene'))
-        .command('getgroupid', ctx => console.log(ctx))
         .hears(commands.createPicture.command, ctx => ctx.scene.enter('generateByTextScene'))
+        .hears(commands.stylingAvatar.command, ctx => ctx.scene.enter('stylingAvatarByTextScene'))
         .hears(commands.experiment.command, ctx => ctx.scene.enter('generateByBlandImageScene'))
         .hears(commands.stylingImage.command, ctx => ctx.scene.enter('generateByImageAndTextScene'))
+        .hears('Help', ctx => {
+            ctx.replyWithHTML(`В результате ты увидишь изображение с кнопками. 
+Кнопки U1, U2, U3, U4 позволяют выбрать результат, после нажатия тебе отправится это изображение. 
+Кнопки V1, V2, V3, V4 позволяют сгенерировать ещё 4 картинки по выбранному варианту. 
+Кнопка обновления позволяет сгенерировать результат ещё раз исходя из исходного запроса. `);
+        })
         .command(commands.exit.command, ctx => exitOfBot(ctx));
 
     bot.launch();

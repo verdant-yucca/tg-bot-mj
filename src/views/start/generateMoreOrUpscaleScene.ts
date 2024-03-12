@@ -49,7 +49,10 @@ export const generateMoreOrUpscaleStep = async (ctx: Scenes.WizardContext<Scenes
             }).then(async Upscale => {
                     if (!Upscale) return;
                     ctx.telegram.editMessageCaption(waitMessage.chat.id, waitMessage.message_id, '0', `Download photo...`);
-                    ctx.replyWithPhoto({ url: Upscale.uri }).then(resultMessage => {
+                    ctx.replyWithPhoto({ url: Upscale.uri }, {
+                        caption: `Изображение по запросу:
+${prompt}`
+                    }).then(resultMessage => {
                         ctx.deleteMessage(waitMessage.message_id);
                         const chatId = process.env.GROUP_ID as string;
                         ctx.telegram.forwardMessage(chatId, resultMessage.chat.id, resultMessage.message_id);

@@ -1,8 +1,9 @@
 import { Markup, Scenes } from 'telegraf';
-import { notAccessMsg, somethingWentWrong } from '../../constants/messages';
+import { badRequist, notAccessMsg, somethingWentWrong } from '../../constants/messages';
 import { client } from '../../setup/bot';
 import { getButtonsForFourPhoto } from '../../utils/getButtonsForFourPhoto';
 import { ITGData } from '../../types';
+import { getMainMenu } from '../../constants/buttons';
 
 export const enterYourTextStep1 = (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
     try {
@@ -17,23 +18,27 @@ export const enterYourTextStep1 = (ctx: Scenes.WizardContext<Scenes.WizardSessio
 
             if (avatars.total_count > 0) {
                 const fileId = avatars.photos[0][0].file_id;
-                ctx.telegram.getFileLink(fileId).then(url => {
-                        console.log('url', url);
-                        state.avatarPath = url.toString();
+                ctx.telegram.getFileLink(fileId)
+                    .then(url => {
+                            state.avatarPath = url.toString();
 
-                    }
-                );
-            }
-
-            if (state.avatarPath) {
-                ctx.replyWithHTML('Опишите, как вы хотите изменить свою аватарку:');
-                ctx.wizard.next();
+                            if (state.avatarPath) {
+                                ctx.replyWithHTML('Опишите, как вы хотите изменить свою аватарку:');
+                                ctx.wizard.next();
+                            } else {
+                                ctx.replyWithHTML('У вас нет аватарки в профиле. Данная функция не доступна');
+                                return ctx.scene.leave();
+                            }
+                        }
+                    )
+                    .catch(() => {
+                        ctx.reply(somethingWentWrong);
+                    });
             } else {
-                ctx.replyWithHTML('У вас нет аватарки в профиле. Данная функция не доступна');
-                return ctx.scene.leave();
+                ctx.reply(somethingWentWrong);
             }
-        }).catch(() => {
 
+        }).catch(() => {
             ctx.reply(somethingWentWrong);
         });
 
@@ -91,6 +96,9 @@ Download photo...
             ctx.session.withoutFirstStep = true;
             ctx.scene.leave();
             ctx.scene.enter('generateMoreOrUpscaleScene');
+        }).catch(() => {
+            ctx.deleteMessage(waitMessage.message_id);
+            ctx.replyWithHTML(badRequist, { parse_mode: 'Markdown', reply_markup: getMainMenu().reply_markup });
         });
     } catch (err) {
         console.error('Error msg', err.message);

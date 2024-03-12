@@ -9,18 +9,21 @@ import {
     enterYourTextStep1 as stylingAvatarEnterYourTextStep1,
     stylingAvatarByTextStep2
 } from '../../views/start/stylingAvatarByTextScene';
+import {
+    enterYourImageStep1,
+    enterYourTextStep2,
+    stylingImageByTextStep3
+} from '../../views/start/generateByImageAndTextScene';
 
 const startScene = new Scenes.WizardScene<Scenes.WizardContext>('startScene', startSceneStep);
 const generateByTextScene = new Scenes.WizardScene<Scenes.WizardContext>(
     'generateByTextScene',
-    enterYourTextStep1,
-    generateImageByTextStep2
+    enterYourTextStep1, generateImageByTextStep2
 );
 
 const generateByImageAndTextScene = new Scenes.WizardScene<Scenes.WizardContext>(
     'generateByImageAndTextScene',
-    () => {
-    }
+    enterYourImageStep1, enterYourTextStep2, stylingImageByTextStep3
 );
 
 const stylingAvatarByTextScene = new Scenes.WizardScene<Scenes.WizardContext>(
@@ -32,8 +35,7 @@ const generateByBlandImageScene = new Scenes.WizardScene<Scenes.WizardContext>('
 
 const generateMoreOrUpscaleScene = new Scenes.WizardScene<Scenes.WizardContext>(
     'generateMoreOrUpscaleScene',
-    generateMoreOrUpscaleAwaitStep,
-    generateMoreOrUpscaleStep
+    generateMoreOrUpscaleAwaitStep, generateMoreOrUpscaleStep
 );
 
 export const stage = new Scenes.Stage<Scenes.WizardContext>([
