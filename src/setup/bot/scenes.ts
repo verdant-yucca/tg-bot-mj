@@ -1,12 +1,14 @@
 import { Scenes } from 'telegraf';
+import { startSceneStep } from '../../views/start/startScene';
+import { enterYourTextStep1, generateImageByTextStep2 } from '../../views/start/generateByTextScene';
 import {
-    startSceneStep,
-    enterYourTextStep1,
-    generateImageByTextStep2,
     generateMoreOrUpscaleStep,
     generateMoreOrUpscaleAwaitStep
-} from '../../views';
-import { notAccessMsg } from '../../constants/messages';
+} from '../../views/start/generateMoreOrUpscaleScene';
+import {
+    enterYourTextStep1 as stylingAvatarEnterYourTextStep1,
+    stylingAvatarByTextStep2
+} from '../../views/start/stylingAvatarByTextScene';
 
 const startScene = new Scenes.WizardScene<Scenes.WizardContext>('startScene', startSceneStep);
 const generateByTextScene = new Scenes.WizardScene<Scenes.WizardContext>(
@@ -19,6 +21,11 @@ const generateByImageAndTextScene = new Scenes.WizardScene<Scenes.WizardContext>
     'generateByImageAndTextScene',
     () => {
     }
+);
+
+const stylingAvatarByTextScene = new Scenes.WizardScene<Scenes.WizardContext>(
+    'stylingAvatarByTextScene',
+    stylingAvatarEnterYourTextStep1, stylingAvatarByTextStep2
 );
 const generateByBlandImageScene = new Scenes.WizardScene<Scenes.WizardContext>('generateByBlandImageScene', () => {
 });
@@ -34,5 +41,6 @@ export const stage = new Scenes.Stage<Scenes.WizardContext>([
     generateByTextScene,
     generateByImageAndTextScene,
     generateByBlandImageScene,
-    generateMoreOrUpscaleScene
+    generateMoreOrUpscaleScene,
+    stylingAvatarByTextScene
 ]);

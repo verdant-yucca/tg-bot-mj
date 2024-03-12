@@ -23,6 +23,7 @@ export const setupBot = (token: string) => {
     stage
         .command(commands.start.command, ctx => ctx.scene.enter('startScene'))
         .hears(commands.createPicture.command, ctx => ctx.scene.enter('generateByTextScene'))
+        .hears(commands.stylingAvatar.command, ctx => ctx.scene.enter('stylingAvatarByTextScene'))
         .hears(commands.experiment.command, ctx => ctx.scene.enter('generateByBlandImageScene'))
         .hears(commands.stylingImage.command, ctx => ctx.scene.enter('generateByImageAndTextScene'))
         .command(commands.exit.command, ctx => exitOfBot(ctx));

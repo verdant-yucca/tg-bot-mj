@@ -2,6 +2,7 @@ import { Markup, Scenes } from 'telegraf';
 import { notAccessMsg, somethingWentWrong } from '../../constants/messages';
 import { client } from '../../setup/bot';
 import { getButtonsForFourPhoto } from '../../utils/getButtonsForFourPhoto';
+import { ITGData } from '../../types';
 
 export const enterYourTextStep1 = (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
     try {
@@ -9,8 +10,33 @@ export const enterYourTextStep1 = (ctx: Scenes.WizardContext<Scenes.WizardSessio
             ctx.replyWithHTML(notAccessMsg);
             return ctx.scene.leave();
         }
-        ctx.replyWithHTML('Введите свой запрос:');
-        ctx.wizard.next();
+        const { id } = ctx.from as ITGData;
+        ctx.telegram.getUserProfilePhotos(id).then(async avatars => {
+
+            const state = ctx.session as { avatarPath?: string };
+
+            if (avatars.total_count > 0) {
+                const fileId = avatars.photos[0][0].file_id;
+                const file = await ctx.telegram.getFileLink(fileId).then(url => {
+                        console.log('url', url);
+                        state.avatarPath = url.toString();
+
+                    }
+                );
+            }
+
+            if (state.avatarPath) {
+                ctx.replyWithHTML('Опишите, как вы хотите изменить свою аватарку:');
+                ctx.wizard.next();
+            } else {
+                ctx.replyWithHTML('У вас нет аватарки в профиле. Данная функция не доступна');
+                return ctx.scene.leave();
+            }
+        }).catch(() => {
+
+            ctx.reply(somethingWentWrong);
+        });
+
     } catch (err) {
         console.error('Error msg', err.message);
         console.error('Catch start:', err);
@@ -19,8 +45,9 @@ export const enterYourTextStep1 = (ctx: Scenes.WizardContext<Scenes.WizardSessio
         return;
     }
 };
-export const generateImageByTextStep2 = async (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
+export const stylingAvatarByTextStep2 = async (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
     try {
+        const { avatarPath } = ctx.session as { avatarPath: string };
         //https://i.yapx.ru/XFv9d.gif
         const waitMessage = await ctx.replyWithDocument({
             url: 'https://i.yapx.ru/XFv9d.gif',
@@ -29,7 +56,7 @@ export const generateImageByTextStep2 = async (ctx: Scenes.WizardContext<Scenes.
             caption: `Ваш запрос добавлен в очередь. Пожалуйста, ожидайте.`
         });
         //@ts-ignore
-        const prompt: string = ctx.update.message.text;
+        const prompt: string = `${avatarPath} ${ctx.update.message.text}`;
         client.Imagine(
             prompt,
             (uri: string, progress: string) => {

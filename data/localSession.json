@@ -9,74 +9,75 @@
           "cursor": 1
         },
         "result": {
-          "id": "1216710202573852714",
+          "id": "1216929584294006865",
           "flags": 0,
-          "content": "**some picture** - <@1215196036746973224> (relaxed)",
-          "hash": "b8f341d2-a48a-495d-8189-f766bca5ba6f",
+          "content": "**<https://s.mj.run/J7zvsh_gTXQ> cut angel** - <@1215196036746973224> (relaxed)",
+          "hash": "ef08c230-5461-4f41-ac3b-e5d0c3b1bb04",
           "progress": "done",
-          "uri": "https://cdn.discordapp.com/attachments/1215917479436750859/1216710202250756146/323deadshot323_some_picture_b8f341d2-a48a-495d-8189-f766bca5ba6f.png?ex=660160ad&is=65eeebad&hm=fbf56b246994feb87da81d582cebd65a0fc4536d4bb06cf9cb05e4e50155bf72&",
-          "proxy_url": "https://media.discordapp.net/attachments/1215917479436750859/1216710202250756146/323deadshot323_some_picture_b8f341d2-a48a-495d-8189-f766bca5ba6f.png?ex=660160ad&is=65eeebad&hm=fbf56b246994feb87da81d582cebd65a0fc4536d4bb06cf9cb05e4e50155bf72&",
+          "uri": "https://cdn.discordapp.com/attachments/1215917479436750859/1216929584042479646/323deadshot323_cut_angel_ef08c230-5461-4f41-ac3b-e5d0c3b1bb04.png?ex=66022cfe&is=65efb7fe&hm=5ea8ce99b0541889daff2e6fd801d2cd91a84c2e9e13286c2bee6c0527d5b6cf&",
+          "proxy_url": "https://media.discordapp.net/attachments/1215917479436750859/1216929584042479646/323deadshot323_cut_angel_ef08c230-5461-4f41-ac3b-e5d0c3b1bb04.png?ex=66022cfe&is=65efb7fe&hm=5ea8ce99b0541889daff2e6fd801d2cd91a84c2e9e13286c2bee6c0527d5b6cf&",
           "options": [
             {
               "type": 2,
               "style": 2,
               "label": "U1",
-              "custom": "MJ::JOB::upsample::1::b8f341d2-a48a-495d-8189-f766bca5ba6f"
+              "custom": "MJ::JOB::upsample::1::ef08c230-5461-4f41-ac3b-e5d0c3b1bb04"
             },
             {
               "type": 2,
               "style": 2,
               "label": "U2",
-              "custom": "MJ::JOB::upsample::2::b8f341d2-a48a-495d-8189-f766bca5ba6f"
+              "custom": "MJ::JOB::upsample::2::ef08c230-5461-4f41-ac3b-e5d0c3b1bb04"
             },
             {
               "type": 2,
               "style": 2,
               "label": "U3",
-              "custom": "MJ::JOB::upsample::3::b8f341d2-a48a-495d-8189-f766bca5ba6f"
+              "custom": "MJ::JOB::upsample::3::ef08c230-5461-4f41-ac3b-e5d0c3b1bb04"
             },
             {
               "type": 2,
               "style": 2,
               "label": "U4",
-              "custom": "MJ::JOB::upsample::4::b8f341d2-a48a-495d-8189-f766bca5ba6f"
+              "custom": "MJ::JOB::upsample::4::ef08c230-5461-4f41-ac3b-e5d0c3b1bb04"
             },
             {
               "type": 2,
               "style": 2,
               "label": "🔄",
-              "custom": "MJ::JOB::reroll::0::b8f341d2-a48a-495d-8189-f766bca5ba6f::SOLO"
+              "custom": "MJ::JOB::reroll::0::ef08c230-5461-4f41-ac3b-e5d0c3b1bb04::SOLO"
             },
             {
               "type": 2,
               "style": 2,
               "label": "V1",
-              "custom": "MJ::JOB::variation::1::b8f341d2-a48a-495d-8189-f766bca5ba6f"
+              "custom": "MJ::JOB::variation::1::ef08c230-5461-4f41-ac3b-e5d0c3b1bb04"
             },
             {
               "type": 2,
               "style": 2,
               "label": "V2",
-              "custom": "MJ::JOB::variation::2::b8f341d2-a48a-495d-8189-f766bca5ba6f"
+              "custom": "MJ::JOB::variation::2::ef08c230-5461-4f41-ac3b-e5d0c3b1bb04"
             },
             {
               "type": 2,
               "style": 2,
               "label": "V3",
-              "custom": "MJ::JOB::variation::3::b8f341d2-a48a-495d-8189-f766bca5ba6f"
+              "custom": "MJ::JOB::variation::3::ef08c230-5461-4f41-ac3b-e5d0c3b1bb04"
             },
             {
               "type": 2,
               "style": 2,
               "label": "V4",
-              "custom": "MJ::JOB::variation::4::b8f341d2-a48a-495d-8189-f766bca5ba6f"
+              "custom": "MJ::JOB::variation::4::ef08c230-5461-4f41-ac3b-e5d0c3b1bb04"
             }
           ],
           "width": 2048,
           "height": 2048
         },
-        "prompt": "some picture",
-        "withoutFirstStep": true
+        "prompt": "https://api.telegram.org/file/bot6416591669:AAGcYEMPO1yFhtFAUBMVO58luQczJs0YlRk/photos/file_5.jpg cut angel",
+        "withoutFirstStep": true,
+        "avatarPath": "https://api.telegram.org/file/bot6416591669:AAGcYEMPO1yFhtFAUBMVO58luQczJs0YlRk/photos/file_5.jpg"
       }
     },
     {

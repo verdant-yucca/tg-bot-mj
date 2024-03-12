@@ -33,8 +33,7 @@ export const generateMoreOrUpscaleStep = async (ctx: Scenes.WizardContext<Scenes
             url: 'https://i.yapx.ru/XFv9d.gif',
             filename: 'XFv9d.gif'
         }, {
-            caption: `Генерация займёт 0-10 минут. Пожалуйста, ожидайте.
-Выполнено: 0%`
+            caption: `Ваш запрос добавлен в очередь. Пожалуйста, ожидайте.`
         });
 
         const id = (result?.id || '') as string;
@@ -102,6 +101,42 @@ export const generateMoreOrUpscaleStep = async (ctx: Scenes.WizardContext<Scenes
                 ctx.session.prompt = prompt;
                 ctx.scene.leave();
 
+                ctx.scene.enter('generateMoreOrUpscaleScene');
+            });
+        } else if (custom.includes('reroll')) {
+            client.Imagine(
+                prompt,
+                (uri: string, progress: string) => {
+                    ctx.telegram.editMessageCaption(waitMessage.chat.id, waitMessage.message_id, '0', `
+                        Генерация займёт 0-10 минут. Пожалуйста, ожидайте.
+Выполнено: ${progress}
+                    `);
+                }
+            ).then(Imagine => {
+                if (!Imagine) {
+                    console.log('no message');
+                    ctx.scene.leave();
+                    return;
+                }
+                ctx.telegram.editMessageCaption(waitMessage.chat.id, waitMessage.message_id, '0', `
+                        Генерация займёт 0-10 минут. Пожалуйста, ожидайте.
+Выполнено: 100%
+Download photo...
+                    `);
+                //U1 U2 U3 U4 V1 V2 V3 V4  "Vary (Strong)" ...
+                const buttons = getButtonsForFourPhoto(Imagine);
+                console.log('buttons', buttons);
+                ctx.replyWithPhoto({ url: Imagine.uri }, Markup.inlineKeyboard(buttons)).then(() => {
+                    ctx.deleteMessage(waitMessage.message_id);
+                });
+
+                //@ts-ignore
+                ctx.session.result = Imagine;
+                //@ts-ignore
+                ctx.session.prompt = prompt;
+                //@ts-ignore
+                ctx.session.withoutFirstStep = true;
+                ctx.scene.leave();
                 ctx.scene.enter('generateMoreOrUpscaleScene');
             });
         }
