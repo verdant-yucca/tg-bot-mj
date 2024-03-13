@@ -1,9 +1,8 @@
 import { Markup, Scenes } from 'telegraf';
 import { badRequest, notAccessMsg, somethingWentWrong } from '../../constants/messages';
-import { getButtonsForFourPhoto } from '../../utils/getButtonsForFourPhoto';
 import { client } from '../../setup/bot';
 import { getMainMenu } from '../../constants/buttons';
-import { getUrlPhotoFromMessage } from '../../utils/getUrlPhotoFromMessage';
+import { saveQueryInDB, getUrlPhotoFromMessage, getButtonsForFourPhoto } from '../../utils';
 
 export const enterYourImageStep1 = (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
   try {
@@ -73,6 +72,8 @@ export const stylingImageByTextStep3 = async (ctx: Scenes.WizardContext<Scenes.W
         caption: `Ваш запрос добавлен в очередь. Пожалуйста, ожидайте.`
       }
     );
+
+    // saveQueryInDB({});
 
     //@ts-ignore
     const prompt: string = `${firstUrlImage} ${secondUrlImage}`;

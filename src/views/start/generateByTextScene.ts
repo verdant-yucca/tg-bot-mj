@@ -46,6 +46,7 @@ export const generateImageByTextStep2 = async (ctx: Scenes.WizardContext<Scenes.
       }
     );
 
+    //TODO: tut
     client
       .Imagine(prompt, (uri: string, progress: string) => {
         ctx.telegram.editMessageCaption(

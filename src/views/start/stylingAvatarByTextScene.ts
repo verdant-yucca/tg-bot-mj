@@ -77,6 +77,9 @@ export const stylingAvatarByTextStep2 = async (ctx: Scenes.WizardContext<Scenes.
                     `
         );
       })
+      
+    //TODO: tut\
+    
       .then(Imagine => {
         if (!Imagine) {
           console.log('no message');

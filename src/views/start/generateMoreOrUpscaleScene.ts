@@ -39,6 +39,10 @@ export const generateMoreOrUpscaleStep = async (ctx: Scenes.WizardContext<Scenes
         const id = (result?.id || '') as string;
         const flags = (result?.flags || 0) as number;
         if (custom.includes('upsample')) {
+
+            //TODO: tut
+
+
             client.Custom({
                 msgId: id,
                 flags: flags,
@@ -75,6 +79,9 @@ ${prompt}`
                 }
             );
         } else if (custom.includes('variation')) {
+            
+    //TODO: tut
+
             client.Custom({
                 msgId: id,
                 flags: flags,
@@ -107,6 +114,9 @@ ${prompt}`
                 ctx.scene.enter('generateMoreOrUpscaleScene');
             });
         } else if (custom.includes('reroll')) {
+            
+    //TODO: tut
+    
             client.Imagine(
                 prompt,
                 (uri: string, progress: string) => {

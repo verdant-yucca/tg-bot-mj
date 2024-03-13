@@ -76,6 +76,7 @@ export const stylingImageByTextStep3 = async (ctx: Scenes.WizardContext<Scenes.W
         caption: `Ваш запрос добавлен в очередь. Пожалуйста, ожидайте.`
       }
     );
+    //TODO: tut
     //@ts-ignore
     const prompt: string = `${imageUrl} ${ctx.update.message.text}`;
     client
