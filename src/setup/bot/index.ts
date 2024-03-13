@@ -54,6 +54,9 @@ export const setupBot = (token: string) => {
 
     bot.launch();
 
-    process.once('SIGINT', () => bot.stop('SIGINT'));
+    process.once('SIGINT', () => {
+        bot.stop('SIGINT');
+        process.exit();
+    })
     process.once('SIGTERM', () => bot.stop('SIGTERM'));
 };
