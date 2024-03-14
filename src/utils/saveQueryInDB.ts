@@ -1,11 +1,13 @@
-import { InlineKeyboardButton } from 'telegraf/typings/core/types/typegram';
 import { API } from '../api';
+import { Scenes } from 'telegraf';
+import { ITGData } from '../types';
 
-export const saveQueryInDB = async (chatId: string, prompt: string) => {
-  return await API.query.query({ chatId, prompt });
+export const saveQueryInDB = async (ctx: Scenes.WizardContext<Scenes.WizardSessionData>, prompt: string) => {
+    const { id: chatId } = ctx.from as ITGData;
+
+    return await API.query.saveQuery({ chatId: chatId.toString(), prompt });
 };
 
-export const updateQueryInDB = async (_id: string, buttonsArr: string[], imagineId?: string, flags?: string) => {
-  const buttons = JSON.stringify(buttonsArr);
-  return await API.query.updateQuery({ _id, buttons, imagineId, flags });
+export const updateQueryInDB = async ({ _id, buttons, discordMsgId, flags }: ApiTypes.UpdateQueryRequest) => {
+    return await API.query.updateQuery({ _id, buttons, discordMsgId, flags });
 };

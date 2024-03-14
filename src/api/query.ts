@@ -1,16 +1,18 @@
 import axios from 'axios';
-import * as dotenv from 'dotenv';
-
-dotenv.config();
 
 const baseUrl = process.env.API_URL || '';
 
-export const query = async (payload: ApiTypes.Query) => {
-  const { data } = await axios.post<ApiTypes.QueryResponse>(`${baseUrl}/queries`, payload);
-  return data;
+export const saveQuery = async (payload: ApiTypes.SaveQueryRequest): Promise<ApiTypes.SaveQueryResponse> => {
+    const { data } = await axios.post(`${baseUrl}/saveQuery`, payload);
+    return data;
 };
 
-export const updateQuery = async (payload: ApiTypes.UpdateQueryResponse) => {
-  const { data } = await axios.put<ApiTypes.UpdateQueryResponse>(`${baseUrl}/queries`, payload);
-  return data;
+export const updateQuery = async (payload: ApiTypes.UpdateQueryRequest): Promise<ApiTypes.UpdateQueryResponse> => {
+    const { data } = await axios.post(`${baseUrl}/updateQuery`, payload);
+    return data;
+};
+
+export const getQuery = async (payload: ApiTypes.GetQueryRequest): Promise<ApiTypes.GetQueryResponse> => {
+    const { data } = await axios.post(`${baseUrl}/getQuery`, payload);
+    return data;
 };

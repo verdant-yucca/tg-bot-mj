@@ -1,105 +1,61 @@
 import { Markup, Scenes } from 'telegraf';
-import { badRequest, notAccessMsg, somethingWentWrong } from '../../constants/messages';
 import { client } from '../../setup/bot';
-import { getButtonsForFourPhoto } from '../../utils/getButtonsForFourPhoto';
-import { getMainMenu } from '../../constants/buttons';
+import { getButtonsForFourPhoto, getDataButtonsForFourPhoto } from '../../utils/getButtonsForFourPhoto';
+import {
+  sendBadRequestMessage,
+  sendDownloadPhotoInProgressMesage,
+  sendLoadingMesage,
+  sendSomethingWentWrong,
+  sendWaitMessage
+} from '../../utils/sendLoading';
+import { saveQueryInDB, updateQueryInDB } from '../../utils';
+import { checkHasLinkInText } from '../../utils/checkHasLinkInText';
 
 export const enterYourTextStep1 = (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
   try {
-    if (typeof ctx.from === 'undefined' || ctx.from?.is_bot) {
-      ctx.replyWithHTML(notAccessMsg);
-      return ctx.scene.leave();
-    }
+    if (typeof ctx.from === 'undefined' || ctx.from?.is_bot) return sendSomethingWentWrong(ctx);
     ctx.replyWithHTML('Введите свой запрос:');
     ctx.wizard.next();
   } catch (err) {
     console.error('Error msg', err.message);
-    console.error('Catch start:', err);
-    ctx.reply(somethingWentWrong);
-    ctx.scene.leave();
-    return;
+    return sendSomethingWentWrong(ctx);
   }
 };
 export const generateImageByTextStep2 = async (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
   try {
-    //@ts-ignore
-    const prompt: string = ctx.update.message.text;
+    const prompt = ctx.update.message.text as string;
+    if (checkHasLinkInText(ctx, prompt)) return;
+    const waitMessage = await sendWaitMessage(ctx);
+    const { _id } = await saveQueryInDB(ctx, prompt);
 
-    const regex = /https?:\/\/\S+/g;
-    const withLinkInMessage = regex.test(prompt);
-    if (withLinkInMessage) {
-      ctx.replyWithHTML('Отправка ссылок в запросе запрещена!', {
-        parse_mode: 'Markdown',
-        reply_markup: getMainMenu().reply_markup
-      });
-      return ctx.scene.leave();
-    }
-
-    //https://i.yapx.ru/XFv9d.gif
-    const waitMessage = await ctx.replyWithDocument(
-      {
-        url: 'https://i.yapx.ru/XFv9d.gif',
-        filename: 'XFv9d.gif'
-      },
-      {
-        caption: `Ваш запрос добавлен в очередь. Пожалуйста, ожидайте.`
-      }
-    );
-
-    //TODO: tut
     client
-      .Imagine(prompt, (uri: string, progress: string) => {
-        ctx.telegram.editMessageCaption(
-          waitMessage.chat.id,
-          waitMessage.message_id,
-          '0',
-          `
-                        Генерация займёт 0-10 минут. Пожалуйста, ожидайте.
-Выполнено: ${progress}
-                    `
-        );
-      })
+      .Imagine(prompt, (uri: string, progress: string) => sendLoadingMesage(ctx, waitMessage, progress))
       .then(Imagine => {
-        if (!Imagine) {
-          console.log('no message');
-          ctx.scene.leave();
-          return;
-        }
-        ctx.telegram.editMessageCaption(
-          waitMessage.chat.id,
-          waitMessage.message_id,
-          '0',
-          `
-                        Генерация займёт 0-10 минут. Пожалуйста, ожидайте.
-Выполнено: 100%
-Download photo...
-                    `
-        );
-        //U1 U2 U3 U4 V1 V2 V3 V4  "Vary (Strong)" ...
-        const buttons = getButtonsForFourPhoto(Imagine);
-        ctx.replyWithPhoto({ url: Imagine.uri }, Markup.inlineKeyboard(buttons)).then(() => {
+        if (!Imagine) return sendSomethingWentWrong(ctx);
+        sendDownloadPhotoInProgressMesage(ctx, waitMessage);
+
+        ctx.replyWithPhoto({ url: Imagine.uri }, Markup.inlineKeyboard(getButtonsForFourPhoto(_id))).then(() => {
           ctx.deleteMessage(waitMessage.message_id);
         });
 
-        //@ts-ignore
-        ctx.session.result = Imagine;
-        //@ts-ignore
-        ctx.session.prompt = prompt;
-        //@ts-ignore
-        ctx.session.withoutFirstStep = true;
+        const sessionData = ctx.session as { withoutFirstStep: boolean };
+        sessionData.withoutFirstStep = true;
+        updateQueryInDB({
+          _id,
+          buttons: JSON.stringify(getDataButtonsForFourPhoto(Imagine)),
+          discordMsgId: Imagine.id || '',
+          flags: Imagine.flags.toString()
+        });
+
         ctx.scene.leave();
         ctx.scene.enter('generateMoreOrUpscaleScene');
       })
       .catch(e => {
-        console.log('eeeeeeeeeeee', e);
         ctx.deleteMessage(waitMessage.message_id);
-        ctx.replyWithHTML(badRequest, { parse_mode: 'Markdown', reply_markup: getMainMenu().reply_markup });
+        return sendBadRequestMessage(ctx);
       });
   } catch (err) {
     console.error('Error msg', err.message);
-    console.error('Catch start:', err);
-    ctx.reply(somethingWentWrong);
-    ctx.scene.leave();
-    return;
+    return sendSomethingWentWrong(ctx);
   }
 };

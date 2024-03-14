@@ -1,144 +1,78 @@
 import { Markup, Scenes } from 'telegraf';
-import { badRequest, notAccessMsg, somethingWentWrong } from '../../constants/messages';
 import { client } from '../../setup/bot';
-import { getMainMenu } from '../../constants/buttons';
-import { saveQueryInDB, getUrlPhotoFromMessage, getButtonsForFourPhoto, updateQueryInDB} from '../../utils';
-import { ITGData } from '../../types';
+import { saveQueryInDB, getUrlPhotoFromMessage, getButtonsForFourPhoto, updateQueryInDB } from '../../utils';
+import {
+    sendBadRequestMessage,
+    sendDownloadPhotoInProgressMesage,
+    sendLoadingMesage,
+    sendSomethingWentWrong,
+    sendWaitMessage
+} from '../../utils/sendLoading';
+import { getDataButtonsForFourPhoto } from '../../utils/getButtonsForFourPhoto';
 
 export const enterYourImageStep1 = (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
-  try {
-    if (typeof ctx.from === 'undefined' || ctx.from?.is_bot) {
-      ctx.replyWithHTML(notAccessMsg);
-      return ctx.scene.leave();
+    try {
+        if (typeof ctx.from === 'undefined' || ctx.from?.is_bot) return sendSomethingWentWrong(ctx);
+        ctx.replyWithHTML('Отправьте изображение или ссылку на изображение, которое хотите стилизовать:');
+        ctx.wizard.next();
+    } catch (err) {
+        console.error('Error msg', err.message);
+        return sendSomethingWentWrong(ctx);
     }
-    ctx.replyWithHTML('Отправьте изображение или ссылку на изображение, которое хотите стилизовать:');
-
-    ctx.wizard.next();
-  } catch (err) {
-    console.error('Error msg', err.message);
-    console.error('Catch start:', err);
-    ctx.reply(somethingWentWrong);
-    ctx.scene.leave();
-    return;
-  }
 };
 
 export const enterYourTextStep2 = async (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
-  try {
-    if (typeof ctx.from === 'undefined' || ctx.from?.is_bot) {
-      ctx.replyWithHTML(notAccessMsg);
-      return ctx.scene.leave();
+    try {
+        if (typeof ctx.from === 'undefined' || ctx.from?.is_bot) sendSomethingWentWrong(ctx);
+
+        const result = await getUrlPhotoFromMessage(ctx);
+        if (!result) return sendSomethingWentWrong(ctx);
+        const state = ctx.session as { firstUrlImage?: string };
+        state.firstUrlImage = result;
+        ctx.replyWithHTML('Отправьте второе изображение или ссылку:');
+        ctx.wizard.next();
+    } catch (err) {
+        console.error('Error msg', err.message);
+        return sendSomethingWentWrong(ctx);
     }
-    console.log(ctx.message);
-
-    const result = await getUrlPhotoFromMessage(ctx);
-    if (!result) {
-      ctx.reply(somethingWentWrong);
-      return ctx.scene.leave();
-    }
-
-    const state = ctx.session as { firstUrlImage?: string };
-
-    state.firstUrlImage = result.toString();
-    ctx.replyWithHTML('Отправьте второе изображение или вторую ссылку на изображение, которое хотите стилизовать:');
-    ctx.wizard.next();
-  } catch (err) {
-    console.error('Error msg', err.message);
-    console.error('Catch start:', err);
-    ctx.reply(somethingWentWrong);
-    ctx.scene.leave();
-    return;
-  }
 };
 
 export const stylingImageByTextStep3 = async (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
-  try {
-    const { firstUrlImage } = ctx.session as { firstUrlImage?: string };
-    const secondUrlImage = await getUrlPhotoFromMessage(ctx);
+    try {
+        const { firstUrlImage } = ctx.session as { firstUrlImage?: string };
+        const secondUrlImage = await getUrlPhotoFromMessage(ctx);
+        if (!secondUrlImage) return sendSomethingWentWrong(ctx);
+        const waitMessage = await sendWaitMessage(ctx);
+        const prompt: string = `${firstUrlImage} ${secondUrlImage}`;
+        const { _id } = await saveQueryInDB(ctx, prompt);
 
-    if (!secondUrlImage) {
-      ctx.reply(somethingWentWrong);
-      return ctx.scene.leave();
+        client
+            .Imagine(prompt, (uri, progress) => sendLoadingMesage(ctx, waitMessage, progress))
+            .then(Imagine => {
+                if (!Imagine) return sendSomethingWentWrong(ctx);
+                sendDownloadPhotoInProgressMesage(ctx, waitMessage);
+                ctx.replyWithPhoto({ url: Imagine.uri }, Markup.inlineKeyboard(getButtonsForFourPhoto(_id)))
+                    .then(() => {
+                        ctx.deleteMessage(waitMessage.message_id);
+                    });
+
+                const dataButtons = JSON.stringify(getDataButtonsForFourPhoto(Imagine));
+                updateQueryInDB({
+                    _id,
+                    buttons: dataButtons,
+                    discordMsgId: Imagine.id || '',
+                    flags: Imagine.flags.toString()
+                });
+
+                ctx.scene.leave();
+                ctx.scene.enter('generateMoreOrUpscaleScene');
+            })
+            .catch(() => {
+                ctx.deleteMessage(waitMessage.message_id);
+                return sendBadRequestMessage(ctx);
+            });
+    } catch (err) {
+        console.error('Error msg', err.message);
+        sendSomethingWentWrong(ctx);
     }
-
-    //https://i.yapx.ru/XFv9d.gif
-    const waitMessage = await ctx.replyWithDocument(
-      {
-        url: 'https://i.yapx.ru/XFv9d.gif',
-        filename: 'XFv9d.gif'
-      },
-      {
-        caption: `Ваш запрос добавлен в очередь. Пожалуйста, ожидайте.`
-      }
-    );
-
-    //prompt
-    //chat id
-    //@ts-ignore
-    const prompt: string = `${firstUrlImage} ${secondUrlImage}`;
-    const { id: chatId } = ctx.from as ITGData;
-
-    const { _id } = await saveQueryInDB(prompt, chatId.toString());
-
-    client
-      .Imagine(prompt, (uri: string, progress: string) => {
-        ctx.telegram.editMessageCaption(
-          waitMessage.chat.id,
-          waitMessage.message_id,
-          '0',
-          `
-                      Генерация займёт 0-10 минут. Пожалуйста, ожидайте.
-Выполнено: ${progress}
-                  `
-        );
-      })
-      .then(Imagine => {
-        if (!Imagine) {
-          console.log('no message');
-          ctx.scene.leave();
-          return;
-        }
-        ctx.telegram.editMessageCaption(
-          waitMessage.chat.id,
-          waitMessage.message_id,
-          '0',
-          `
-                      Генерация займёт 0-10 минут. Пожалуйста, ожидайте.
-Выполнено: 100%
-Download photo...
-                  `
-        );
-        //U1 U2 U3 U4 V1 V2 V3 V4  "Vary (Strong)" ...
-        const buttons = getButtonsForFourPhoto(Imagine);
-        ctx.replyWithPhoto({ url: Imagine.uri }, Markup.inlineKeyboard(buttons)).then(() => {
-          ctx.deleteMessage(waitMessage.message_id);
-        });
-
-        //@ts-ignore
-        ctx.session.result = Imagine;
-        //@ts-ignore
-        ctx.session.prompt = prompt;
-        //@ts-ignore
-        ctx.session.withoutFirstStep = true;
-
-        // Imagine?.id
-        // Imagine?.flags
-        //buttons надо достать и распарсить в массив который будет содержать только data
-        //prompt
-        const res = updateQueryInDB(_id,  [''], Imagine?.id, Imagine?.flags,);
-
-        ctx.scene.leave();
-        ctx.scene.enter('generateMoreOrUpscaleScene');
-      })
-      .catch(() => {
-        ctx.deleteMessage(waitMessage.message_id);
-        ctx.replyWithHTML(badRequest, { parse_mode: 'Markdown', reply_markup: getMainMenu().reply_markup });
-      });
-  } catch (err) {
-    console.error('Error msg', err.message);
-    console.error('Catch start:', err);
-    ctx.reply(somethingWentWrong);
-    ctx.scene.leave();
-    return;
-  }
 };
