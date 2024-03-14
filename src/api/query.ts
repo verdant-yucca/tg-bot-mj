@@ -9,3 +9,8 @@ export const query = async (payload: ApiTypes.Query) => {
   const { data } = await axios.post<ApiTypes.QueryResponse>(`${baseUrl}/queries`, payload);
   return data;
 };
+
+export const updateQuery = async (payload: ApiTypes.UpdateQueryResponse) => {
+  const { data } = await axios.put<ApiTypes.UpdateQueryResponse>(`${baseUrl}/queries`, payload);
+  return data;
+};

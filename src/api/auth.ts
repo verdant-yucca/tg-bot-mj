@@ -10,7 +10,3 @@ export const tgAuth = async (payload: ApiTypes.AuthDto) => {
   return data;
 };
 
-export const query = async (payload: ApiTypes.Query) => {
-  const { data } = await axios.post<ApiTypes.QueryResponse>(`${baseUrl}/queries`, payload);
-  return data;
-};
