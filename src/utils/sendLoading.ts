@@ -12,20 +12,23 @@ export const sendBadRequestMessage = (ctx: Scenes.WizardContext<Scenes.WizardSes
     return ctx.scene.leave();
 };
 
-export const sendWaitMessage = async (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
+export const sendWaitMessage = async (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) =>
     //https://i.yapx.ru/XFv9d.gif
-    return await ctx.replyWithDocument(
+    await ctx.replyWithDocument(
         {
             url: 'https://i.yapx.ru/XFv9d.gif',
-            filename: 'XFv9d.gif'
+            filename: 'XFv9d.gif',
         },
         {
-            caption: `Ваш запрос добавлен в очередь. Пожалуйста, ожидайте.`
-        }
+            caption: `Ваш запрос добавлен в очередь. Пожалуйста, ожидайте.`,
+        },
     );
-};
 
-export const sendLoadingMesage = (ctx: Scenes.WizardContext<Scenes.WizardSessionData>, message: any, progress: string) => {
+export const sendLoadingMesage = (
+    ctx: Scenes.WizardContext<Scenes.WizardSessionData>,
+    message: any,
+    progress: string,
+) => {
     ctx.telegram.editMessageCaption(
         message.chat.id,
         message.message_id,
@@ -33,11 +36,14 @@ export const sendLoadingMesage = (ctx: Scenes.WizardContext<Scenes.WizardSession
         `
                       Генерация займёт 0-10 минут. Пожалуйста, ожидайте.
 Выполнено: ${progress}
-                  `
+                  `,
     );
 };
 
-export const sendDownloadPhotoInProgressMesage = (ctx: Scenes.WizardContext<Scenes.WizardSessionData>, message: any) => {
+export const sendDownloadPhotoInProgressMesage = (
+    ctx: Scenes.WizardContext<Scenes.WizardSessionData>,
+    message: any,
+) => {
     ctx.telegram.editMessageCaption(
         message.chat.id,
         message.message_id,
@@ -46,6 +52,6 @@ export const sendDownloadPhotoInProgressMesage = (ctx: Scenes.WizardContext<Scen
                       Генерация займёт 0-10 минут. Пожалуйста, ожидайте.
 Выполнено: 100%
 Download photo...
-                  `
+                  `,
     );
 };

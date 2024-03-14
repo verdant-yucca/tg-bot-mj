@@ -9,7 +9,7 @@ export const checkHasLinkInText = (ctx: Scenes.WizardContext<Scenes.WizardSessio
         isHasLinkInText = true;
         ctx.replyWithHTML('Отправка ссылок в запросе запрещена!', {
             parse_mode: 'Markdown',
-            reply_markup: getMainMenu().reply_markup
+            reply_markup: getMainMenu().reply_markup,
         });
         ctx.scene.leave();
     }

@@ -9,7 +9,7 @@ export interface ITGData {
 }
 
 export interface IStateData {
-    user: ApiTypes.UserResponse;
+    user: any;
     jwt?: string;
     lastMsgId?: number;
 }
@@ -23,7 +23,7 @@ export interface IBackToStepData {
 
 export interface ReplyMarkup {
     reply_markup: {
-        inline_keyboard: { text: string; callback_data: string }[][];
+        inline_keyboard: Array<Array<{ text: string; callback_data: string }>>;
         resize_keyboard?: boolean;
     };
 }

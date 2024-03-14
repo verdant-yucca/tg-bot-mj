@@ -17,7 +17,7 @@ export const setupBot = (token: string) => {
         ChannelId: <string>process.env.CHANNEL_ID,
         SalaiToken: <string>process.env.SALAI_TOKEN,
         // Debug: true,
-        Ws: true //enable ws is required for remix mode (and custom zoom)
+        Ws: true, //enable ws is required for remix mode (and custom zoom)
     });
     client.init();
     stage
@@ -38,8 +38,7 @@ export const setupBot = (token: string) => {
     bot.use(new sessionLocal({ database: 'data/localSession.json' }).middleware());
     bot.use(stage.middleware());
 
-    bot
-        .command(commands.start.command, ctx => ctx.scene.enter('startScene'))
+    bot.command(commands.start.command, ctx => ctx.scene.enter('startScene'))
         .hears(commands.createPicture.command, ctx => ctx.scene.enter('generateByTextScene'))
         .hears(commands.stylingAvatar.command, ctx => ctx.scene.enter('stylingAvatarByTextScene'))
         .hears(commands.experiment.command, ctx => ctx.scene.enter('generateByBlandImageScene'))
@@ -57,6 +56,6 @@ export const setupBot = (token: string) => {
     process.once('SIGINT', () => {
         bot.stop('SIGINT');
         process.exit();
-    })
+    });
     process.once('SIGTERM', () => bot.stop('SIGTERM'));
 };

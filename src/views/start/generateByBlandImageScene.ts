@@ -6,7 +6,7 @@ import {
     sendDownloadPhotoInProgressMesage,
     sendLoadingMesage,
     sendSomethingWentWrong,
-    sendWaitMessage
+    sendWaitMessage,
 } from '../../utils/sendLoading';
 import { getDataButtonsForFourPhoto } from '../../utils/getButtonsForFourPhoto';
 
@@ -43,7 +43,7 @@ export const stylingImageByTextStep3 = async (ctx: Scenes.WizardContext<Scenes.W
         const secondUrlImage = await getUrlPhotoFromMessage(ctx);
         if (!secondUrlImage) return sendSomethingWentWrong(ctx);
         const waitMessage = await sendWaitMessage(ctx);
-        const prompt: string = `${firstUrlImage} ${secondUrlImage}`;
+        const prompt = `${firstUrlImage} ${secondUrlImage}`;
         const { _id } = await saveQueryInDB(ctx, prompt);
 
         client
@@ -51,17 +51,18 @@ export const stylingImageByTextStep3 = async (ctx: Scenes.WizardContext<Scenes.W
             .then(Imagine => {
                 if (!Imagine) return sendSomethingWentWrong(ctx);
                 sendDownloadPhotoInProgressMesage(ctx, waitMessage);
-                ctx.replyWithPhoto({ url: Imagine.uri }, Markup.inlineKeyboard(getButtonsForFourPhoto(_id)))
-                    .then(() => {
+                ctx.replyWithPhoto({ url: Imagine.uri }, Markup.inlineKeyboard(getButtonsForFourPhoto(_id))).then(
+                    () => {
                         ctx.deleteMessage(waitMessage.message_id);
-                    });
+                    },
+                );
 
                 const dataButtons = JSON.stringify(getDataButtonsForFourPhoto(Imagine));
                 updateQueryInDB({
                     _id,
                     buttons: dataButtons,
                     discordMsgId: Imagine.id || '',
-                    flags: Imagine.flags.toString()
+                    flags: Imagine.flags.toString(),
                 });
 
                 ctx.scene.leave();

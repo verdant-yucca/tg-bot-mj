@@ -8,6 +8,5 @@ export const saveQueryInDB = async (ctx: Scenes.WizardContext<Scenes.WizardSessi
     return await API.query.saveQuery({ chatId: chatId.toString(), prompt });
 };
 
-export const updateQueryInDB = async ({ _id, buttons, discordMsgId, flags }: ApiTypes.UpdateQueryRequest) => {
-    return await API.query.updateQuery({ _id, buttons, discordMsgId, flags });
-};
+export const updateQueryInDB = async ({ _id, buttons, discordMsgId, flags }: ApiTypes.UpdateQueryRequest) =>
+    await API.query.updateQuery({ _id, buttons, discordMsgId, flags });

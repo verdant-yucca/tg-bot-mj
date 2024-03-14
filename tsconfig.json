@@ -1,25 +1,36 @@
 {
   "compilerOptions": {
+    "types": [
+      "node"
+    ],
     "module": "commonjs",
     "declaration": true,
     "removeComments": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "target": "es2021",
+    "allowSyntheticDefaultImports": true,
+    "target": "es2020",
     "sourceMap": true,
+    "skipLibCheck": true,
     "outDir": "./dist",
     "baseUrl": "./src",
+    "strict": true,
+    "paths": {
+      "src/*": [
+        "*"
+      ]
+    },
     "incremental": true,
     "esModuleInterop": true,
-    "skipLibCheck": true,
-    "allowSyntheticDefaultImports": true,
-    "strictNullChecks": true,
-    "paths": {
-      "*": ["node_modules/*"]
-    }
+    "resolveJsonModule": true,
+    "strictNullChecks": true
   },
   "ts-node": {
     "files": true
   },
-  "typings": "src/models/*.d.ts"
+  "exclude": [
+    "node_modules",
+    "files",
+    "./dist"
+  ]
 }
