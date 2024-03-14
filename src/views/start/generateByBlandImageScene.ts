@@ -2,7 +2,8 @@ import { Markup, Scenes } from 'telegraf';
 import { badRequest, notAccessMsg, somethingWentWrong } from '../../constants/messages';
 import { client } from '../../setup/bot';
 import { getMainMenu } from '../../constants/buttons';
-import { saveQueryInDB, getUrlPhotoFromMessage, getButtonsForFourPhoto } from '../../utils';
+import { saveQueryInDB, getUrlPhotoFromMessage, getButtonsForFourPhoto, updateQueryInDB} from '../../utils';
+import { ITGData } from '../../types';
 
 export const enterYourImageStep1 = (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
   try {
@@ -52,8 +53,6 @@ export const enterYourTextStep2 = async (ctx: Scenes.WizardContext<Scenes.Wizard
 
 export const stylingImageByTextStep3 = async (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
   try {
-
-
     const { firstUrlImage } = ctx.session as { firstUrlImage?: string };
     const secondUrlImage = await getUrlPhotoFromMessage(ctx);
 
@@ -73,10 +72,14 @@ export const stylingImageByTextStep3 = async (ctx: Scenes.WizardContext<Scenes.W
       }
     );
 
-    // saveQueryInDB({});
-
+    //prompt
+    //chat id
     //@ts-ignore
     const prompt: string = `${firstUrlImage} ${secondUrlImage}`;
+    const { id: chatId } = ctx.from as ITGData;
+
+    const { _id } = await saveQueryInDB(prompt, chatId.toString());
+
     client
       .Imagine(prompt, (uri: string, progress: string) => {
         ctx.telegram.editMessageCaption(
@@ -117,6 +120,13 @@ Download photo...
         ctx.session.prompt = prompt;
         //@ts-ignore
         ctx.session.withoutFirstStep = true;
+
+        // Imagine?.id
+        // Imagine?.flags
+        //buttons надо достать и распарсить в массив который будет содержать только data
+        //prompt
+        const res = updateQueryInDB(_id,  [''], Imagine?.id, Imagine?.flags,);
+
         ctx.scene.leave();
         ctx.scene.enter('generateMoreOrUpscaleScene');
       })

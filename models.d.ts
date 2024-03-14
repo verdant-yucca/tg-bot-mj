@@ -24,4 +24,11 @@ declare namespace ApiTypes {
     dateQuery: string;
     __v: number;
   }
+
+  export interface UpdateQueryResponse {
+    _id: string;
+    imagineId?: string;
+    flags?: string;
+    buttons: string;
+  }
 }
