@@ -10,10 +10,12 @@ import {
     sendWaitMessage
 } from '../utils/sendLoading';
 import { saveQueryInDB, updateQueryInDB } from '../utils';
+import { checkIsGroupMember } from '../utils/checkIsGroupMember';
 
-export const enterYourImageStep1 = (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
+export const enterYourImageStep1 = async (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
     try {
         if (typeof ctx.from === 'undefined' || ctx.from?.is_bot) return sendSomethingWentWrong(ctx);
+        if (!await checkIsGroupMember(ctx)) return;
         ctx.replyWithHTML('Отправьте изображение или ссылку на изображение, которое хотите стилизовать:');
         ctx.wizard.next();
     } catch (e) {
@@ -76,8 +78,6 @@ export const stylingImageByTextStep3 = async (ctx: Scenes.WizardContext<Scenes.W
                     }
                 );
 
-                const sessionData = ctx.session as { withoutFirstStep: boolean };
-                sessionData.withoutFirstStep = true;
                 const dataButtons = JSON.stringify(getDataButtonsForFourPhoto(Imagine));
                 updateQueryInDB({
                     _id,
@@ -87,7 +87,6 @@ export const stylingImageByTextStep3 = async (ctx: Scenes.WizardContext<Scenes.W
                 });
 
                 ctx.scene.leave();
-                ctx.scene.enter('generateMoreOrUpscaleScene');
             })
             .catch(() => {
                 ctx.deleteMessage(waitMessage.message_id);

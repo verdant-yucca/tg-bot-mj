@@ -40,6 +40,13 @@ export const setupBot = (token: string) => {
     bot.use((ctx, next) => logger(ctx, next));
     bot.use(new sessionLocal({ database: 'data/localSession.json' }).middleware());
     bot.use(stage.middleware());
+    bot.use((ctx, next) => {
+        if (!ctx.message) {
+            ctx.scene.enter('generateMoreOrUpscaleScene');
+        } else {
+            return next();
+        }
+    });
 
     bot.command(commands.start.command, ctx => ctx.scene.enter('startScene'))
         .hears(commands.createPicture.command, ctx => ctx.scene.enter('generateByTextScene'))

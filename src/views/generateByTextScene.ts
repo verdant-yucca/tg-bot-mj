@@ -11,10 +11,12 @@ import {
 } from '../utils/sendLoading';
 import { saveQueryInDB, updateQueryInDB } from '../utils';
 import { checkHasLinkInText } from '../utils/checkHasLinkInText';
+import { checkIsGroupMember } from '../utils/checkIsGroupMember';
 
-export const enterYourTextStep1 = (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
+export const enterYourTextStep1 = async (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
     try {
         if (typeof ctx.from === 'undefined' || ctx.from?.is_bot) return sendSomethingWentWrong(ctx);
+        if (!await checkIsGroupMember(ctx)) return;
         ctx.replyWithHTML('Введите свой запрос:');
         ctx.wizard.next();
     } catch (e) {
@@ -43,8 +45,6 @@ export const generateImageByTextStep2 = async (ctx: Scenes.WizardContext<Scenes.
                     }
                 );
 
-                const sessionData = ctx.session as { withoutFirstStep: boolean };
-                sessionData.withoutFirstStep = true;
                 updateQueryInDB({
                     _id,
                     buttons: JSON.stringify(getDataButtonsForFourPhoto(Imagine)),
@@ -53,7 +53,6 @@ export const generateImageByTextStep2 = async (ctx: Scenes.WizardContext<Scenes.
                 });
 
                 ctx.scene.leave();
-                ctx.scene.enter('generateMoreOrUpscaleScene');
             })
             .catch(() => {
                 ctx.deleteMessage(waitMessage.message_id);

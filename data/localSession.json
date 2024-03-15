@@ -3,7 +3,11 @@
     {
       "id": "1343412914:1343412914",
       "data": {
-        "__scenes": {},
+        "__scenes": {
+          "current": "generateMoreOrUpscaleScene",
+          "state": {},
+          "cursor": 0
+        },
         "result": {
           "id": "1216929584294006865",
           "flags": 0,
@@ -160,6 +164,22 @@
     },
     {
       "id": "-1001940959482:1343412914",
+      "data": {
+        "__scenes": {}
+      }
+    },
+    {
+      "id": "446122615:446122615",
+      "data": {
+        "__scenes": {
+          "current": "generateByTextScene",
+          "state": {},
+          "cursor": 1
+        }
+      }
+    },
+    {
+      "id": "-1001940959482:446122615",
       "data": {
         "__scenes": {}
       }

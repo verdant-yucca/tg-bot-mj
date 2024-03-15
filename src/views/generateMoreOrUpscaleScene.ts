@@ -11,6 +11,7 @@ import {
 import { saveQueryInDB, updateQueryInDB } from '../utils';
 import { getQuery } from '../api/query';
 import * as dotenv from 'dotenv';
+import { checkIsGroupMember } from '../utils/checkIsGroupMember';
 
 dotenv.config();
 
@@ -26,6 +27,7 @@ export const generateMoreOrUpscaleAwaitStep = (ctx: Scenes.WizardContext<Scenes.
 
 export const generateMoreOrUpscaleStep = async (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
     try {
+        if (!await checkIsGroupMember(ctx)) return;
         const callback = ctx.update && 'callback_query' in ctx.update ? ctx.update.callback_query : undefined;
         const callbackData = callback && 'data' in callback ? callback.data : undefined;
         const queryId = callbackData?.split('!!!')[0] || '';
@@ -109,7 +111,6 @@ ${prompt}`
                     });
 
                     ctx.scene.leave();
-                    ctx.scene.enter('generateMoreOrUpscaleScene');
                 });
         } else if (custom.includes('reroll')) {
             client
@@ -133,7 +134,6 @@ ${prompt}`
                     });
 
                     ctx.scene.leave();
-                    ctx.scene.enter('generateMoreOrUpscaleScene');
                 });
         }
     } catch (e) {

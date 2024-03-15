@@ -49,7 +49,6 @@ const generateByBlandImageScene = new Scenes.WizardScene<Scenes.WizardContext>(
 
 const generateMoreOrUpscaleScene = new Scenes.WizardScene<Scenes.WizardContext>(
     'generateMoreOrUpscaleScene',
-    generateMoreOrUpscaleAwaitStep,
     generateMoreOrUpscaleStep
 );
 

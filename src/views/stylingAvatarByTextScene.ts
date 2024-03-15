@@ -11,10 +11,12 @@ import {
     sendWaitMessage
 } from '../utils/sendLoading';
 import { saveQueryInDB, updateQueryInDB } from '../utils';
+import { checkIsGroupMember } from '../utils/checkIsGroupMember';
 
-export const enterYourTextStep1 = (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
+export const enterYourTextStep1 = async (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
     try {
         if (typeof ctx.from === 'undefined' || ctx.from?.is_bot) return sendSomethingWentWrong(ctx);
+        if (!await checkIsGroupMember(ctx)) return;
         const { id } = ctx.from as ITGData;
         ctx.telegram
             .getUserProfilePhotos(id)
@@ -77,7 +79,6 @@ export const stylingAvatarByTextStep2 = async (ctx: Scenes.WizardContext<Scenes.
                 });
 
                 ctx.scene.leave();
-                ctx.scene.enter('generateMoreOrUpscaleScene');
             })
             .catch(() => {
                 ctx.deleteMessage(waitMessage.message_id);
