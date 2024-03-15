@@ -1,8 +1,10 @@
+import * as dotenv from 'dotenv';
 import { IConfigService } from './config/config.interface';
 import { ConfigService } from './config/config.service';
 import { setupApp } from './setup';
 import { setupBot } from './setup/bot';
 
+dotenv.config();
 const app = setupApp();
 const config: IConfigService = new ConfigService();
 

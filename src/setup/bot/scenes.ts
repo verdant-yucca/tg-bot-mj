@@ -1,25 +1,25 @@
 import { Scenes } from 'telegraf';
-import { startSceneStep } from 'src/views/startScene';
-import { enterYourTextStep1, generateImageByTextStep2 } from 'src/views/generateByTextScene';
+import { startSceneStep } from '../../views/startScene';
+import { enterYourTextStep1, generateImageByTextStep2 } from '../../views/generateByTextScene';
 import {
     generateMoreOrUpscaleStep,
     generateMoreOrUpscaleAwaitStep
-} from 'src/views/generateMoreOrUpscaleScene';
+} from '../../views/generateMoreOrUpscaleScene';
 import {
     enterYourTextStep1 as stylingAvatarEnterYourTextStep1,
     stylingAvatarByTextStep2
-} from 'src/views/stylingAvatarByTextScene';
+} from '../../views/stylingAvatarByTextScene';
 import {
     enterYourImageStep1,
     enterYourTextStep2,
     stylingImageByTextStep3
-} from 'src/views/generateByImageAndTextScene';
+} from '../../views/generateByImageAndTextScene';
 
 import {
     enterYourImageStep1 as blandImageSceneStep1,
     enterYourTextStep2 as blandImageSceneStep2,
     stylingImageByTextStep3 as blandImageSceneStep3
-} from 'src/views/generateByBlandImageScene';
+} from '../../views/generateByBlandImageScene';
 
 const startScene = new Scenes.WizardScene<Scenes.WizardContext>('startScene', startSceneStep);
 const generateByTextScene = new Scenes.WizardScene<Scenes.WizardContext>(

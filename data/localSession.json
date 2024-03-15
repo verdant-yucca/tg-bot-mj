@@ -3,11 +3,7 @@
     {
       "id": "1343412914:1343412914",
       "data": {
-        "__scenes": {
-          "current": "generateByImageAndTextScene",
-          "state": {},
-          "cursor": 2
-        },
+        "__scenes": {},
         "result": {
           "id": "1216929584294006865",
           "flags": 0,

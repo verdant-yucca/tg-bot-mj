@@ -1,4 +1,5 @@
 import { Markup, Scenes } from 'telegraf';
+import { MJMessage } from 'midjourney';
 import { client } from '../setup/bot';
 import { getButtonsForFourPhoto, getDataButtonsForFourPhoto } from '../utils/getButtonsForFourPhoto';
 import {
@@ -9,7 +10,9 @@ import {
 } from '../utils/sendLoading';
 import { saveQueryInDB, updateQueryInDB } from '../utils';
 import { getQuery } from '../api/query';
-import { MJMessage } from 'midjourney';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 export const generateMoreOrUpscaleAwaitStep = (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
     try {

@@ -1,4 +1,5 @@
 import { Markup, Scenes } from 'telegraf';
+import { MJMessage } from 'midjourney';
 import { client } from '../setup/bot';
 import { getButtonsForFourPhoto, getDataButtonsForFourPhoto } from '../utils/getButtonsForFourPhoto';
 import { ITGData } from '../types';
@@ -10,7 +11,6 @@ import {
     sendWaitMessage
 } from '../utils/sendLoading';
 import { saveQueryInDB, updateQueryInDB } from '../utils';
-import { MJMessage } from 'midjourney';
 
 export const enterYourTextStep1 = (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
     try {

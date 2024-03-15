@@ -1,36 +1,37 @@
 {
-  "compilerOptions": {
-    "types": [
-      "node"
-    ],
-    "module": "commonjs",
-    "declaration": true,
-    "removeComments": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "allowSyntheticDefaultImports": true,
-    "target": "es2020",
-    "sourceMap": true,
-    "skipLibCheck": true,
-    "outDir": "./dist",
-    "baseUrl": "./src",
-    "strict": true,
-    "paths": {
-      "src/*": [
-        "*"
-      ]
+    "compilerOptions": {
+        "types": [
+            "node"
+        ],
+        "module": "commonjs",
+        "declaration": true,
+        "removeComments": true,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "allowSyntheticDefaultImports": true,
+        "target": "es2020",
+        "sourceMap": true,
+        "skipLibCheck": true,
+        "outDir": "./dist",
+        "baseUrl": "./src",
+        "strict": true,
+        "incremental": true,
+        "esModuleInterop": true,
+        "resolveJsonModule": true,
+        "strictNullChecks": true
     },
-    "incremental": true,
-    "esModuleInterop": true,
-    "resolveJsonModule": true,
-    "strictNullChecks": true
-  },
-  "ts-node": {
-    "files": true
-  },
-  "exclude": [
-    "node_modules",
-    "files",
-    "./dist"
-  ]
+    "ts-node": {
+        "files": true
+    },
+    "include": [
+        "src"
+    ],
+    "files": [
+        "./models.d.ts"
+    ],
+    "exclude": [
+        "node_modules",
+        "files",
+        "./dist"
+    ]
 }

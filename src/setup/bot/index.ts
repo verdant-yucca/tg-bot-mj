@@ -2,20 +2,23 @@ import { Telegraf, Scenes } from 'telegraf';
 import sessionLocal from 'telegraf-session-local';
 import { Midjourney } from 'midjourney';
 
-import { commands } from 'src/constants/bot';
+import { commands } from '../../constants/bot';
 import { stage } from './scenes';
-import { exitOfBot } from 'src/utils';
-import { logger } from 'src/middlewares';
+import { exitOfBot } from '../../utils';
+import { logger } from '../../middlewares';
+import * as dotenv from 'dotenv';
 
-export var client: Midjourney;
+dotenv.config();
+
+export var client: any;
 export var bot: Telegraf<Scenes.WizardContext<Scenes.WizardSessionData>>;
 
 export const setupBot = (token: string) => {
     bot = new Telegraf<Scenes.WizardContext>(token);
     client = new Midjourney({
-        ServerId: <string>process.env.SERVER_ID,
-        ChannelId: <string>process.env.CHANNEL_ID,
-        SalaiToken: <string>process.env.SALAI_TOKEN,
+        ServerId: process.env.SERVER_ID,
+        ChannelId: process.env.CHANNEL_ID,
+        SalaiToken: process.env.SALAI_TOKEN || '',
         // Debug: true,
         Ws: true //enable ws is required for remix mode (and custom zoom)
     });

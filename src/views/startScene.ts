@@ -3,7 +3,7 @@ import { greetingsMsg, notAccessMsg } from '../constants/messages';
 import { IStateData, ITGData } from '../types';
 import { API } from '../api';
 import { getMainMenu } from '../constants/buttons';
-import { sendSomethingWentWrong } from 'src/utils/sendLoading';
+import { sendSomethingWentWrong } from '../utils/sendLoading';
 
 export const startSceneStep = async (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
     try {
@@ -22,23 +22,17 @@ export const startSceneStep = async (ctx: Scenes.WizardContext<Scenes.WizardSess
             const file = await ctx.telegram.getFile(fileId);
             avatarPath = file.file_path;
         }
-        if (process.env.NODE_ENV === 'prod') {
-            const { jwt, user } = await API.auth.tgAuth({
-                chatId: id.toString(),
-                languageCode: language_code,
-                username: username || `${first_name}_${id}`,
-                firstName: first_name,
-                lastName: last_name || '',
-                avatarPath
-            });
 
-            state.jwt = jwt;
-            state.user = user;
+        await API.auth.tgAuth({
+            chatId: id.toString(),
+            languageCode: language_code,
+            username: username || `${first_name}_${id}`,
+            firstName: first_name,
+            lastName: last_name || '',
+            avatarPath
+        });
 
-            ctx.replyWithHTML(greetingsMsg(state.user.firstName));
-        } else {
-            ctx.reply(greetingsMsg(first_name), getMainMenu());
-        }
+        ctx.reply(greetingsMsg(first_name), getMainMenu());
 
         return ctx.scene.leave();
     } catch (e) {
