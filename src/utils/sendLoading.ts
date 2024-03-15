@@ -1,13 +1,27 @@
 import { Scenes } from 'telegraf';
-import { badRequest, somethingWentWrong } from '../constants/messages';
+import { badRequest, somethingWentWrong, hssOutstandingRequest, hssCompletedRequest } from '../constants/messages';
 import { getMainMenu } from '../constants/buttons';
 
+export const sendHasOutstandingRequestMessage = (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
+    ctx.reply(hssOutstandingRequest);
+    return ctx.scene.leave();
+};
+
+export const sendHasCompletedRequestMessage = (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
+    ctx.reply(hssCompletedRequest);
+    return ctx.scene.leave();
+};
+
 export const sendSomethingWentWrong = (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
+    const session = ctx.session as { isHasOutstandingRequest: boolean };
+    session.isHasOutstandingRequest = false;
     ctx.reply(somethingWentWrong);
     return ctx.scene.leave();
 };
 
 export const sendBadRequestMessage = (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
+    const session = ctx.session as { isHasOutstandingRequest: boolean };
+    session.isHasOutstandingRequest = false;
     ctx.replyWithHTML(badRequest, { parse_mode: 'Markdown', reply_markup: getMainMenu().reply_markup });
     return ctx.scene.leave();
 };
@@ -17,17 +31,17 @@ export const sendWaitMessage = async (ctx: Scenes.WizardContext<Scenes.WizardSes
     await ctx.replyWithDocument(
         {
             url: 'https://i.yapx.ru/XFv9d.gif',
-            filename: 'XFv9d.gif',
+            filename: 'XFv9d.gif'
         },
         {
-            caption: `Ваш запрос добавлен в очередь. Пожалуйста, ожидайте.`,
-        },
+            caption: `Ваш запрос добавлен в очередь. Пожалуйста, ожидайте.`
+        }
     );
 
 export const sendLoadingMesage = (
     ctx: Scenes.WizardContext<Scenes.WizardSessionData>,
     message: any,
-    progress: string,
+    progress: string
 ) => {
     ctx.telegram.editMessageCaption(
         message.chat.id,
@@ -36,13 +50,13 @@ export const sendLoadingMesage = (
         `
                       Генерация займёт 0-10 минут. Пожалуйста, ожидайте.
 Выполнено: ${progress}
-                  `,
+                  `
     );
 };
 
 export const sendDownloadPhotoInProgressMesage = (
     ctx: Scenes.WizardContext<Scenes.WizardSessionData>,
-    message: any,
+    message: any
 ) => {
     ctx.telegram.editMessageCaption(
         message.chat.id,
@@ -52,6 +66,6 @@ export const sendDownloadPhotoInProgressMesage = (
                       Генерация займёт 0-10 минут. Пожалуйста, ожидайте.
 Выполнено: 100%
 Download photo...
-                  `,
+                  `
     );
 };

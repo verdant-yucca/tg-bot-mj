@@ -4,7 +4,7 @@ import { client } from '../setup/bot';
 import { getButtonsForFourPhoto, getDataButtonsForFourPhoto } from '../utils/getButtonsForFourPhoto';
 import {
     sendBadRequestMessage,
-    sendDownloadPhotoInProgressMesage,
+    sendDownloadPhotoInProgressMesage, sendHasOutstandingRequestMessage,
     sendLoadingMesage,
     sendSomethingWentWrong,
     sendWaitMessage
@@ -16,6 +16,8 @@ export const enterYourImageStep1 = async (ctx: Scenes.WizardContext<Scenes.Wizar
     try {
         if (typeof ctx.from === 'undefined' || ctx.from?.is_bot) return sendSomethingWentWrong(ctx);
         if (!await checkIsGroupMember(ctx)) return;
+        const session = ctx.session as { isHasOutstandingRequest: boolean };
+        if (session.isHasOutstandingRequest) return sendHasOutstandingRequestMessage(ctx);
         ctx.replyWithHTML('Отправьте изображение или ссылку на изображение, которое хотите стилизовать:');
         ctx.wizard.next();
     } catch (e) {
@@ -43,15 +45,23 @@ export const enterYourTextStep2 = (ctx: Scenes.WizardContext<Scenes.WizardSessio
                         ctx.replyWithHTML('Опишите, как вы хотите изменить изображение:');
                         ctx.wizard.next();
                     } else {
+                        const session = ctx.session as { isHasOutstandingRequest: boolean };
+                        session.isHasOutstandingRequest = false;
                         ctx.replyWithHTML('Что то пошло не так...');
                         return ctx.scene.leave();
                     }
                 })
-                .catch(() => sendSomethingWentWrong(ctx));
+                .catch(() => {
+                    return sendSomethingWentWrong(ctx);
+                });
         } else {
+            const session = ctx.session as { isHasOutstandingRequest: boolean };
+            session.isHasOutstandingRequest = false;
             return sendSomethingWentWrong(ctx);
         }
     } catch (e) {
+        const session = ctx.session as { isHasOutstandingRequest: boolean };
+        session.isHasOutstandingRequest = false;
         console.error('Error msg', e);
         return sendSomethingWentWrong(ctx);
     }
@@ -81,18 +91,23 @@ export const stylingImageByTextStep3 = async (ctx: Scenes.WizardContext<Scenes.W
                 const dataButtons = JSON.stringify(getDataButtonsForFourPhoto(Imagine));
                 updateQueryInDB({
                     _id,
+                    action: 'stylingImageByText',
                     buttons: dataButtons,
                     discordMsgId: Imagine.id || '',
                     flags: Imagine.flags.toString()
-                });
+                }, ctx);
 
-                ctx.scene.leave();
+                return ctx.scene.leave();
             })
             .catch(() => {
+                const session = ctx.session as { isHasOutstandingRequest: boolean };
+                session.isHasOutstandingRequest = false;
                 ctx.deleteMessage(waitMessage.message_id);
                 return sendBadRequestMessage(ctx);
             });
     } catch (e) {
+        const session = ctx.session as { isHasOutstandingRequest: boolean };
+        session.isHasOutstandingRequest = false;
         console.error('Error msg', e);
         return sendSomethingWentWrong(ctx);
     }

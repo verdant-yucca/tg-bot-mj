@@ -4,7 +4,7 @@ import { client } from '../setup/bot';
 import { getButtonsForFourPhoto, getDataButtonsForFourPhoto } from '../utils/getButtonsForFourPhoto';
 import {
     sendBadRequestMessage,
-    sendDownloadPhotoInProgressMesage,
+    sendDownloadPhotoInProgressMesage, sendHasOutstandingRequestMessage,
     sendLoadingMesage,
     sendSomethingWentWrong,
     sendWaitMessage
@@ -17,6 +17,8 @@ export const enterYourTextStep1 = async (ctx: Scenes.WizardContext<Scenes.Wizard
     try {
         if (typeof ctx.from === 'undefined' || ctx.from?.is_bot) return sendSomethingWentWrong(ctx);
         if (!await checkIsGroupMember(ctx)) return;
+        const session = ctx.session as { isHasOutstandingRequest: boolean };
+        if (session.isHasOutstandingRequest) return sendHasOutstandingRequestMessage(ctx);
         ctx.replyWithHTML('Введите свой запрос:');
         ctx.wizard.next();
     } catch (e) {
@@ -47,10 +49,11 @@ export const generateImageByTextStep2 = async (ctx: Scenes.WizardContext<Scenes.
 
                 updateQueryInDB({
                     _id,
+                    action: 'generateImageByText',
                     buttons: JSON.stringify(getDataButtonsForFourPhoto(Imagine)),
                     discordMsgId: Imagine.id || '',
                     flags: Imagine.flags.toString()
-                });
+                }, ctx);
 
                 ctx.scene.leave();
             })

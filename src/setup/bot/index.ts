@@ -1,4 +1,4 @@
-import { Telegraf, Scenes } from 'telegraf';
+import { Telegraf, Scenes, session } from 'telegraf';
 import sessionLocal from 'telegraf-session-local';
 import { Midjourney } from 'midjourney';
 
@@ -10,7 +10,8 @@ import * as dotenv from 'dotenv';
 
 dotenv.config();
 
-export var client: any;
+export var isHasOutstandingRequest: boolean = false;
+export var client: Midjourney;
 export var bot: Telegraf<Scenes.WizardContext<Scenes.WizardSessionData>>;
 
 export const setupBot = (token: string) => {
@@ -35,18 +36,19 @@ export const setupBot = (token: string) => {
 Кнопки V1, V2, V3, V4 позволяют сгенерировать ещё 4 картинки по выбранному варианту. 
 Кнопка обновления позволяет сгенерировать результат ещё раз исходя из исходного запроса. `);
         })
+        .on('callback_query', (ctx) => ctx.scene.enter('generateMoreOrUpscaleScene'))
         .command(commands.exit.command, ctx => exitOfBot(ctx));
 
     bot.use((ctx, next) => logger(ctx, next));
-    bot.use(new sessionLocal({ database: 'data/localSession.json' }).middleware());
+    // bot.use(new sessionLocal({ database: 'data/localSession.json' }).middleware());
+    bot.use(session());
     bot.use(stage.middleware());
-    bot.use((ctx, next) => {
-        if (!ctx.message) {
-            ctx.scene.enter('generateMoreOrUpscaleScene');
-        } else {
-            return next();
-        }
-    });
+    // bot.use((ctx, next) => {
+    //     if (!ctx.message) {
+    //     } else {
+    //         return next();
+    //     }
+    // });
 
     bot.command(commands.start.command, ctx => ctx.scene.enter('startScene'))
         .hears(commands.createPicture.command, ctx => ctx.scene.enter('generateByTextScene'))
@@ -59,6 +61,7 @@ export const setupBot = (token: string) => {
 Кнопки V1, V2, V3, V4 позволяют сгенерировать ещё 4 картинки по выбранному варианту. 
 Кнопка обновления позволяет сгенерировать результат ещё раз исходя из исходного запроса. `);
         })
+        .on('callback_query', (ctx) => ctx.scene.enter('generateMoreOrUpscaleScene'))
         .command(commands.exit.command, ctx => exitOfBot(ctx));
 
     bot.launch();

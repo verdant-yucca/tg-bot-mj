@@ -25,6 +25,7 @@ declare namespace ApiTypes {
     export interface UpdateQueryRequest {
         _id: string;
         discordMsgId: string;
+        action: string;
         flags: string;
         buttons: string;
     }
@@ -44,5 +45,13 @@ declare namespace ApiTypes {
         buttons: string;
         chatId: string;
         prompt: string;
+    }
+
+    export interface FindQueryRequest {
+        action: string;
+    }
+
+    export interface FindQueryResponse {
+        result: boolean;
     }
 }

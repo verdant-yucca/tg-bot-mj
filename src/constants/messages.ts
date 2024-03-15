@@ -14,7 +14,9 @@ export const greetingsMsg = (name: string) => {
 };
 
 export const notAccessMsg = `No access`;
-export const somethingWentWrong = 'Something went wrong';
+export const somethingWentWrong = 'Что то пошло не так. Попробуйте ещё раз.';
+export const hssOutstandingRequest = 'Предыдущий запрос ещё не завершился. Пожалуйста, ожидайте.';
+export const hssCompletedRequest = 'Вы уже делали ранее этот запрос, выберите другое действие.';
 export const exitMsg = 'Bye! 🖖 To start the bot, enter: /start';
 export const badRequest = `
 **Banned prompt detected**

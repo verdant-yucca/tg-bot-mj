@@ -4,7 +4,7 @@ import { client } from '../setup/bot';
 import { saveQueryInDB, getUrlPhotoFromMessage, getButtonsForFourPhoto, updateQueryInDB } from '../utils';
 import {
     sendBadRequestMessage,
-    sendDownloadPhotoInProgressMesage,
+    sendDownloadPhotoInProgressMesage, sendHasOutstandingRequestMessage,
     sendLoadingMesage,
     sendSomethingWentWrong,
     sendWaitMessage
@@ -16,6 +16,9 @@ export const enterYourImageStep1 = async (ctx: Scenes.WizardContext<Scenes.Wizar
     try {
         if (typeof ctx.from === 'undefined' || ctx.from?.is_bot) return sendSomethingWentWrong(ctx);
         if (!await checkIsGroupMember(ctx)) return;
+        const session = ctx.session as { isHasOutstandingRequest: boolean };
+        if (session.isHasOutstandingRequest) return sendHasOutstandingRequestMessage(ctx);
+
         ctx.replyWithHTML('Отправьте изображение или ссылку на изображение, которое хотите стилизовать:');
         ctx.wizard.next();
     } catch (e) {
@@ -63,10 +66,11 @@ export const stylingImageByTextStep3 = async (ctx: Scenes.WizardContext<Scenes.W
                 const dataButtons = JSON.stringify(getDataButtonsForFourPhoto(Imagine));
                 updateQueryInDB({
                     _id,
+                    action: 'blandImage',
                     buttons: dataButtons,
                     discordMsgId: Imagine.id || '',
                     flags: Imagine.flags.toString()
-                });
+                }, ctx);
 
                 ctx.scene.leave();
             })

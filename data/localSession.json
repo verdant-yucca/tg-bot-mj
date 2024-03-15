@@ -4,9 +4,9 @@
       "id": "1343412914:1343412914",
       "data": {
         "__scenes": {
-          "current": "generateMoreOrUpscaleScene",
+          "current": "generateByTextScene",
           "state": {},
-          "cursor": 0
+          "cursor": 1
         },
         "result": {
           "id": "1216929584294006865",
@@ -78,7 +78,8 @@
         "prompt": "https://api.telegram.org/file/bot6416591669:AAGcYEMPO1yFhtFAUBMVO58luQczJs0YlRk/photos/file_5.jpg cut angel",
         "withoutFirstStep": true,
         "avatarPath": "https://api.telegram.org/file/bot6416591669:AAGcYEMPO1yFhtFAUBMVO58luQczJs0YlRk/photos/file_5.jpg",
-        "imageUrl": "https://api.telegram.org/file/bot6416591669:AAGcYEMPO1yFhtFAUBMVO58luQczJs0YlRk/photos/file_6.jpg"
+        "imageUrl": "https://api.telegram.org/file/bot6416591669:AAGcYEMPO1yFhtFAUBMVO58luQczJs0YlRk/photos/file_6.jpg",
+        "isHasOutstandingRequest": false
       }
     },
     {

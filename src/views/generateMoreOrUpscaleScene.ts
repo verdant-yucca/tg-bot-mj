@@ -3,7 +3,8 @@ import { MJMessage } from 'midjourney';
 import { client } from '../setup/bot';
 import { getButtonsForFourPhoto, getDataButtonsForFourPhoto } from '../utils/getButtonsForFourPhoto';
 import {
-    sendDownloadPhotoInProgressMesage,
+    sendBadRequestMessage,
+    sendDownloadPhotoInProgressMesage, sendHasCompletedRequestMessage, sendHasOutstandingRequestMessage,
     sendLoadingMesage,
     sendSomethingWentWrong,
     sendWaitMessage
@@ -12,6 +13,7 @@ import { saveQueryInDB, updateQueryInDB } from '../utils';
 import { getQuery } from '../api/query';
 import * as dotenv from 'dotenv';
 import { checkIsGroupMember } from '../utils/checkIsGroupMember';
+import { findQueryInDB } from '../utils/saveQueryInDB';
 
 dotenv.config();
 
@@ -28,8 +30,15 @@ export const generateMoreOrUpscaleAwaitStep = (ctx: Scenes.WizardContext<Scenes.
 export const generateMoreOrUpscaleStep = async (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
     try {
         if (!await checkIsGroupMember(ctx)) return;
+        const session = ctx.session as { isHasOutstandingRequest: boolean };
+        if (session.isHasOutstandingRequest) return sendHasOutstandingRequestMessage(ctx);
+
         const callback = ctx.update && 'callback_query' in ctx.update ? ctx.update.callback_query : undefined;
-        const callbackData = callback && 'data' in callback ? callback.data : undefined;
+        const callbackData = callback && 'data' in callback ? callback.data : '';
+
+        const isHasCompletedRequest = await findQueryInDB({ action: callbackData });
+        if (isHasCompletedRequest.result) return sendHasCompletedRequestMessage(ctx);
+
         const queryId = callbackData?.split('!!!')[0] || '';
         const button = callbackData?.split('!!!')[1] || '';
         const { buttons, discordMsgId, prompt, flags } = await getQuery({ _id: queryId });
@@ -73,15 +82,24 @@ ${prompt}`
                         ctx.deleteMessage(waitMessage.message_id);
                         const chatId = process.env.GROUP_ID as string;
                         ctx.telegram.forwardMessage(chatId, resultMessage.chat.id, resultMessage.message_id);
+                    }).catch(() => {
+                        ctx.deleteMessage(waitMessage.message_id);
+                        return sendSomethingWentWrong(ctx);
                     });
 
                     updateQueryInDB({
                         _id,
+                        action: callbackData,
                         buttons: '',
                         discordMsgId: Upscale.id || '',
                         flags: Upscale.flags.toString()
-                    });
+                    }, ctx);
                     ctx.scene.leave();
+                })
+                .catch(() => {
+
+                    ctx.deleteMessage(waitMessage.message_id);
+                    return sendSomethingWentWrong(ctx);
                 });
         } else if (custom.includes('variation')) {
             client
@@ -105,12 +123,17 @@ ${prompt}`
                     const dataButtons = JSON.stringify(getDataButtonsForFourPhoto(Variation));
                     updateQueryInDB({
                         _id,
+                        action: callbackData,
                         buttons: dataButtons,
                         discordMsgId: Variation.id || '',
                         flags: Variation.flags.toString()
-                    });
+                    }, ctx);
 
                     ctx.scene.leave();
+                })
+                .catch(() => {
+                    ctx.deleteMessage(waitMessage.message_id);
+                    return sendSomethingWentWrong(ctx);
                 });
         } else if (custom.includes('reroll')) {
             client
@@ -128,12 +151,17 @@ ${prompt}`
                     const dataButtons = JSON.stringify(getDataButtonsForFourPhoto(Imagine));
                     updateQueryInDB({
                         _id,
+                        action: callbackData,
                         buttons: dataButtons,
                         discordMsgId: Imagine.id || '',
                         flags: Imagine.flags.toString()
-                    });
+                    }, ctx);
 
                     ctx.scene.leave();
+                })
+                .catch(() => {
+                    ctx.deleteMessage(waitMessage.message_id);
+                    return sendSomethingWentWrong(ctx);
                 });
         }
     } catch (e) {

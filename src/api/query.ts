@@ -18,3 +18,8 @@ export const getQuery = async (payload: ApiTypes.GetQueryRequest): Promise<ApiTy
     const { data } = await axios.post(`${baseUrl}/getQuery`, payload);
     return data;
 };
+
+export const findQuery = async (payload: ApiTypes.FindQueryRequest): Promise<ApiTypes.FindQueryResponse> => {
+    const { data } = await axios.post(`${baseUrl}/findQuery`, payload);
+    return data;
+};

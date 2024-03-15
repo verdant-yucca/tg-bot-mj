@@ -5,7 +5,7 @@ import { getButtonsForFourPhoto, getDataButtonsForFourPhoto } from '../utils/get
 import { ITGData } from '../types';
 import {
     sendBadRequestMessage,
-    sendDownloadPhotoInProgressMesage,
+    sendDownloadPhotoInProgressMesage, sendHasOutstandingRequestMessage,
     sendLoadingMesage,
     sendSomethingWentWrong,
     sendWaitMessage
@@ -17,6 +17,9 @@ export const enterYourTextStep1 = async (ctx: Scenes.WizardContext<Scenes.Wizard
     try {
         if (typeof ctx.from === 'undefined' || ctx.from?.is_bot) return sendSomethingWentWrong(ctx);
         if (!await checkIsGroupMember(ctx)) return;
+        const session = ctx.session as { isHasOutstandingRequest: boolean };
+        if (session.isHasOutstandingRequest) return sendHasOutstandingRequestMessage(ctx);
+
         const { id } = ctx.from as ITGData;
         ctx.telegram
             .getUserProfilePhotos(id)
@@ -73,10 +76,11 @@ export const stylingAvatarByTextStep2 = async (ctx: Scenes.WizardContext<Scenes.
                 const dataButtons = JSON.stringify(getDataButtonsForFourPhoto(Imagine));
                 updateQueryInDB({
                     _id,
+                    action: 'stylingAvatarByText',
                     buttons: dataButtons,
                     discordMsgId: Imagine.id || '',
                     flags: Imagine.flags.toString()
-                });
+                }, ctx);
 
                 ctx.scene.leave();
             })
