@@ -7,14 +7,14 @@ export const getButtonsForFourPhoto = (id: string): InlineKeyboardMarkup['inline
         Markup.button.callback('U1', `${id}!!!U1`),
         Markup.button.callback('U2', `${id}!!!U2`),
         Markup.button.callback('U3', `${id}!!!U3`),
-        Markup.button.callback('U4', `${id}!!!U4`),
+        Markup.button.callback('U4', `${id}!!!U4`)
     ];
 
     const secondRow = [
         Markup.button.callback('V1', `${id}!!!V1`),
         Markup.button.callback('V2', `${id}!!!V2`),
         Markup.button.callback('V3', `${id}!!!V3`),
-        Markup.button.callback('V4', `${id}!!!V4`),
+        Markup.button.callback('V4', `${id}!!!V4`)
     ];
     const thirdRow = [Markup.button.callback('🔄', `${id}!!!🔄`)];
 
@@ -22,17 +22,20 @@ export const getButtonsForFourPhoto = (id: string): InlineKeyboardMarkup['inline
 };
 
 export const getDataButtonsForFourPhoto = (response: MJMessage) => {
-    const arrButton = response.options?.map(option => ({ [option.label]: option.custom }));
-    //TODO FIX IT
+    const buttons = response.options?.reduce((acc, option) => {
+        acc[option.label] = option.custom;
+        return acc;
+    }, {} as { [key: string]: string }) || {};
+
     return {
-        U1: arrButton['U1'],
-        U2: arrButton['U2'],
-        U3: arrButton['U3'],
-        U4: arrButton['U4'],
-        V1: arrButton['V1'],
-        V2: arrButton['V2'],
-        V3: arrButton['V3'],
-        V4: arrButton['V4'],
-        '🔄': arrButton['🔄'],
+        U1: buttons['U1'],
+        U2: buttons['U2'],
+        U3: buttons['U3'],
+        U4: buttons['U4'],
+        V1: buttons['V1'],
+        V2: buttons['V2'],
+        V3: buttons['V3'],
+        V4: buttons['V4'],
+        '🔄': buttons['🔄']
     };
 };

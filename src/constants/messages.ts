@@ -1,5 +1,3 @@
-import { getNoun } from '../utils/getNoun';
-
 export const greetingsMsg = (name: string) => {
     const baseMsg = `Приветствую, ${name}! 👋 я твой индивидуальный творческий робот "Художник Extraordinaire" 🤖!`;
     return `${baseMsg} В моем эстетическом арсенале у нас:
@@ -15,17 +13,9 @@ export const greetingsMsg = (name: string) => {
   `;
 };
 
-export const resultMsg = (num: number) => {
-    const word = getNoun(num, 'результат', 'результата', 'результатов');
-    return `По Вашему запросу найдено ${num} ${word}:\n\n`;
-};
-
 export const notAccessMsg = `No access`;
 export const somethingWentWrong = 'Something went wrong';
-export const searchWaitMsg = 'Поиск...';
-export const invalidSearchRequestMsg = 'Некорректный запрос, попробуйте еще раз';
 export const exitMsg = 'Bye! 🖖 To start the bot, enter: /start';
-export const notReservesMsg = 'Нет резервов';
 export const badRequest = `
 **Banned prompt detected**
 

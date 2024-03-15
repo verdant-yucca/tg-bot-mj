@@ -1,55 +1,56 @@
 import { Scenes } from 'telegraf';
-import { startSceneStep } from '../../views/start/startScene';
-import { enterYourTextStep1, generateImageByTextStep2 } from '../../views/start/generateByTextScene';
+import { startSceneStep } from 'src/views/startScene';
+import { enterYourTextStep1, generateImageByTextStep2 } from 'src/views/generateByTextScene';
 import {
     generateMoreOrUpscaleStep,
-    generateMoreOrUpscaleAwaitStep,
-} from '../../views/start/generateMoreOrUpscaleScene';
+    generateMoreOrUpscaleAwaitStep
+} from 'src/views/generateMoreOrUpscaleScene';
 import {
     enterYourTextStep1 as stylingAvatarEnterYourTextStep1,
-    stylingAvatarByTextStep2,
-} from '../../views/start/stylingAvatarByTextScene';
+    stylingAvatarByTextStep2
+} from 'src/views/stylingAvatarByTextScene';
 import {
     enterYourImageStep1,
     enterYourTextStep2,
-    stylingImageByTextStep3,
-} from '../../views/start/generateByImageAndTextScene';
+    stylingImageByTextStep3
+} from 'src/views/generateByImageAndTextScene';
+
 import {
     enterYourImageStep1 as blandImageSceneStep1,
     enterYourTextStep2 as blandImageSceneStep2,
-    stylingImageByTextStep3 as blandImageSceneStep3,
-} from '../../views/start/generateByBlandImageScene';
+    stylingImageByTextStep3 as blandImageSceneStep3
+} from 'src/views/generateByBlandImageScene';
 
 const startScene = new Scenes.WizardScene<Scenes.WizardContext>('startScene', startSceneStep);
 const generateByTextScene = new Scenes.WizardScene<Scenes.WizardContext>(
     'generateByTextScene',
     enterYourTextStep1,
-    generateImageByTextStep2,
+    generateImageByTextStep2
 );
 
 const generateByImageAndTextScene = new Scenes.WizardScene<Scenes.WizardContext>(
     'generateByImageAndTextScene',
     enterYourImageStep1,
     enterYourTextStep2,
-    stylingImageByTextStep3,
+    stylingImageByTextStep3
 );
 
 const stylingAvatarByTextScene = new Scenes.WizardScene<Scenes.WizardContext>(
     'stylingAvatarByTextScene',
     stylingAvatarEnterYourTextStep1,
-    stylingAvatarByTextStep2,
+    stylingAvatarByTextStep2
 );
 const generateByBlandImageScene = new Scenes.WizardScene<Scenes.WizardContext>(
     'generateByBlandImageScene',
     blandImageSceneStep1,
     blandImageSceneStep2,
-    blandImageSceneStep3,
+    blandImageSceneStep3
 );
 
 const generateMoreOrUpscaleScene = new Scenes.WizardScene<Scenes.WizardContext>(
     'generateMoreOrUpscaleScene',
     generateMoreOrUpscaleAwaitStep,
-    generateMoreOrUpscaleStep,
+    generateMoreOrUpscaleStep
 );
 
 export const stage = new Scenes.Stage<Scenes.WizardContext>([
@@ -58,5 +59,5 @@ export const stage = new Scenes.Stage<Scenes.WizardContext>([
     generateByImageAndTextScene,
     generateByBlandImageScene,
     generateMoreOrUpscaleScene,
-    stylingAvatarByTextScene,
+    stylingAvatarByTextScene
 ]);

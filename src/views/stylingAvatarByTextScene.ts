@@ -1,15 +1,16 @@
 import { Markup, Scenes } from 'telegraf';
-import { client } from '../../setup/bot';
-import { getButtonsForFourPhoto, getDataButtonsForFourPhoto } from '../../utils/getButtonsForFourPhoto';
-import { ITGData } from '../../types';
+import { client } from '../setup/bot';
+import { getButtonsForFourPhoto, getDataButtonsForFourPhoto } from '../utils/getButtonsForFourPhoto';
+import { ITGData } from '../types';
 import {
     sendBadRequestMessage,
     sendDownloadPhotoInProgressMesage,
     sendLoadingMesage,
     sendSomethingWentWrong,
-    sendWaitMessage,
-} from '../../utils/sendLoading';
-import { saveQueryInDB, updateQueryInDB } from '../../utils';
+    sendWaitMessage
+} from '../utils/sendLoading';
+import { saveQueryInDB, updateQueryInDB } from '../utils';
+import { MJMessage } from 'midjourney';
 
 export const enterYourTextStep1 = (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
     try {
@@ -41,27 +42,30 @@ export const enterYourTextStep1 = (ctx: Scenes.WizardContext<Scenes.WizardSessio
                 }
             })
             .catch(() => sendSomethingWentWrong(ctx));
-    } catch (err) {
-        console.error('Error msg', err.message);
+    } catch (e) {
+        console.error('Error msg', e);
         return sendSomethingWentWrong(ctx);
     }
 };
 export const stylingAvatarByTextStep2 = async (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
     try {
         const { avatarPath } = ctx.session as { avatarPath: string };
-        const waitMessage = await sendWaitMessage(ctx);
-        const prompt = `${avatarPath} ${ctx.update.message.text as string}`;
+        const tgMessage = 'message' in ctx.update ? ctx.update.message : undefined;
+        const textTgMessage = tgMessage && 'text' in tgMessage && tgMessage.text;
+        const prompt = `${avatarPath} ${textTgMessage}`;
         const { _id } = await saveQueryInDB(ctx, prompt);
+
+        const waitMessage = await sendWaitMessage(ctx);
 
         client
             .Imagine(prompt, (uri: string, progress: string) => sendLoadingMesage(ctx, waitMessage, progress))
-            .then(Imagine => {
+            .then((Imagine: MJMessage | null) => {
                 if (!Imagine) return sendSomethingWentWrong(ctx);
                 sendDownloadPhotoInProgressMesage(ctx, waitMessage);
                 ctx.replyWithPhoto({ url: Imagine.uri }, Markup.inlineKeyboard(getButtonsForFourPhoto(_id))).then(
                     () => {
                         ctx.deleteMessage(waitMessage.message_id);
-                    },
+                    }
                 );
 
                 const dataButtons = JSON.stringify(getDataButtonsForFourPhoto(Imagine));
@@ -69,7 +73,7 @@ export const stylingAvatarByTextStep2 = async (ctx: Scenes.WizardContext<Scenes.
                     _id,
                     buttons: dataButtons,
                     discordMsgId: Imagine.id || '',
-                    flags: Imagine.flags.toString(),
+                    flags: Imagine.flags.toString()
                 });
 
                 ctx.scene.leave();
@@ -79,8 +83,8 @@ export const stylingAvatarByTextStep2 = async (ctx: Scenes.WizardContext<Scenes.
                 ctx.deleteMessage(waitMessage.message_id);
                 return sendBadRequestMessage(ctx);
             });
-    } catch (err) {
-        console.error('Error msg', err.message);
+    } catch (e) {
+        console.error('Error msg', e);
         return sendSomethingWentWrong(ctx);
     }
 };

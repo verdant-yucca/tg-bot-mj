@@ -1,5 +1,3 @@
-import { Scenes } from 'telegraf';
-
 export interface ITGData {
     id: number;
     language_code?: string;
@@ -12,13 +10,6 @@ export interface IStateData {
     user: any;
     jwt?: string;
     lastMsgId?: number;
-}
-
-export interface IBackToStepData {
-    ctx: Scenes.WizardContext<Scenes.WizardSessionData>;
-    indexStep: number;
-    value: string | number;
-    handle: (ctx: Scenes.WizardContext<Scenes.WizardSessionData>, value: string | number) => Promise<any>;
 }
 
 export interface ReplyMarkup {

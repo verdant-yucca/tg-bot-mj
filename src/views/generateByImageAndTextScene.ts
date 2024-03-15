@@ -1,22 +1,23 @@
 import { Markup, Scenes } from 'telegraf';
-import { client } from '../../setup/bot';
-import { getButtonsForFourPhoto, getDataButtonsForFourPhoto } from '../../utils/getButtonsForFourPhoto';
+import { MJMessage } from 'midjourney';
+import { client } from '../setup/bot';
+import { getButtonsForFourPhoto, getDataButtonsForFourPhoto } from '../utils/getButtonsForFourPhoto';
 import {
     sendBadRequestMessage,
     sendDownloadPhotoInProgressMesage,
     sendLoadingMesage,
     sendSomethingWentWrong,
-    sendWaitMessage,
-} from '../../utils/sendLoading';
-import { saveQueryInDB, updateQueryInDB } from '../../utils';
+    sendWaitMessage
+} from '../utils/sendLoading';
+import { saveQueryInDB, updateQueryInDB } from '../utils';
 
 export const enterYourImageStep1 = (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
     try {
         if (typeof ctx.from === 'undefined' || ctx.from?.is_bot) return sendSomethingWentWrong(ctx);
         ctx.replyWithHTML('Отправьте изображение или ссылку на изображение, которое хотите стилизовать:');
         ctx.wizard.next();
-    } catch (err) {
-        console.error('Error msg', err.message);
+    } catch (e) {
+        console.error('Error msg', e);
         return sendSomethingWentWrong(ctx);
     }
 };
@@ -24,12 +25,12 @@ export const enterYourImageStep1 = (ctx: Scenes.WizardContext<Scenes.WizardSessi
 export const enterYourTextStep2 = (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
     try {
         if (typeof ctx.from === 'undefined' || ctx.from?.is_bot) return sendSomethingWentWrong(ctx);
-        //@ts-ignore
-        const photo = ctx.message.photo;
+        const tgMessage = ctx.message;
+        const photoTgMessage = tgMessage && 'photo' in tgMessage ? tgMessage.photo : undefined;
 
-        if (photo.length > 0) {
+        if (photoTgMessage && photoTgMessage.length > 0) {
             const state = ctx.session as { imageUrl?: string };
-            const fileId = photo[2].file_id;
+            const fileId = photoTgMessage[2].file_id;
 
             ctx.telegram
                 .getFileLink(fileId)
@@ -48,28 +49,31 @@ export const enterYourTextStep2 = (ctx: Scenes.WizardContext<Scenes.WizardSessio
         } else {
             return sendSomethingWentWrong(ctx);
         }
-    } catch (err) {
-        console.error('Error msg', err.message);
+    } catch (e) {
+        console.error('Error msg', e);
         return sendSomethingWentWrong(ctx);
     }
 };
 export const stylingImageByTextStep3 = async (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
     try {
         const { imageUrl } = ctx.session as { imageUrl?: string };
-        const waitMessage = await sendWaitMessage(ctx);
-        const prompt = `${imageUrl} ${ctx.update.message.text as string}`;
+        const tgMessage = 'message' in ctx.update ? ctx.update.message : undefined;
+        const textTgMessage = tgMessage && 'text' in tgMessage ? tgMessage.text : '';
+        const prompt = `${imageUrl} ${textTgMessage}`;
         const { _id } = await saveQueryInDB(ctx, prompt);
+
+        const waitMessage = await sendWaitMessage(ctx);
 
         client
             .Imagine(prompt, (uri: string, progress: string) => sendLoadingMesage(ctx, waitMessage, progress))
-            .then(Imagine => {
+            .then((Imagine: MJMessage | null) => {
                 if (!Imagine) return sendSomethingWentWrong(ctx);
                 sendDownloadPhotoInProgressMesage(ctx, waitMessage);
 
                 ctx.replyWithPhoto({ url: Imagine.uri }, Markup.inlineKeyboard(getButtonsForFourPhoto(_id))).then(
                     () => {
                         ctx.deleteMessage(waitMessage.message_id);
-                    },
+                    }
                 );
 
                 const sessionData = ctx.session as { withoutFirstStep: boolean };
@@ -79,7 +83,7 @@ export const stylingImageByTextStep3 = async (ctx: Scenes.WizardContext<Scenes.W
                     _id,
                     buttons: dataButtons,
                     discordMsgId: Imagine.id || '',
-                    flags: Imagine.flags.toString(),
+                    flags: Imagine.flags.toString()
                 });
 
                 ctx.scene.leave();
@@ -89,8 +93,8 @@ export const stylingImageByTextStep3 = async (ctx: Scenes.WizardContext<Scenes.W
                 ctx.deleteMessage(waitMessage.message_id);
                 return sendBadRequestMessage(ctx);
             });
-    } catch (err) {
-        console.error('Error msg', err.message);
+    } catch (e) {
+        console.error('Error msg', e);
         return sendSomethingWentWrong(ctx);
     }
 };

@@ -1,8 +1,9 @@
 import { Scenes } from 'telegraf';
-import { greetingsMsg, notAccessMsg, somethingWentWrong } from '../../constants/messages';
-import { IStateData, ITGData } from '../../types';
-import { API } from '../../api';
-import { getMainMenu } from '../../constants/buttons';
+import { greetingsMsg, notAccessMsg } from '../constants/messages';
+import { IStateData, ITGData } from '../types';
+import { API } from '../api';
+import { getMainMenu } from '../constants/buttons';
+import { sendSomethingWentWrong } from 'src/utils/sendLoading';
 
 export const startSceneStep = async (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
     try {
@@ -28,7 +29,7 @@ export const startSceneStep = async (ctx: Scenes.WizardContext<Scenes.WizardSess
                 username: username || `${first_name}_${id}`,
                 firstName: first_name,
                 lastName: last_name || '',
-                avatarPath,
+                avatarPath
             });
 
             state.jwt = jwt;
@@ -40,9 +41,8 @@ export const startSceneStep = async (ctx: Scenes.WizardContext<Scenes.WizardSess
         }
 
         return ctx.scene.leave();
-    } catch (err) {
-        console.error('Error msg', err.message);
-        console.error('Catch start:', err);
-        ctx.reply(somethingWentWrong);
+    } catch (e) {
+        console.error('Error msg', e);
+        return sendSomethingWentWrong(ctx);
     }
 };

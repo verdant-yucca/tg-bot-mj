@@ -1,6 +1,6 @@
 import { Scenes } from 'telegraf';
 
-export const getUrlPhotoFromMessage = async (ctx: Scenes.WizardContext<Scenes.WizardSessionData>): Promise<string> => {
+export const getUrlPhotoFromMessage = async (ctx: Scenes.WizardContext<Scenes.WizardSessionData>): Promise<string | undefined> => {
     const message = ctx.message;
     const photo = message && 'photo' in message ? message.photo : undefined;
     const url = message && 'text' in message ? message.text : undefined;
@@ -13,5 +13,5 @@ export const getUrlPhotoFromMessage = async (ctx: Scenes.WizardContext<Scenes.Wi
         if (url) return url.toString();
     }
 
-    return '';
+    return undefined;
 };
