@@ -21,7 +21,7 @@ export const enterYourTextStep1 = async (ctx: Scenes.WizardContext<Scenes.Wizard
         if (!await checkIsGroupMember(ctx)) return;
         const session = ctx.session as { isHasOutstandingRequest: boolean };
         if (session.isHasOutstandingRequest) return sendHasOutstandingRequestMessage(ctx);
-        ctx.replyWithHTML(messageEnterYourTextForGenerateImage());
+        ctx.replyWithHTML(messageEnterYourTextForGenerateImage(), { parse_mode: 'Markdown' });
         ctx.wizard.next();
     } catch (e) {
         console.error('Error msg', e);
@@ -47,7 +47,7 @@ export const generateImageByTextStep2 = async (ctx: Scenes.WizardContext<Scenes.
                 if (!Imagine) return sendSomethingWentWrong(ctx);
                 sendDownloadPhotoInProgressMesage(ctx, waitMessage);
 
-                ctx.replyWithPhoto({ url: Imagine.uri }, Markup.inlineKeyboard(getButtonsForFourPhoto(_id))).then(
+                ctx.replyWithPhoto({ url: Imagine.uri }, { reply_markup: Markup.inlineKeyboard(getButtonsForFourPhoto(_id)).reply_markup, parse_mode: 'Markdown' }).then(
                     () => {
                         ctx.deleteMessage(waitMessage.message_id);
                     }

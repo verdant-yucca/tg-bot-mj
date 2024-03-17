@@ -36,10 +36,10 @@ export const enterYourTextStep1 = async (ctx: Scenes.WizardContext<Scenes.Wizard
                             state.avatarPath = url.toString();
 
                             if (state.avatarPath) {
-                                ctx.replyWithHTML(messageEnterYourTextForStylingAvatar());
+                                ctx.replyWithHTML(messageEnterYourTextForStylingAvatar(), { parse_mode: 'Markdown' });
                                 ctx.wizard.next();
                             } else {
-                                ctx.replyWithHTML(messageNoAvatarInProfile());
+                                ctx.replyWithHTML(messageNoAvatarInProfile(), { parse_mode: 'Markdown' });
                                 return ctx.scene.leave();
                             }
                         })
@@ -73,10 +73,13 @@ export const stylingAvatarByTextStep2 = async (ctx: Scenes.WizardContext<Scenes.
             .then((Imagine: MJMessage | null) => {
                 if (!Imagine) return sendSomethingWentWrong(ctx);
                 sendDownloadPhotoInProgressMesage(ctx, waitMessage);
-                ctx.replyWithPhoto({ url: Imagine.uri }, Markup.inlineKeyboard(getButtonsForFourPhoto(_id))).then(
-                    () => {
-                        ctx.deleteMessage(waitMessage.message_id);
-                    }
+                ctx.replyWithPhoto(
+                    { url: Imagine.uri },
+                    { reply_markup: Markup.inlineKeyboard(getButtonsForFourPhoto(_id)).reply_markup, parse_mode: 'Markdown' })
+                    .then(
+                        () => {
+                            ctx.deleteMessage(waitMessage.message_id);
+                        }
                 );
 
                 const dataButtons = JSON.stringify(getDataButtonsForFourPhoto(Imagine));

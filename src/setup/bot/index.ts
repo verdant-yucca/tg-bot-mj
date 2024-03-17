@@ -1,12 +1,13 @@
 import { Telegraf, Scenes, session } from 'telegraf';
 import sessionLocal from 'telegraf-session-local';
-import { Midjourney } from 'midjourney';
+import * as dotenv from 'dotenv';
 
+import { Midjourney } from 'midjourney';
 import { commands } from '../../constants/bot';
 import { stage } from './scenes';
 import { exitOfBot } from '../../utils';
 import { logger } from '../../middlewares';
-import * as dotenv from 'dotenv';
+import { helpMessage } from '../../constants/messages';
 
 dotenv.config();
 
@@ -29,11 +30,8 @@ export const setupBot = (token: string) => {
         .hears(commands.stylingAvatar.command, ctx => ctx.scene.enter('stylingAvatarByTextScene'))
         .hears(commands.experiment.command, ctx => ctx.scene.enter('generateByBlandImageScene'))
         .hears(commands.stylingImage.command, ctx => ctx.scene.enter('generateByImageAndTextScene'))
-        .hears('📞 Help', ctx => {
-            ctx.replyWithHTML(`В результате ты увидишь изображение с кнопками. 
-Кнопки U1, U2, U3, U4 позволяют выбрать результат, после нажатия тебе отправится это изображение. 
-Кнопки V1, V2, V3, V4 позволяют сгенерировать ещё 4 картинки по выбранному варианту. 
-Кнопка обновления позволяет сгенерировать результат ещё раз исходя из исходного запроса. `);
+        .hears(commands.help.command, ctx => {
+            ctx.replyWithHTML(helpMessage(), { parse_mode: 'Markdown' });
         })
         .on('callback_query', (ctx) => ctx.scene.enter('generateMoreOrUpscaleScene'))
         .command(commands.exit.command, ctx => exitOfBot(ctx));
@@ -42,26 +40,6 @@ export const setupBot = (token: string) => {
     // bot.use(new sessionLocal({ database: 'data/localSession.json' }).middleware());
     bot.use(session());
     bot.use(stage.middleware());
-    // bot.use((ctx, next) => {
-    //     if (!ctx.message) {
-    //     } else {
-    //         return next();
-    //     }
-    // });
-
-    bot.command(commands.start.command, ctx => ctx.scene.enter('startScene'))
-        .hears(commands.createPicture.command, ctx => ctx.scene.enter('generateByTextScene'))
-        .hears(commands.stylingAvatar.command, ctx => ctx.scene.enter('stylingAvatarByTextScene'))
-        .hears(commands.experiment.command, ctx => ctx.scene.enter('generateByBlandImageScene'))
-        .hears(commands.stylingImage.command, ctx => ctx.scene.enter('generateByImageAndTextScene'))
-        .hears('Help', ctx => {
-            ctx.replyWithHTML(`В результате ты увидишь изображение с кнопками. 
-Кнопки U1, U2, U3, U4 позволяют выбрать результат, после нажатия тебе отправится это изображение. 
-Кнопки V1, V2, V3, V4 позволяют сгенерировать ещё 4 картинки по выбранному варианту. 
-Кнопка обновления позволяет сгенерировать результат ещё раз исходя из исходного запроса. `);
-        })
-        .on('callback_query', (ctx) => ctx.scene.enter('generateMoreOrUpscaleScene'))
-        .command(commands.exit.command, ctx => exitOfBot(ctx));
 
     bot.launch();
 

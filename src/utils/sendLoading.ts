@@ -1,21 +1,30 @@
 import { Scenes } from 'telegraf';
-import { badRequest, somethingWentWrong, hssOutstandingRequest, hssCompletedRequest } from '../constants/messages';
+import {
+    badRequest,
+    somethingWentWrong,
+    hssOutstandingRequest,
+    hssCompletedRequest,
+    waitMessageDownloadPhoto, waitMessageWithProgress, waitMessage
+} from '../constants/messages';
 import { getMainMenu } from '../constants/buttons';
 
 export const sendHasOutstandingRequestMessage = (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
-    ctx.reply(hssOutstandingRequest());
+    ctx.replyWithHTML(hssOutstandingRequest(), { parse_mode: 'Markdown',
+        reply_markup: getMainMenu().reply_markup });
     return ctx.scene.leave();
 };
 
 export const sendHasCompletedRequestMessage = (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
-    ctx.reply(hssCompletedRequest());
+    ctx.replyWithHTML(hssCompletedRequest(), { parse_mode: 'Markdown',
+        reply_markup: getMainMenu().reply_markup });
     return ctx.scene.leave();
 };
 
 export const sendSomethingWentWrong = (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
     const session = ctx.session as { isHasOutstandingRequest: boolean };
     session.isHasOutstandingRequest = false;
-    ctx.reply(somethingWentWrong());
+    ctx.replyWithHTML(somethingWentWrong(), { parse_mode: 'Markdown',
+        reply_markup: getMainMenu().reply_markup });
     return ctx.scene.leave();
 };
 
@@ -34,7 +43,9 @@ export const sendWaitMessage = async (ctx: Scenes.WizardContext<Scenes.WizardSes
             filename: 'XFv9d.gif'
         },
         {
-            caption: `Ваш запрос добавлен в очередь. Пожалуйста, ожидайте.`
+            parse_mode: 'Markdown',
+            caption: waitMessage(),
+            reply_markup: getMainMenu().reply_markup
         }
     );
 
@@ -47,10 +58,7 @@ export const sendLoadingMesage = (
         message.chat.id,
         message.message_id,
         '0',
-        `
-                      Генерация займёт 0-10 минут. Пожалуйста, ожидайте.
-Выполнено: ${progress}
-                  `
+        waitMessageWithProgress(progress)
     );
 };
 
@@ -62,10 +70,6 @@ export const sendDownloadPhotoInProgressMesage = (
         message.chat.id,
         message.message_id,
         '0',
-        `
-                      Генерация займёт 0-10 минут. Пожалуйста, ожидайте.
-Выполнено: 100%
-Download photo...
-                  `
+        waitMessageDownloadPhoto()
     );
 };

@@ -8,16 +8,16 @@ export const checkIsGroupMember = async (ctx: Scenes.WizardContext<Scenes.Wizard
     const chatId = process.env.GROUP_ID as string;
     const userId = ctx.chat?.id;
     if (!userId) {
-        ctx.replyWithHTML(inNotGroupMember());
+        ctx.replyWithHTML(inNotGroupMember(), { parse_mode: 'Markdown' });
         ctx.scene.leave();
         return false;
     }
 
     const member = await ctx.telegram.getChatMember(chatId, ctx.chat?.id);
     if (member.status != 'member' && member.status != 'administrator' && member.status != 'creator') {
-        ctx.replyWithHTML(inNotGroupMember());
+        ctx.replyWithHTML(inNotGroupMember(), { parse_mode: 'Markdown' });
         ctx.scene.leave();
-        return false;
+        return true;
     } else {
         return true;
     }

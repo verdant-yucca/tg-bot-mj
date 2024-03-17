@@ -8,11 +8,10 @@ import { sendSomethingWentWrong } from '../utils/sendLoading';
 export const startSceneStep = async (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
     try {
         if (typeof ctx.from === 'undefined' || ctx.from?.is_bot) {
-            ctx.replyWithHTML(somethingWentWrong());
+            ctx.replyWithHTML(somethingWentWrong(), { parse_mode: 'Markdown' });
             return ctx.scene.leave();
         }
 
-        const state = ctx.wizard.state as IStateData;
         const { id, language_code, username, first_name, last_name } = ctx.from as ITGData;
         const avatars = await ctx.telegram.getUserProfilePhotos(id);
         let avatarPath: string | undefined = undefined;
@@ -32,7 +31,7 @@ export const startSceneStep = async (ctx: Scenes.WizardContext<Scenes.WizardSess
             avatarPath
         });
 
-        ctx.reply(greetingsMsg(first_name), getMainMenu());
+        ctx.replyWithHTML(greetingsMsg(first_name), { reply_markup: getMainMenu().reply_markup, parse_mode: 'Markdown' });
 
         return ctx.scene.leave();
     } catch (e) {

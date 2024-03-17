@@ -1,10 +1,20 @@
+const jsonPath = '../../data/textMessages.json';
 import jsonTexts from '../../data/textMessages.json';
+
+let json = jsonTexts;
+
+export const reloadJson = () => {
+    delete require.cache[require.resolve(jsonPath)];
+    json = require(jsonPath);
+    console.log(json);
+}
+
 export const getText = (fieldName: string, params?: { name: string; value: string}) => {
     try {
         // @ts-ignore
-        const resText: string = jsonTexts[fieldName];
+        let resText: string = json[fieldName];
         if (params) {
-            resText.replace(`{{${params.name}}}`, params.value)
+            resText = resText.replace(`{{${params.name}}}`, params.value)
         }
         return resText;
     } catch {
@@ -27,3 +37,12 @@ export const messageEnterFirstImageForBlend = () => getText('messageEnterFirstIm
 export const messageEnterSecondImageForBlend = () => getText('messageEnterSecondImageForBlend');
 export const messageResult = () => getText('messageResult');
 export const prohibitedSendingLinks = () => getText('prohibitedSendingLinks');
+export const helpMessage = () => getText('helpMessage');
+export const waitMessage = () => getText('waitMessage');
+export const waitMessageWithProgress = (progress: string) => getText('waitMessageWithProgress', { name: 'progress', value: progress });
+export const waitMessageDownloadPhoto = () => getText('waitMessageDownloadPhoto');
+export const textButton1 = () => getText('textButton1');
+export const textButton2 = () => getText('textButton2');
+export const textButton3 = () => getText('textButton3');
+export const textButton4 = () => getText('textButton4');
+export const textButton5 = () => getText('textButton5');

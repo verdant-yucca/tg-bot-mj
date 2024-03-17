@@ -20,7 +20,7 @@ export const enterYourImageStep1 = async (ctx: Scenes.WizardContext<Scenes.Wizar
         const session = ctx.session as { isHasOutstandingRequest: boolean };
         if (session.isHasOutstandingRequest) return sendHasOutstandingRequestMessage(ctx);
 
-        ctx.replyWithHTML(messageEnterFirstImageForBlend());
+        ctx.replyWithHTML(messageEnterFirstImageForBlend(), { parse_mode: 'Markdown' });
         ctx.wizard.next();
     } catch (e) {
         console.error('Error msg', e);
@@ -36,7 +36,7 @@ export const enterYourTextStep2 = async (ctx: Scenes.WizardContext<Scenes.Wizard
         if (!firstUrlImage) return sendSomethingWentWrong(ctx);
         const state = ctx.session as { firstUrlImage?: string };
         state.firstUrlImage = firstUrlImage;
-        ctx.replyWithHTML(messageEnterSecondImageForBlend());
+        ctx.replyWithHTML(messageEnterSecondImageForBlend(), { parse_mode: 'Markdown' });
         ctx.wizard.next();
     } catch (e) {
         console.error('Error msg', e);
@@ -58,7 +58,7 @@ export const stylingImageByTextStep3 = async (ctx: Scenes.WizardContext<Scenes.W
             .then((Imagine: MJMessage | null) => {
                 if (!Imagine) return sendSomethingWentWrong(ctx);
                 sendDownloadPhotoInProgressMesage(ctx, waitMessage);
-                ctx.replyWithPhoto({ url: Imagine.uri }, Markup.inlineKeyboard(getButtonsForFourPhoto(_id))).then(
+                ctx.replyWithPhoto({ url: Imagine.uri }, { parse_mode: 'Markdown', reply_markup: Markup.inlineKeyboard(getButtonsForFourPhoto(_id)).reply_markup }).then(
                     () => {
                         ctx.deleteMessage(waitMessage.message_id);
                     }

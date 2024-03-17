@@ -23,7 +23,7 @@ export const enterYourImageStep1 = async (ctx: Scenes.WizardContext<Scenes.Wizar
         if (!await checkIsGroupMember(ctx)) return;
         const session = ctx.session as { isHasOutstandingRequest: boolean };
         if (session.isHasOutstandingRequest) return sendHasOutstandingRequestMessage(ctx);
-        ctx.replyWithHTML(messageEnterImageForStylingImage());
+        ctx.replyWithHTML(messageEnterImageForStylingImage(), { parse_mode: 'Markdown' });
         ctx.wizard.next();
     } catch (e) {
         console.error('Error msg', e);
@@ -47,7 +47,7 @@ export const enterYourTextStep2 = (ctx: Scenes.WizardContext<Scenes.WizardSessio
                     state.imageUrl = url.toString();
 
                     if (state.imageUrl) {
-                        ctx.replyWithHTML(messageEnterTextForStylingImage());
+                        ctx.replyWithHTML(messageEnterTextForStylingImage(), { parse_mode: 'Markdown' });
                         ctx.wizard.next();
                     } else {
                         return sendSomethingWentWrong(ctx);
@@ -82,7 +82,7 @@ export const stylingImageByTextStep3 = async (ctx: Scenes.WizardContext<Scenes.W
                 if (!Imagine) return sendSomethingWentWrong(ctx);
                 sendDownloadPhotoInProgressMesage(ctx, waitMessage);
 
-                ctx.replyWithPhoto({ url: Imagine.uri }, Markup.inlineKeyboard(getButtonsForFourPhoto(_id))).then(
+                ctx.replyWithPhoto({ url: Imagine.uri }, { reply_markup: Markup.inlineKeyboard(getButtonsForFourPhoto(_id)).reply_markup, parse_mode: 'Markdown'}).then(
                     () => {
                         ctx.deleteMessage(waitMessage.message_id);
                     }

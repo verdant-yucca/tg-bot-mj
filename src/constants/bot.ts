@@ -1,3 +1,5 @@
+import { textButton1, textButton2, textButton3, textButton4, textButton5 } from './messages';
+
 export const commands = {
     start: {
         command: 'start',
@@ -5,23 +7,28 @@ export const commands = {
         description: 'use /start to Start the bot',
     },
     createPicture: {
-        command: '🎨 Создать картину',
-        title: '🎨 Создать картину',
+        command: textButton1(),
+        title: textButton1(),
         description: '',
     },
     experiment: {
-        command: '🔮 Экспериментировать',
-        title: '🔮 Экспериментировать',
+        command: textButton4(),
+        title: textButton4(),
         description: '',
     },
     stylingAvatar: {
-        command: '🖌 Стилизовать аватар',
-        title: '🖌 Стилизовать аватар',
+        command: textButton2(),
+        title: textButton2(),
         description: '',
     },
     stylingImage: {
-        command: '🖌 Стилизовать фото',
-        title: '🖌 Стилизовать фото',
+        command: textButton3(),
+        title: textButton3(),
+        description: '',
+    },
+    help: {
+        command: textButton5(),
+        title: textButton5(),
         description: '',
     },
     exit: {

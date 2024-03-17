@@ -9,6 +9,6 @@ export const wrapCommandsMarkup = (commands: Commands): ReplyMarkup => ({
 });
 
 export const exitOfBot = async (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
-    ctx.replyWithHTML('By by');
+    ctx.replyWithHTML('By by', { parse_mode: 'Markdown' });
     ctx.scene.leave();
 };
