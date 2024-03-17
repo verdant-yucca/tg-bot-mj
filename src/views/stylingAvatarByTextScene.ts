@@ -12,6 +12,8 @@ import {
 } from '../utils/sendLoading';
 import { saveQueryInDB, updateQueryInDB } from '../utils';
 import { checkIsGroupMember } from '../utils/checkIsGroupMember';
+import { getTranslatePrompt } from '../utils/getTranslatePrompt';
+import { messageEnterYourTextForStylingAvatar, messageNoAvatarInProfile } from '../constants/messages';
 
 export const enterYourTextStep1 = async (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
     try {
@@ -34,10 +36,10 @@ export const enterYourTextStep1 = async (ctx: Scenes.WizardContext<Scenes.Wizard
                             state.avatarPath = url.toString();
 
                             if (state.avatarPath) {
-                                ctx.replyWithHTML('Опишите, как вы хотите изменить свою аватарку:');
+                                ctx.replyWithHTML(messageEnterYourTextForStylingAvatar());
                                 ctx.wizard.next();
                             } else {
-                                ctx.replyWithHTML('У вас нет аватарки в профиле. Данная функция не доступна');
+                                ctx.replyWithHTML(messageNoAvatarInProfile());
                                 return ctx.scene.leave();
                             }
                         })
@@ -57,7 +59,11 @@ export const stylingAvatarByTextStep2 = async (ctx: Scenes.WizardContext<Scenes.
         const { avatarPath } = ctx.session as { avatarPath: string };
         const tgMessage = 'message' in ctx.update ? ctx.update.message : undefined;
         const textTgMessage = tgMessage && 'text' in tgMessage && tgMessage.text;
-        const prompt = `${avatarPath} ${textTgMessage}`;
+        let translatedTgMessage = textTgMessage;
+        if (textTgMessage) {
+            translatedTgMessage = await getTranslatePrompt(textTgMessage);
+        }
+        const prompt = `${avatarPath} ${translatedTgMessage}`;
         const { _id } = await saveQueryInDB(ctx, prompt);
 
         const waitMessage = await sendWaitMessage(ctx);

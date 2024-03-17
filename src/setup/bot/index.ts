@@ -10,7 +10,6 @@ import * as dotenv from 'dotenv';
 
 dotenv.config();
 
-export var isHasOutstandingRequest: boolean = false;
 export var client: Midjourney;
 export var bot: Telegraf<Scenes.WizardContext<Scenes.WizardSessionData>>;
 

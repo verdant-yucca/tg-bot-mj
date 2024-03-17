@@ -1,5 +1,5 @@
 import { Scenes } from 'telegraf';
-import { greetingsMsg, notAccessMsg } from '../constants/messages';
+import { greetingsMsg, somethingWentWrong } from '../constants/messages';
 import { IStateData, ITGData } from '../types';
 import { API } from '../api';
 import { getMainMenu } from '../constants/buttons';
@@ -8,7 +8,7 @@ import { sendSomethingWentWrong } from '../utils/sendLoading';
 export const startSceneStep = async (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
     try {
         if (typeof ctx.from === 'undefined' || ctx.from?.is_bot) {
-            ctx.replyWithHTML(notAccessMsg);
+            ctx.replyWithHTML(somethingWentWrong());
             return ctx.scene.leave();
         }
 

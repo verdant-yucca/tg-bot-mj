@@ -54,4 +54,13 @@ declare namespace ApiTypes {
     export interface FindQueryResponse {
         result: boolean;
     }
+
+    export interface GetTranslateRequest {
+        text: string;
+        targetLanguageCode: string;
+    }
+
+    export interface GetTranslateResponse {
+        text: string;
+    }
 }

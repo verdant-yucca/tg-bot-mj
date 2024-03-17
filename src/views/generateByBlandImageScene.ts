@@ -11,6 +11,7 @@ import {
 } from '../utils/sendLoading';
 import { getDataButtonsForFourPhoto } from '../utils/getButtonsForFourPhoto';
 import { checkIsGroupMember } from '../utils/checkIsGroupMember';
+import { messageEnterFirstImageForBlend, messageEnterSecondImageForBlend } from '../constants/messages';
 
 export const enterYourImageStep1 = async (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
     try {
@@ -19,7 +20,7 @@ export const enterYourImageStep1 = async (ctx: Scenes.WizardContext<Scenes.Wizar
         const session = ctx.session as { isHasOutstandingRequest: boolean };
         if (session.isHasOutstandingRequest) return sendHasOutstandingRequestMessage(ctx);
 
-        ctx.replyWithHTML('Отправьте изображение или ссылку на изображение, которое хотите стилизовать:');
+        ctx.replyWithHTML(messageEnterFirstImageForBlend());
         ctx.wizard.next();
     } catch (e) {
         console.error('Error msg', e);
@@ -35,7 +36,7 @@ export const enterYourTextStep2 = async (ctx: Scenes.WizardContext<Scenes.Wizard
         if (!firstUrlImage) return sendSomethingWentWrong(ctx);
         const state = ctx.session as { firstUrlImage?: string };
         state.firstUrlImage = firstUrlImage;
-        ctx.replyWithHTML('Отправьте второе изображение или ссылку:');
+        ctx.replyWithHTML(messageEnterSecondImageForBlend());
         ctx.wizard.next();
     } catch (e) {
         console.error('Error msg', e);

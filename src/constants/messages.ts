@@ -1,33 +1,29 @@
-export const greetingsMsg = (name: string) => {
-    const baseMsg = `Приветствую, ${name}! 👋 я твой индивидуальный творческий робот "Художник Extraordinaire" 🤖!`;
-    return `${baseMsg} В моем эстетическом арсенале у нас:
+import jsonTexts from '../../data/textMessages.json';
+export const getText = (fieldName: string, params?: { name: string; value: string}) => {
+    try {
+        // @ts-ignore
+        const resText: string = jsonTexts[fieldName];
+        if (params) {
+            resText.replace(`{{${params.name}}}`, params.value)
+        }
+        return resText;
+    } catch {
+        return '0'
+    }
+}
 
-   - Генерация уникальных художественных произведений в соответствии с твоим описанием 🖼.
-   - Эксперименты с изображениями для создания удивительных и необычных композиций.
-   - Стилизация изображений с использованием различных художественных подходов и техник.
-   - Творческое создание разнообразных вариаций картин, чтобы удовлетворить твою визуальную фантазию.
-   - Разработка индивидуальных и уникальных стикеров для выражения твоих эмоций.
-  Ты можешь выбрать из моих потрясающих моделей, таких как "Художник 3000", "Импрессионист 2.0" и "Сюрреалист 9000". Сменить модель легко - просто напиши /model.
-  
-  Приступая к использованию этого телеграм-бота, ты автоматически соглашаешься с моими творческими правилами. Подробнее о них можно узнать, отправив команду /rules. Вместе мы создадим великолепие! 🎨✨
-  `;
-};
-
-export const notAccessMsg = `No access`;
-export const somethingWentWrong = 'Что то пошло не так. Попробуйте ещё раз.';
-export const hssOutstandingRequest = 'Предыдущий запрос ещё не завершился. Пожалуйста, ожидайте.';
-export const hssCompletedRequest = 'Вы уже делали ранее этот запрос, выберите другое действие.';
-export const exitMsg = 'Bye! 🖖 To start the bot, enter: /start';
-export const badRequest = `
-**Banned prompt detected**
-
-**РАЗРЕШЕНО**
-- Любое изображение с рейтингом PG-13, связанное с художественной литературой, фэнтези, мифологией.
-- Реальные изображения, которые могут рассматриваться как уважительные или беззаботные пародии, сатира, карикатуры
-- Воображаемые или преувеличенные сценарии реальной жизни, включая абсурдные или юмористические ситуации.
-
-**ЗАПРЕЩЕНО**
-- Неуважительные, вредные, вводящие в заблуждение изображения общественных деятелей/событий или потенциально способные ввести в заблуждение.
-- Разжигающие ненависть высказывания, явное насилие или насилие в реальном мире.
-- Обнаженные или несогласованные откровенно сексуализированные общественные деятели.
-- Изображения, которые могут считаться культурно нечувствительными`;
+export const greetingsMsg = (name: string) => getText('greetingsMsg', { name: 'name', value: name });
+export const somethingWentWrong = () => getText('somethingWentWrong');
+export const hssOutstandingRequest = () => getText('hasOutstandingRequest');
+export const hssCompletedRequest = () => getText('hasCompletedRequest');
+export const badRequest = () => getText('badRequest');
+export const inNotGroupMember = () => getText('inNotGroupMember');
+export const messageEnterYourTextForGenerateImage = () => getText('messageEnterYourTextForGenerateImage');
+export const messageEnterYourTextForStylingAvatar = () => getText('messageEnterYourTextForStylingAvatar');
+export const messageNoAvatarInProfile = () => getText('messageNoAvatarInProfile');
+export const messageEnterImageForStylingImage = () => getText('messageEnterImageForStylingImage');
+export const messageEnterTextForStylingImage = () => getText('messageEnterTextForStylingImage');
+export const messageEnterFirstImageForBlend = () => getText('messageEnterFirstImageForBlend');
+export const messageEnterSecondImageForBlend = () => getText('messageEnterSecondImageForBlend');
+export const messageResult = () => getText('messageResult');
+export const prohibitedSendingLinks = () => getText('prohibitedSendingLinks');

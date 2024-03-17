@@ -1,6 +1,5 @@
 import { Scenes } from 'telegraf';
 
-import { exitMsg } from '../constants/messages';
 import { Commands, ReplyMarkup } from '../types';
 
 export const wrapCommandsMarkup = (commands: Commands): ReplyMarkup => ({
@@ -10,6 +9,6 @@ export const wrapCommandsMarkup = (commands: Commands): ReplyMarkup => ({
 });
 
 export const exitOfBot = async (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
-    ctx.replyWithHTML(exitMsg);
+    ctx.replyWithHTML('By by');
     ctx.scene.leave();
 };

@@ -12,6 +12,8 @@ import {
 import { saveQueryInDB, updateQueryInDB } from '../utils';
 import { checkHasLinkInText } from '../utils/checkHasLinkInText';
 import { checkIsGroupMember } from '../utils/checkIsGroupMember';
+import { getTranslatePrompt } from '../utils/getTranslatePrompt';
+import { messageEnterYourTextForGenerateImage } from '../constants/messages';
 
 export const enterYourTextStep1 = async (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
     try {
@@ -19,7 +21,7 @@ export const enterYourTextStep1 = async (ctx: Scenes.WizardContext<Scenes.Wizard
         if (!await checkIsGroupMember(ctx)) return;
         const session = ctx.session as { isHasOutstandingRequest: boolean };
         if (session.isHasOutstandingRequest) return sendHasOutstandingRequestMessage(ctx);
-        ctx.replyWithHTML('Введите свой запрос:');
+        ctx.replyWithHTML(messageEnterYourTextForGenerateImage());
         ctx.wizard.next();
     } catch (e) {
         console.error('Error msg', e);
@@ -29,8 +31,12 @@ export const enterYourTextStep1 = async (ctx: Scenes.WizardContext<Scenes.Wizard
 export const generateImageByTextStep2 = async (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
     try {
         const tgMessage = 'message' in ctx.update ? ctx.update.message : undefined;
-        const textTgMessage = tgMessage && 'text' in tgMessage ? tgMessage.text : undefined;
-        const prompt = textTgMessage || '';
+        const textTgMessage = tgMessage && 'text' in tgMessage ? tgMessage.text : '';
+        let translatedTgMessage = textTgMessage;
+        if (textTgMessage) {
+            translatedTgMessage = await getTranslatePrompt(textTgMessage);
+        }
+        const prompt = translatedTgMessage;
         if (checkHasLinkInText(ctx, prompt)) return;
         const waitMessage = await sendWaitMessage(ctx);
         const { _id } = await saveQueryInDB(ctx, prompt);

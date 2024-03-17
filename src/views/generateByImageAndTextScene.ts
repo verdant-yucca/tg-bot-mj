@@ -11,6 +11,11 @@ import {
 } from '../utils/sendLoading';
 import { saveQueryInDB, updateQueryInDB } from '../utils';
 import { checkIsGroupMember } from '../utils/checkIsGroupMember';
+import { getTranslatePrompt } from '../utils/getTranslatePrompt';
+import {
+    messageEnterImageForStylingImage,
+    messageEnterTextForStylingImage
+} from '../constants/messages';
 
 export const enterYourImageStep1 = async (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
     try {
@@ -18,7 +23,7 @@ export const enterYourImageStep1 = async (ctx: Scenes.WizardContext<Scenes.Wizar
         if (!await checkIsGroupMember(ctx)) return;
         const session = ctx.session as { isHasOutstandingRequest: boolean };
         if (session.isHasOutstandingRequest) return sendHasOutstandingRequestMessage(ctx);
-        ctx.replyWithHTML('Отправьте изображение или ссылку на изображение, которое хотите стилизовать:');
+        ctx.replyWithHTML(messageEnterImageForStylingImage());
         ctx.wizard.next();
     } catch (e) {
         console.error('Error msg', e);
@@ -42,26 +47,17 @@ export const enterYourTextStep2 = (ctx: Scenes.WizardContext<Scenes.WizardSessio
                     state.imageUrl = url.toString();
 
                     if (state.imageUrl) {
-                        ctx.replyWithHTML('Опишите, как вы хотите изменить изображение:');
+                        ctx.replyWithHTML(messageEnterTextForStylingImage());
                         ctx.wizard.next();
                     } else {
-                        const session = ctx.session as { isHasOutstandingRequest: boolean };
-                        session.isHasOutstandingRequest = false;
-                        ctx.replyWithHTML('Что то пошло не так...');
-                        return ctx.scene.leave();
+                        return sendSomethingWentWrong(ctx);
                     }
                 })
-                .catch(() => {
-                    return sendSomethingWentWrong(ctx);
-                });
+                .catch(() => sendSomethingWentWrong(ctx));
         } else {
-            const session = ctx.session as { isHasOutstandingRequest: boolean };
-            session.isHasOutstandingRequest = false;
             return sendSomethingWentWrong(ctx);
         }
     } catch (e) {
-        const session = ctx.session as { isHasOutstandingRequest: boolean };
-        session.isHasOutstandingRequest = false;
         console.error('Error msg', e);
         return sendSomethingWentWrong(ctx);
     }
@@ -71,7 +67,11 @@ export const stylingImageByTextStep3 = async (ctx: Scenes.WizardContext<Scenes.W
         const { imageUrl } = ctx.session as { imageUrl?: string };
         const tgMessage = 'message' in ctx.update ? ctx.update.message : undefined;
         const textTgMessage = tgMessage && 'text' in tgMessage ? tgMessage.text : '';
-        const prompt = `${imageUrl} ${textTgMessage}`;
+        let translatedTgMessage = textTgMessage;
+        if (textTgMessage) {
+            translatedTgMessage = await getTranslatePrompt(textTgMessage);
+        }
+        const prompt = `${imageUrl} ${translatedTgMessage}`;
         const { _id } = await saveQueryInDB(ctx, prompt);
 
         const waitMessage = await sendWaitMessage(ctx);
@@ -106,8 +106,6 @@ export const stylingImageByTextStep3 = async (ctx: Scenes.WizardContext<Scenes.W
                 return sendBadRequestMessage(ctx);
             });
     } catch (e) {
-        const session = ctx.session as { isHasOutstandingRequest: boolean };
-        session.isHasOutstandingRequest = false;
         console.error('Error msg', e);
         return sendSomethingWentWrong(ctx);
     }

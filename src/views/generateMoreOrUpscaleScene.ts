@@ -3,7 +3,6 @@ import { MJMessage } from 'midjourney';
 import { client } from '../setup/bot';
 import { getButtonsForFourPhoto, getDataButtonsForFourPhoto } from '../utils/getButtonsForFourPhoto';
 import {
-    sendBadRequestMessage,
     sendDownloadPhotoInProgressMesage, sendHasCompletedRequestMessage, sendHasOutstandingRequestMessage,
     sendLoadingMesage,
     sendSomethingWentWrong,
@@ -14,6 +13,7 @@ import { getQuery } from '../api/query';
 import * as dotenv from 'dotenv';
 import { checkIsGroupMember } from '../utils/checkIsGroupMember';
 import { findQueryInDB } from '../utils/saveQueryInDB';
+import { messageResult } from '../constants/messages';
 
 dotenv.config();
 
@@ -75,8 +75,7 @@ export const generateMoreOrUpscaleStep = async (ctx: Scenes.WizardContext<Scenes
                     ctx.replyWithPhoto(
                         { url: Upscale.uri },
                         {
-                            caption: `Изображение по запросу:
-${prompt}`
+                            caption: messageResult()
                         }
                     ).then(resultMessage => {
                         ctx.deleteMessage(waitMessage.message_id);

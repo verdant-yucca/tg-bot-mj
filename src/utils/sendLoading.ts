@@ -3,26 +3,26 @@ import { badRequest, somethingWentWrong, hssOutstandingRequest, hssCompletedRequ
 import { getMainMenu } from '../constants/buttons';
 
 export const sendHasOutstandingRequestMessage = (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
-    ctx.reply(hssOutstandingRequest);
+    ctx.reply(hssOutstandingRequest());
     return ctx.scene.leave();
 };
 
 export const sendHasCompletedRequestMessage = (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
-    ctx.reply(hssCompletedRequest);
+    ctx.reply(hssCompletedRequest());
     return ctx.scene.leave();
 };
 
 export const sendSomethingWentWrong = (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
     const session = ctx.session as { isHasOutstandingRequest: boolean };
     session.isHasOutstandingRequest = false;
-    ctx.reply(somethingWentWrong);
+    ctx.reply(somethingWentWrong());
     return ctx.scene.leave();
 };
 
 export const sendBadRequestMessage = (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
     const session = ctx.session as { isHasOutstandingRequest: boolean };
     session.isHasOutstandingRequest = false;
-    ctx.replyWithHTML(badRequest, { parse_mode: 'Markdown', reply_markup: getMainMenu().reply_markup });
+    ctx.replyWithHTML(badRequest(), { parse_mode: 'Markdown', reply_markup: getMainMenu().reply_markup });
     return ctx.scene.leave();
 };
 
