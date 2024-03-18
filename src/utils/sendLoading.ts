@@ -9,22 +9,28 @@ import {
 import { getMainMenu } from '../constants/buttons';
 
 export const sendHasOutstandingRequestMessage = (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
-    ctx.replyWithHTML(hssOutstandingRequest(), { parse_mode: 'Markdown',
-        reply_markup: getMainMenu().reply_markup });
+    ctx.replyWithHTML(hssOutstandingRequest(), {
+        parse_mode: 'Markdown',
+        reply_markup: getMainMenu().reply_markup
+    });
     return ctx.scene.leave();
 };
 
 export const sendHasCompletedRequestMessage = (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
-    ctx.replyWithHTML(hssCompletedRequest(), { parse_mode: 'Markdown',
-        reply_markup: getMainMenu().reply_markup });
+    ctx.replyWithHTML(hssCompletedRequest(), {
+        parse_mode: 'Markdown',
+        reply_markup: getMainMenu().reply_markup
+    });
     return ctx.scene.leave();
 };
 
 export const sendSomethingWentWrong = (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
     const session = ctx.session as { isHasOutstandingRequest: boolean };
     session.isHasOutstandingRequest = false;
-    ctx.replyWithHTML(somethingWentWrong(), { parse_mode: 'Markdown',
-        reply_markup: getMainMenu().reply_markup });
+    ctx.replyWithHTML(somethingWentWrong(), {
+        parse_mode: 'Markdown',
+        reply_markup: getMainMenu().reply_markup
+    });
     return ctx.scene.leave();
 };
 
@@ -58,7 +64,8 @@ export const sendLoadingMesage = (
         message.chat.id,
         message.message_id,
         '0',
-        waitMessageWithProgress(progress)
+        waitMessageWithProgress(progress),
+        { parse_mode: 'Markdown' }
     );
 };
 
@@ -70,6 +77,7 @@ export const sendDownloadPhotoInProgressMesage = (
         message.chat.id,
         message.message_id,
         '0',
-        waitMessageDownloadPhoto()
+        waitMessageDownloadPhoto(),
+        { parse_mode: 'Markdown' }
     );
 };

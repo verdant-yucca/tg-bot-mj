@@ -47,7 +47,10 @@ export const generateImageByTextStep2 = async (ctx: Scenes.WizardContext<Scenes.
                 if (!Imagine) return sendSomethingWentWrong(ctx);
                 sendDownloadPhotoInProgressMesage(ctx, waitMessage);
 
-                ctx.replyWithPhoto({ url: Imagine.uri }, { reply_markup: Markup.inlineKeyboard(getButtonsForFourPhoto(_id)).reply_markup, parse_mode: 'Markdown' }).then(
+                ctx.replyWithPhoto({ url: Imagine.uri }, {
+                    reply_markup: Markup.inlineKeyboard(getButtonsForFourPhoto(_id)).reply_markup,
+                    parse_mode: 'Markdown'
+                }).then(
                     () => {
                         ctx.deleteMessage(waitMessage.message_id);
                     }
