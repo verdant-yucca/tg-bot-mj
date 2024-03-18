@@ -13,6 +13,7 @@ const token = config.get('BOT_TOKEN');
 const port = config.get('PORT');
 
 setupBot(token);
+console.log('port', port);
 
 app.listen(port, () => console.log(`App listening on port ${port}`))
 
