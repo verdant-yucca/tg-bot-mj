@@ -4,7 +4,7 @@
   "description": "",
   "main": "src/index.ts",
   "scripts": {
-    "build": "rimraf build && tsc -p tsconfig.json",
+    "build": "npx tsc",
     "prod": "ts-node --files -C typescript dist/index.js",
     "start": "nodemon --ignore data/ --watch 'src/**/*.ts' --exec 'ts-node --files index.ts' index.ts",
     "start:windows": "nodemon --ignore data/ index.ts"
