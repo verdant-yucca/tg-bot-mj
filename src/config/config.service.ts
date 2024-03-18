@@ -6,9 +6,14 @@ export class ConfigService implements IConfigService {
 
     constructor() {
         const { error, parsed } = config();
-        if (error) throw new Error('Не найден файл .env');
-        if (!parsed) throw new Error('Пустой файл .env');
-        this.config = parsed;
+        if (error || !parsed) {
+            const { error, parsed } = config({ path: './tg-bot-mj/dist/.env' });
+            if (error) throw new Error('Не найден файл .env');
+            if (!parsed) throw new Error('Пустой файл .env');
+            this.config = parsed;
+        } else {
+            this.config = parsed;
+        }
     }
 
     get(key: string): string {
