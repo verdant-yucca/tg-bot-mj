@@ -29,7 +29,7 @@ export const enterYourTextStep1 = async (ctx: Scenes.WizardContext<Scenes.Wizard
                 const state = ctx.session as { avatarPath?: string };
 
                 if (avatars.total_count > 0) {
-                    const fileId = avatars.photos[0][0].file_id;
+                    const fileId = avatars.photos[0][2].file_id;
                     ctx.telegram
                         .getFileLink(fileId)
                         .then(url => {
@@ -74,13 +74,16 @@ export const stylingAvatarByTextStep2 = async (ctx: Scenes.WizardContext<Scenes.
                 if (!Imagine) return sendSomethingWentWrong(ctx);
                 sendDownloadPhotoInProgressMesage(ctx, waitMessage);
                 ctx.replyWithPhoto(
-                    { url: Imagine.uri },
-                    { reply_markup: Markup.inlineKeyboard(getButtonsForFourPhoto(_id)).reply_markup, parse_mode: 'Markdown' })
+                        { url: Imagine.uri },
+                        {
+                            reply_markup: Markup.inlineKeyboard(getButtonsForFourPhoto(_id)).reply_markup,
+                            parse_mode: 'Markdown'
+                        })
                     .then(
                         () => {
                             ctx.deleteMessage(waitMessage.message_id);
                         }
-                );
+                    );
 
                 const dataButtons = JSON.stringify(getDataButtonsForFourPhoto(Imagine));
                 updateQueryInDB({

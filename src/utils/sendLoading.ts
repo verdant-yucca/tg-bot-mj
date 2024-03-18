@@ -7,6 +7,7 @@ import {
     waitMessageDownloadPhoto, waitMessageWithProgress, waitMessage
 } from '../constants/messages';
 import { getMainMenu } from '../constants/buttons';
+import path from 'path';
 
 export const sendHasOutstandingRequestMessage = (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
     ctx.replyWithHTML(hssOutstandingRequest(), {
@@ -45,13 +46,12 @@ export const sendWaitMessage = async (ctx: Scenes.WizardContext<Scenes.WizardSes
     //https://i.yapx.ru/XFv9d.gif
     await ctx.replyWithDocument(
         {
-            url: 'https://i.yapx.ru/XFv9d.gif',
-            filename: 'XFv9d.gif'
+            source: path.resolve(__dirname, '../static/loading.gif'),
+            filename: 'loading.gif'
         },
         {
             parse_mode: 'Markdown',
-            caption: waitMessage(),
-            reply_markup: getMainMenu().reply_markup
+            caption: waitMessage()
         }
     );
 

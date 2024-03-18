@@ -76,7 +76,7 @@ export const generateMoreOrUpscaleStep = async (ctx: Scenes.WizardContext<Scenes
                         { url: Upscale.uri },
                         {
                             parse_mode: 'Markdown',
-                            caption: messageResult()
+                            caption: messageResult(prompt)
                         }
                     ).then(resultMessage => {
                         ctx.deleteMessage(waitMessage.message_id);
@@ -142,7 +142,10 @@ export const generateMoreOrUpscaleStep = async (ctx: Scenes.WizardContext<Scenes
                     if (!Imagine) return sendSomethingWentWrong(ctx);
                     sendDownloadPhotoInProgressMesage(ctx, waitMessage);
 
-                    ctx.replyWithPhoto({ url: Imagine.uri }, { reply_markup: Markup.inlineKeyboard(getButtonsForFourPhoto(_id)).reply_markup, parse_mode: 'Markdown' }).then(
+                    ctx.replyWithPhoto({ url: Imagine.uri }, {
+                        reply_markup: Markup.inlineKeyboard(getButtonsForFourPhoto(_id)).reply_markup,
+                        parse_mode: 'Markdown'
+                    }).then(
                         () => {
                             ctx.deleteMessage(waitMessage.message_id);
                         }
