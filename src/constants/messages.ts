@@ -36,25 +36,17 @@ export const messageEnterTextForStylingImage = () => getText('messageEnterTextFo
 export const messageEnterFirstImageForBlend = () => getText('messageEnterFirstImageForBlend');
 export const messageEnterSecondImageForBlend = () => getText('messageEnterSecondImageForBlend');
 export const messageResult = (prompt: string) => {
-    const regex = /^(?:https?:\/\/\S+\s+https?:\/\/\S+)|(?:https?:\/\/\S+\s+\S+)|(\S+)$/;
-    const regexTwoUrl = /^(?:https?:\/\/\S+\s+https?:\/\/\S+)$/;
-    const match = prompt.match(regex);
-    if (match) {
-        if (match[1]) {
-            return getText('messageResultOnlyText', { value: prompt, name: 'prompt' });
-        } else {
-            const matchTwoUrl = prompt.match(regexTwoUrl);
-            if (matchTwoUrl && matchTwoUrl[1]) {
-                return getText('messageResultTwoImage');
-            } else {
+    const regex = /(https?:\/\/\S+)/g;
+    const matches = prompt.match(regex);
 
-                return getText('messageResultOneImage', {
-                    value: prompt.replace(/https?:\/\/\S+/gi, ''),
-                    name: 'prompt'
-                });
-            }
-        }
+    if (!matches || matches.length === 0) {
+        return getText('messageResultOnlyText', { value: prompt, name: 'prompt' });
+    } else if (matches.length === 1) {
+        return getText('messageResultOneImage',{ value: prompt.replace(/https?:\/\/\S+/gi, ''), name: 'prompt' });
+    } else if (matches.length === 2) {
+        return getText('messageResultTwoImage');
     } else {
+        // Handle case with more than two links if needed
         return getText('messageResult', { value: prompt, name: 'prompt' });
     }
 };
