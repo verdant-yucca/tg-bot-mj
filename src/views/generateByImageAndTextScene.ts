@@ -61,7 +61,7 @@ export const enterYourTextStep2 = (ctx: Scenes.WizardContext<Scenes.WizardSessio
 
                     await new Promise((resolve, reject) => {
                         // @ts-ignore
-                        response.data.pipe(fs.createWriteStream(`./src/static/${fileId}.jpg`))
+                        response.data.pipe(fs.createWriteStream(`./src/static/${fileId.substring(0, 10)}.jpg`))
                             .on('finish', () => resolve(''))
                             .on('error', (e: any) => {
                                 console.log(e);
@@ -70,7 +70,7 @@ export const enterYourTextStep2 = (ctx: Scenes.WizardContext<Scenes.WizardSessio
                     })
 
                     console.log(`http://158.160.142.41:3001/static/${fileId}.jpg`);
-                    state.imageUrl = `http://158.160.142.41:3001/static/${fileId}.jpg`
+                    state.imageUrl = `http://158.160.142.41:3001/static/${fileId.substring(0, 10)}.jpg`
 
                     if (state.imageUrl) {
                         ctx.replyWithHTML(messageEnterTextForStylingImage(), { parse_mode: 'Markdown' });
