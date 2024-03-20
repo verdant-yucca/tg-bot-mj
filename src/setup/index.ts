@@ -15,8 +15,8 @@ export const setupApp = () => {
     app.use(cors());
     app.use(json());
     app.use(urlencoded({ extended: true }));
-    app.use('/files', express.static('./files'));
-    app.use(express.static('./static'));
+    app.use('/static', express.static('./src/static'));
+    app.use(express.static('./src/static'));
     app.use('/updateText', (req, res) => {
         delete require.cache[require.resolve('../../data/textMessages.json')];
         reloadJson()

@@ -16,6 +16,8 @@ import {
     messageEnterImageForStylingImage,
     messageEnterTextForStylingImage
 } from '../constants/messages';
+import axios from 'axios';
+import * as fs from 'fs';
 
 export const enterYourImageStep1 = async (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
     try {
@@ -43,8 +45,32 @@ export const enterYourTextStep2 = (ctx: Scenes.WizardContext<Scenes.WizardSessio
 
             ctx.telegram
                 .getFileLink(fileId)
-                .then(url => {
-                    state.imageUrl = url.toString();
+                .then(async url => {
+                    const ext = url.toString().split('.');
+                    const currentExt = ext[ext.length-1]
+                    const fileName = `${fileId}.${currentExt}`; // или какой-то другой формат
+
+                    // const fileInfo = await ctx.telegram.getFile(fileId)
+                    // console.log('fileInfo', fileInfo);
+                    // const localPath = `../static/${fileName}`;
+                    // //@ts-ignore
+                    // const res = await ctx.telegram.downloadFile(fileInfo.file_path, localPath);
+
+                    // @ts-ignore
+                    const response = await axios({url, responseType: 'stream'})
+
+                    await new Promise((resolve, reject) => {
+                        // @ts-ignore
+                        response.data.pipe(fs.createWriteStream(`./src/static/${fileId}.jpg`))
+                            .on('finish', () => resolve(''))
+                            .on('error', (e: any) => {
+                                console.log(e);
+                                reject()
+                            })
+                    })
+
+                    console.log(`http://158.160.142.41:3001/static/${fileId}.jpg`);
+                    state.imageUrl = `http://158.160.142.41:3001/static/${fileId}.jpg`
 
                     if (state.imageUrl) {
                         ctx.replyWithHTML(messageEnterTextForStylingImage(), { parse_mode: 'Markdown' });
@@ -71,6 +97,7 @@ export const stylingImageByTextStep3 = async (ctx: Scenes.WizardContext<Scenes.W
         if (textTgMessage) {
             translatedTgMessage = await getTranslatePrompt(textTgMessage);
         }
+        console.log(imageUrl);
         const prompt = `${imageUrl} ${translatedTgMessage}`;
         const { _id } = await saveQueryInDB(ctx, prompt);
 
