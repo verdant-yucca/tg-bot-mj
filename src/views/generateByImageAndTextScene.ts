@@ -98,7 +98,7 @@ export const stylingImageByTextStep3 = async (ctx: Scenes.WizardContext<Scenes.W
             translatedTgMessage = await getTranslatePrompt(textTgMessage);
         }
         console.log(imageUrl);
-        const prompt = `${imageUrl} ${translatedTgMessage}`;
+        const prompt = `${imageUrl}    ${translatedTgMessage}`;
         const { _id } = await saveQueryInDB(ctx, prompt);
 
         const waitMessage = await sendWaitMessage(ctx);
