@@ -9,11 +9,15 @@ import {
 import { getMainMenu } from '../constants/buttons';
 import path from 'path';
 
-export const sendHasOutstandingRequestMessage = (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
-    ctx.replyWithHTML(hssOutstandingRequest(), {
+export const sendHasOutstandingRequestMessage = async (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
+    const wp = await ctx.replyWithHTML(hssOutstandingRequest(), {
         parse_mode: 'Markdown',
         reply_markup: getMainMenu().reply_markup
     });
+    console.log(wp)
+    setTimeout(async () => {
+        await ctx.deleteMessage(wp.message_id);
+    }, 30000); // 60000 миллисекунд = 1 минута
     return ctx.scene.leave();
 };
 
