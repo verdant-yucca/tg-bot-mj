@@ -63,3 +63,4 @@ export const textButton2 = () => getText('textButton2');
 export const textButton3 = () => getText('textButton3');
 export const textButton4 = () => getText('textButton4');
 export const textButton5 = () => getText('textButton5');
+export const ReplayToGroup = () => getText('ReplayToGroup');

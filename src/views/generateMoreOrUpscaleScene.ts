@@ -13,7 +13,7 @@ import { getQuery } from '../api/query';
 import * as dotenv from 'dotenv';
 import { checkIsGroupMember } from '../utils/checkIsGroupMember';
 import { findQueryInDB } from '../utils/saveQueryInDB';
-import { messageResult } from '../constants/messages';
+import {messageResult, ReplayToGroup} from '../constants/messages';
 
 dotenv.config();
 
@@ -81,7 +81,10 @@ export const generateMoreOrUpscaleStep = async (ctx: Scenes.WizardContext<Scenes
                     ).then(resultMessage => {
                         ctx.deleteMessage(waitMessage.message_id);
                         const chatId = process.env.GROUP_ID as string;
-                        ctx.telegram.forwardMessage(chatId, resultMessage.chat.id, resultMessage.message_id);
+
+                        if (ReplayToGroup()) {
+                            ctx.telegram.forwardMessage(chatId, resultMessage.chat.id, resultMessage.message_id);
+                        }
                     }).catch(() => {
                         ctx.deleteMessage(waitMessage.message_id);
                         return sendSomethingWentWrong(ctx);
