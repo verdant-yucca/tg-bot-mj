@@ -20,7 +20,7 @@ export const checkIsGroupMember = async (ctx: Scenes.WizardContext<Scenes.Wizard
     if (member.status != 'member' && member.status != 'administrator' && member.status != 'creator') {
         ctx.replyWithHTML(inNotGroupMember(), { parse_mode: 'Markdown' });
         ctx.scene.leave();
-        return true;
+        return false;
     } else {
         return true;
     }
