@@ -42,7 +42,7 @@ export const messageResult = (prompt: string) => {
     if (!matches || matches.length === 0) {
         return getText('messageResultOnlyText', { value: prompt, name: 'prompt' });
     } else if (matches.length === 1) {
-        return getText('messageResultOneImage',{ value: prompt.replace(/https?:\/\/\S+/gi, ''), name: 'prompt' });
+        return getText('messageResultOneImage', { value: prompt.replace(/https?:\/\/\S+/gi, ''), name: 'prompt' });
     } else if (matches.length === 2) {
         return getText('messageResultTwoImage');
     } else {
@@ -63,4 +63,5 @@ export const textButton2 = () => getText('textButton2');
 export const textButton3 = () => getText('textButton3');
 export const textButton4 = () => getText('textButton4');
 export const textButton5 = () => getText('textButton5');
-export const ReplayToGroup = () => getText('ReplayToGroup');
+export const ReplayToGroup = () => getText('replayToGroup');
+export const needCheckIsGroupMember = () => getText('needCheckIsGroupMember');

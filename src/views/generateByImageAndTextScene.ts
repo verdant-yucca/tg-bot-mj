@@ -18,6 +18,7 @@ import {
 } from '../constants/messages';
 import axios from 'axios';
 import * as fs from 'fs';
+import { getUniqId } from '../utils/getUniqId';
 
 export const enterYourImageStep1 = async (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
     try {
@@ -46,31 +47,19 @@ export const enterYourTextStep2 = (ctx: Scenes.WizardContext<Scenes.WizardSessio
             ctx.telegram
                 .getFileLink(fileId)
                 .then(async url => {
-                    const ext = url.toString().split('.');
-                    const currentExt = ext[ext.length-1]
-                    const fileName = `${fileId}.${currentExt}`; // или какой-то другой формат
-
-                    // const fileInfo = await ctx.telegram.getFile(fileId)
-                    // console.log('fileInfo', fileInfo);
-                    // const localPath = `../static/${fileName}`;
-                    // //@ts-ignore
-                    // const res = await ctx.telegram.downloadFile(fileInfo.file_path, localPath);
-
+                    const filename = getUniqId();
                     // @ts-ignore
-                    const response = await axios({url, responseType: 'stream'})
-
+                    const response = await axios({ url, responseType: 'stream' });
                     await new Promise((resolve, reject) => {
-                        // @ts-ignore
-                        response.data.pipe(fs.createWriteStream(`./src/static/${fileId.substring(0, 10)}.jpg`))
+                        response.data.pipe(fs.createWriteStream(`./src/static/${filename}.jpg`))
                             .on('finish', () => resolve(''))
                             .on('error', (e: any) => {
                                 console.log(e);
-                                reject()
-                            })
-                    })
+                                reject();
+                            });
+                    });
 
-                    console.log(`http://158.160.142.41:3001/static/${fileId}.jpg`);
-                    state.imageUrl = `http://158.160.142.41:3001/static/${fileId.substring(0, 10)}.jpg`
+                    state.imageUrl = `http://158.160.142.41:3001/static/${filename}.jpg`;
 
                     if (state.imageUrl) {
                         ctx.replyWithHTML(messageEnterTextForStylingImage(), { parse_mode: 'Markdown' });
@@ -97,7 +86,6 @@ export const stylingImageByTextStep3 = async (ctx: Scenes.WizardContext<Scenes.W
         if (textTgMessage) {
             translatedTgMessage = await getTranslatePrompt(textTgMessage);
         }
-        console.log(imageUrl);
         const prompt = `${imageUrl}    ${translatedTgMessage}`;
         const { _id } = await saveQueryInDB(ctx, prompt);
 
@@ -109,7 +97,10 @@ export const stylingImageByTextStep3 = async (ctx: Scenes.WizardContext<Scenes.W
                 if (!Imagine) return sendSomethingWentWrong(ctx);
                 sendDownloadPhotoInProgressMesage(ctx, waitMessage);
 
-                ctx.replyWithPhoto({ url: Imagine.uri }, { reply_markup: Markup.inlineKeyboard(getButtonsForFourPhoto(_id)).reply_markup, parse_mode: 'Markdown'}).then(
+                ctx.replyWithPhoto({ url: Imagine.uri }, {
+                    reply_markup: Markup.inlineKeyboard(getButtonsForFourPhoto(_id)).reply_markup,
+                    parse_mode: 'Markdown'
+                }).then(
                     () => {
                         ctx.deleteMessage(waitMessage.message_id);
                     }
