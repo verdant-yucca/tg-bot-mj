@@ -13,14 +13,14 @@ export const checkIsGroupMember = async (ctx: Scenes.WizardContext<Scenes.Wizard
     if (!needCheckIsGroupMember()) return true;
 
     if (!userId) {
-        ctx.replyWithHTML(inNotGroupMember(), { parse_mode: 'Markdown' });
+        ctx.replyWithHTML(inNotGroupMember());
         ctx.scene.leave();
         return false;
     }
 
     const member = await ctx.telegram.getChatMember(chatId, userId);
     if (member.status != 'member' && member.status != 'administrator' && member.status != 'creator') {
-        ctx.replyWithHTML(inNotGroupMember(), { parse_mode: 'Markdown' });
+        ctx.replyWithHTML(inNotGroupMember());
         ctx.scene.leave();
         return false;
     } else {
