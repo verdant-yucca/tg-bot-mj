@@ -6,7 +6,9 @@ dotenv.config();
 
 export const checkIsGroupMember = async (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
     const chatId = process.env.GROUP_ID as string;
-    const userId = ctx.chat?.id;
+    //@ts-ignore
+    const userId = ctx.chat?.id || ctx?.message?.from?.id || ctx?.update?.callback_query?.from.id;
+    console.log('userId', userId);
 
     if (!needCheckIsGroupMember()) return true;
 
@@ -16,7 +18,7 @@ export const checkIsGroupMember = async (ctx: Scenes.WizardContext<Scenes.Wizard
         return false;
     }
 
-    const member = await ctx.telegram.getChatMember(chatId, ctx.chat?.id);
+    const member = await ctx.telegram.getChatMember(chatId, userId);
     if (member.status != 'member' && member.status != 'administrator' && member.status != 'creator') {
         ctx.replyWithHTML(inNotGroupMember(), { parse_mode: 'Markdown' });
         ctx.scene.leave();

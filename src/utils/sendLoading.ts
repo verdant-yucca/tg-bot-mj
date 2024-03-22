@@ -14,7 +14,6 @@ export const sendHasOutstandingRequestMessage = async (ctx: Scenes.WizardContext
         parse_mode: 'Markdown',
         reply_markup: getMainMenu().reply_markup
     });
-    console.log(wp)
     setTimeout(async () => {
         await ctx.deleteMessage(wp.message_id);
     }, 30000); // 60000 миллисекунд = 1 минута

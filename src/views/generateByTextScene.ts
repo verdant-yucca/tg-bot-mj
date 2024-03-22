@@ -38,7 +38,6 @@ export const generateImageByTextStep2 = async (ctx: Scenes.WizardContext<Scenes.
             translatedTgMessage = await getTranslatePrompt(textTgMessage);
             console.log('text after: ', translatedTgMessage);
         }
-        console.log('text after111: ', translatedTgMessage);
         const prompt = translatedTgMessage;
         if (checkHasLinkInText(ctx, prompt)) return;
         const waitMessage = await sendWaitMessage(ctx);
