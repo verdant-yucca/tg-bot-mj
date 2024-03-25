@@ -10,6 +10,7 @@ import { logger } from '../../middlewares';
 import { greetingsMsg, helpMessage, somethingWentWrong } from '../../constants/messages';
 import { getMainMenu } from '../../constants/buttons';
 import { ITGData } from '../../types';
+import { checkIsGroupMember } from '../../utils/checkIsGroupMember';
 
 dotenv.config();
 
@@ -39,8 +40,12 @@ export const setupBot = (token: string) => {
             const callback = ctx.update && 'callback_query' in ctx.update ? ctx.update.callback_query : undefined;
             const callbackData = callback && 'data' in callback ? callback.data : '';
             if (callbackData === commands.alreadySubscribes.command) {
-                const { first_name } = ctx.from as ITGData;
-                ctx.replyWithHTML(greetingsMsg(first_name), { reply_markup: getMainMenu().reply_markup, parse_mode: 'Markdown' });
+                checkIsGroupMember(ctx).then(isMember => {
+                    if (isMember) {
+                        const { first_name } = ctx.from as ITGData;
+                        ctx.replyWithHTML(greetingsMsg(first_name), { reply_markup: getMainMenu().reply_markup, parse_mode: 'Markdown' });
+                    }
+                });
             } else {
                 ctx.scene.enter('generateMoreOrUpscaleScene');
             }
