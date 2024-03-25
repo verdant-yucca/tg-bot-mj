@@ -16,7 +16,7 @@ export const getText = (fieldName: string, params?: { name: string; value: strin
         if (params) {
             resText = resText.replace(`{{${params.name}}}`, params.value);
         }
-        return resText || 'empty value';
+        return resText === undefined ? 'empty value' : resText;
     } catch {
         return 'empty value';
     }
