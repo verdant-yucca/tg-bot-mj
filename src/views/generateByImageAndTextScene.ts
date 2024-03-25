@@ -117,7 +117,16 @@ export const stylingImageByTextStep3 = async (ctx: Scenes.WizardContext<Scenes.W
 
                 return ctx.scene.leave();
             })
-            .catch(() => {
+            .catch((e) => {
+                console.log(e);
+                updateQueryInDB({
+                    _id,
+                    action: 'badRequest',
+                    buttons: '',
+                    discordMsgId: '',
+                    flags: ''
+                }, ctx);
+
                 const session = ctx.session as { isHasOutstandingRequest: boolean };
                 session.isHasOutstandingRequest = false;
                 ctx.deleteMessage(waitMessage.message_id);

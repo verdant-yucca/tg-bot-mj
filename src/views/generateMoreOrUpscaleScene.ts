@@ -85,7 +85,8 @@ export const generateMoreOrUpscaleStep = async (ctx: Scenes.WizardContext<Scenes
                         if (ReplayToGroup()) {
                             ctx.telegram.forwardMessage(chatId, resultMessage.chat.id, resultMessage.message_id);
                         }
-                    }).catch(() => {
+                    }).catch((e) => {
+                        console.log('xzxz', e);
                         ctx.deleteMessage(waitMessage.message_id);
                         return sendSomethingWentWrong(ctx);
                     });
@@ -99,7 +100,15 @@ export const generateMoreOrUpscaleStep = async (ctx: Scenes.WizardContext<Scenes
                     }, ctx);
                     ctx.scene.leave();
                 })
-                .catch(() => {
+                .catch((e) => {
+                    console.log('xzxz22', e);
+                    updateQueryInDB({
+                        _id,
+                        action: 'xzxz22',
+                        buttons: '',
+                        discordMsgId: '',
+                        flags: ''
+                    }, ctx);
 
                     ctx.deleteMessage(waitMessage.message_id);
                     return sendSomethingWentWrong(ctx);
@@ -134,7 +143,15 @@ export const generateMoreOrUpscaleStep = async (ctx: Scenes.WizardContext<Scenes
 
                     ctx.scene.leave();
                 })
-                .catch(() => {
+                .catch((e) => {
+                    console.log('xzxz333', e);
+                    updateQueryInDB({
+                        _id,
+                        action: 'xzxz333',
+                        buttons: '',
+                        discordMsgId: '',
+                        flags: ''
+                    }, ctx);
                     ctx.deleteMessage(waitMessage.message_id);
                     return sendSomethingWentWrong(ctx);
                 });
@@ -165,7 +182,15 @@ export const generateMoreOrUpscaleStep = async (ctx: Scenes.WizardContext<Scenes
 
                     ctx.scene.leave();
                 })
-                .catch(() => {
+                .catch((e) => {
+                    console.log('xzxz444', e);
+                    updateQueryInDB({
+                        _id,
+                        action: 'xzxz444',
+                        buttons: '',
+                        discordMsgId: '',
+                        flags: ''
+                    }, ctx);
                     ctx.deleteMessage(waitMessage.message_id);
                     return sendSomethingWentWrong(ctx);
                 });

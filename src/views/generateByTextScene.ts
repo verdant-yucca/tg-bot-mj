@@ -66,9 +66,17 @@ export const generateImageByTextStep2 = async (ctx: Scenes.WizardContext<Scenes.
                     flags: Imagine.flags.toString()
                 }, ctx);
 
-                ctx.scene.leave();
+                return ctx.scene.leave();
             })
-            .catch(() => {
+            .catch((e) => {
+                console.log(e);
+                updateQueryInDB({
+                    _id,
+                    action: 'badRequest',
+                    buttons: '',
+                    discordMsgId: '',
+                    flags: ''
+                }, ctx);
                 ctx.deleteMessage(waitMessage.message_id);
                 return sendBadRequestMessage(ctx);
             });
