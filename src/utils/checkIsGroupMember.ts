@@ -1,6 +1,6 @@
-import { Scenes } from 'telegraf';
+import { Markup, Scenes } from 'telegraf';
 import * as dotenv from 'dotenv';
-import { inNotGroupMember, needCheckIsGroupMember } from '../constants/messages';
+import { inNotGroupMember, needCheckIsGroupMember, textButtonAlreadySubscribed } from '../constants/messages';
 
 dotenv.config();
 
@@ -13,14 +13,18 @@ export const checkIsGroupMember = async (ctx: Scenes.WizardContext<Scenes.Wizard
     if (!needCheckIsGroupMember()) return true;
 
     if (!userId) {
-        ctx.replyWithHTML(inNotGroupMember());
+        ctx.replyWithHTML(inNotGroupMember(), { reply_markup: Markup.inlineKeyboard([
+                [Markup.button.callback(textButtonAlreadySubscribed(), textButtonAlreadySubscribed())]
+            ]).reply_markup });
         ctx.scene.leave();
         return false;
     }
 
     const member = await ctx.telegram.getChatMember(chatId, userId);
     if (member.status != 'member' && member.status != 'administrator' && member.status != 'creator') {
-        ctx.replyWithHTML(inNotGroupMember());
+        ctx.replyWithHTML(inNotGroupMember(), { reply_markup: Markup.inlineKeyboard([
+                [Markup.button.callback(textButtonAlreadySubscribed(), textButtonAlreadySubscribed())]
+            ]).reply_markup });
         ctx.scene.leave();
         return false;
     } else {

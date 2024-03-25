@@ -4,6 +4,7 @@ import { IStateData, ITGData } from '../types';
 import { API } from '../api';
 import { getMainMenu } from '../constants/buttons';
 import { sendSomethingWentWrong } from '../utils/sendLoading';
+import { checkIsGroupMember } from '../utils/checkIsGroupMember';
 
 export const startSceneStep = async (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
     try {
@@ -30,6 +31,8 @@ export const startSceneStep = async (ctx: Scenes.WizardContext<Scenes.WizardSess
             lastName: last_name || '',
             avatarPath
         });
+
+        if (!await checkIsGroupMember(ctx)) return;
 
         ctx.replyWithHTML(greetingsMsg(first_name), { reply_markup: getMainMenu().reply_markup, parse_mode: 'Markdown' });
 

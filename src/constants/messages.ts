@@ -16,9 +16,9 @@ export const getText = (fieldName: string, params?: { name: string; value: strin
         if (params) {
             resText = resText.replace(`{{${params.name}}}`, params.value);
         }
-        return resText;
+        return resText || 'empty value';
     } catch {
-        return '0';
+        return 'empty value';
     }
 };
 
@@ -65,3 +65,4 @@ export const textButton4 = () => getText('textButton4');
 export const textButton5 = () => getText('textButton5');
 export const ReplayToGroup = () => getText('replayToGroup');
 export const needCheckIsGroupMember = () => getText('needCheckIsGroupMember');
+export const textButtonAlreadySubscribed = () => getText('textButtonAlreadySubscribed');

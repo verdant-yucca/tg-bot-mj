@@ -7,7 +7,9 @@ import { commands } from '../../constants/bot';
 import { stage } from './scenes';
 import { exitOfBot } from '../../utils';
 import { logger } from '../../middlewares';
-import { helpMessage } from '../../constants/messages';
+import { greetingsMsg, helpMessage, somethingWentWrong } from '../../constants/messages';
+import { getMainMenu } from '../../constants/buttons';
+import { ITGData } from '../../types';
 
 dotenv.config();
 
@@ -32,6 +34,15 @@ export const setupBot = (token: string) => {
         .hears(commands.stylingImage.command, ctx => ctx.scene.enter('generateByImageAndTextScene'))
         .hears(commands.help.command, ctx => {
             ctx.replyWithHTML(helpMessage(), { parse_mode: 'Markdown' });
+        })
+        .hears(commands.alreadySubscribes.command, ctx => {
+            if (typeof ctx.from === 'undefined' || ctx.from?.is_bot) {
+                ctx.replyWithHTML(somethingWentWrong(), { parse_mode: 'Markdown' });
+                return;
+            }
+            const { first_name } = ctx.from as ITGData;
+            ctx.replyWithHTML(greetingsMsg(first_name), { reply_markup: getMainMenu().reply_markup, parse_mode: 'Markdown' });
+
         })
         .on('callback_query', (ctx) => ctx.scene.enter('generateMoreOrUpscaleScene'))
         .command(commands.exit.command, ctx => exitOfBot(ctx));

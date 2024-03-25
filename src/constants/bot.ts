@@ -1,4 +1,11 @@
-import { textButton1, textButton2, textButton3, textButton4, textButton5 } from './messages';
+import {
+    textButton1,
+    textButton2,
+    textButton3,
+    textButton4,
+    textButton5,
+    textButtonAlreadySubscribed
+} from './messages';
 
 export const commands = {
     start: {
@@ -29,6 +36,11 @@ export const commands = {
     help: {
         command: textButton5(),
         title: textButton5(),
+        description: '',
+    },
+    alreadySubscribes: {
+        command: textButtonAlreadySubscribed(),
+        title: textButtonAlreadySubscribed(),
         description: '',
     },
     exit: {
