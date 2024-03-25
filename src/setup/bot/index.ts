@@ -35,16 +35,16 @@ export const setupBot = (token: string) => {
         .hears(commands.help.command, ctx => {
             ctx.replyWithHTML(helpMessage(), { parse_mode: 'Markdown' });
         })
-        .hears(commands.alreadySubscribes.command, ctx => {
-            if (typeof ctx.from === 'undefined' || ctx.from?.is_bot) {
-                ctx.replyWithHTML(somethingWentWrong(), { parse_mode: 'Markdown' });
-                return;
+        .on('callback_query', (ctx) => {
+            const callback = ctx.update && 'callback_query' in ctx.update ? ctx.update.callback_query : undefined;
+            const callbackData = callback && 'data' in callback ? callback.data : '';
+            if (callbackData === commands.alreadySubscribes.command) {
+                const { first_name } = ctx.from as ITGData;
+                ctx.replyWithHTML(greetingsMsg(first_name), { reply_markup: getMainMenu().reply_markup, parse_mode: 'Markdown' });
+            } else {
+                ctx.scene.enter('generateMoreOrUpscaleScene');
             }
-            const { first_name } = ctx.from as ITGData;
-            ctx.replyWithHTML(greetingsMsg(first_name), { reply_markup: getMainMenu().reply_markup, parse_mode: 'Markdown' });
-
         })
-        .on('callback_query', (ctx) => ctx.scene.enter('generateMoreOrUpscaleScene'))
         .command(commands.exit.command, ctx => exitOfBot(ctx));
 
     bot.use((ctx, next) => logger(ctx, next));
