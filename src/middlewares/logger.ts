@@ -3,7 +3,7 @@ import { Update } from 'telegraf/typings/core/types/typegram';
 
 export const logger = (ctx: Context<Update>, next: () => Promise<void>) => {
     const chanel = ctx.update as any;
-    if (chanel.channel_post?.chat?.id) return ctx.reply('You can\'t run a bot in a channel 😞');
+    if (chanel.channel_post?.chat?.id) return;
 
     try {
         const date = new Date().toISOString();
