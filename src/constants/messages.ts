@@ -40,14 +40,19 @@ export const messageResult = (prompt: string) => {
     const matches = prompt.match(regex);
 
     if (!matches || matches.length === 0) {
-        return getText('messageResultOnlyText', { value: prompt, name: 'prompt' });
+        const promptCut =  prompt.length > 1023 ? prompt.slice(0, 900) + '...' : prompt;
+        return getText('messageResultOnlyText', { value: promptCut, name: 'prompt' });
     } else if (matches.length === 1) {
-        return getText('messageResultOneImage', { value: prompt.replace(/https?:\/\/\S+/gi, ''), name: 'prompt' });
+        const promptWithoutLink =  prompt.replace(/https?:\/\/\S+/gi, '');
+        const promptCut =  promptWithoutLink.length > 1023 ? promptWithoutLink.slice(0, 1017) + '...' : promptWithoutLink;
+
+        return getText('messageResultOneImage', { value: promptCut, name: 'prompt' });
     } else if (matches.length === 2) {
         return getText('messageResultTwoImage');
     } else {
+        const promptCut =  prompt.length > 1023 ? prompt.slice(0, 900) + '...' : prompt;
         // Handle case with more than two links if needed
-        return getText('messageResult', { value: prompt, name: 'prompt' });
+        return getText('messageResult', { value: promptCut, name: 'prompt' });
     }
 };
 export const prohibitedSendingLinks = () => getText('prohibitedSendingLinks');
