@@ -1,14 +1,15 @@
 import { Scenes } from 'telegraf';
 
-import { Commands, ReplyMarkup } from '../types';
-
-export const wrapCommandsMarkup = (commands: Commands): ReplyMarkup => ({
-    reply_markup: {
-        inline_keyboard: commands,
-    },
-});
+import { ITGData } from '../types';
+import { API } from '../api';
 
 export const exitOfBot = async (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
+    const { id } = ctx.from as ITGData;
+    await API.auth.tgAuth({
+        chatId: id.toString(),
+        left: true,
+    });
+
     ctx.replyWithHTML('By by', { parse_mode: 'Markdown' });
     ctx.scene.leave();
 };

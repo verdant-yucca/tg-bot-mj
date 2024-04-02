@@ -40,17 +40,18 @@ export const messageResult = (prompt: string) => {
     const matches = prompt.match(regex);
 
     if (!matches || matches.length === 0) {
-        const promptCut =  prompt.length > 1023 ? prompt.slice(0, 900) + '...' : prompt;
+        const promptCut = prompt.length > 1023 ? prompt.slice(0, 900) + '...' : prompt;
         return getText('messageResultOnlyText', { value: promptCut, name: 'prompt' });
     } else if (matches.length === 1) {
-        const promptWithoutLink =  prompt.replace(/https?:\/\/\S+/gi, '');
-        const promptCut =  promptWithoutLink.length > 1023 ? promptWithoutLink.slice(0, 1017) + '...' : promptWithoutLink;
+        const promptWithoutLink = prompt.replace(/https?:\/\/\S+/gi, '');
+        const promptCut =
+            promptWithoutLink.length > 1023 ? promptWithoutLink.slice(0, 1017) + '...' : promptWithoutLink;
 
         return getText('messageResultOneImage', { value: promptCut, name: 'prompt' });
     } else if (matches.length === 2) {
         return getText('messageResultTwoImage');
     } else {
-        const promptCut =  prompt.length > 1023 ? prompt.slice(0, 900) + '...' : prompt;
+        const promptCut = prompt.length > 1023 ? prompt.slice(0, 900) + '...' : prompt;
         // Handle case with more than two links if needed
         return getText('messageResult', { value: promptCut, name: 'prompt' });
     }
@@ -58,10 +59,11 @@ export const messageResult = (prompt: string) => {
 export const prohibitedSendingLinks = () => getText('prohibitedSendingLinks');
 export const helpMessage = () => getText('helpMessage');
 export const waitMessage = () => getText('waitMessage');
-export const waitMessageWithProgress = (progress: string) => getText('waitMessageWithProgress', {
-    name: 'progress',
-    value: progress
-});
+export const waitMessageWithProgress = (progress: string) =>
+    getText('waitMessageWithProgress', {
+        name: 'progress',
+        value: progress,
+    });
 export const waitMessageDownloadPhoto = () => getText('waitMessageDownloadPhoto');
 export const textButton1 = () => getText('textButton1');
 export const textButton2 = () => getText('textButton2');
@@ -71,3 +73,4 @@ export const textButton5 = () => getText('textButton5');
 export const ReplayToGroup = () => getText('replayToGroup');
 export const needCheckIsGroupMember = () => getText('needCheckIsGroupMember');
 export const textButtonAlreadySubscribed = () => getText('textButtonAlreadySubscribed');
+export const noRequestsAvailable = () => getText('noRequestsAvailable');

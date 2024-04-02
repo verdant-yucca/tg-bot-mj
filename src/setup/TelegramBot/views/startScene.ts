@@ -1,10 +1,11 @@
 import { Scenes } from 'telegraf';
-import { greetingsMsg, somethingWentWrong } from '../constants/messages';
-import { IStateData, ITGData } from '../types';
-import { API } from '../api';
-import { getMainMenu } from '../constants/buttons';
-import { sendSomethingWentWrong } from '../utils/sendLoading';
-import { checkIsGroupMember } from '../utils/checkIsGroupMember';
+import { greetingsMsg, somethingWentWrong } from '../../../constants/messages';
+import { ITGData } from '../../../types';
+import { API } from '../../../api';
+import { getMainMenu } from '../../../constants/buttons';
+import { sendSomethingWentWrong } from '../../../utils/sendLoading';
+import { checkIsGroupMember } from '../../../utils/checks/checkIsGroupMember';
+import { escapeTelegrafMarkdown } from '../../../utils/escapeTelegrafMarkdown';
 
 export const startSceneStep = async (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
     try {
@@ -25,20 +26,25 @@ export const startSceneStep = async (ctx: Scenes.WizardContext<Scenes.WizardSess
 
         await API.auth.tgAuth({
             chatId: id.toString(),
-            languageCode: language_code,
-            username: username || `${first_name}_${id}`,
+            languageCode: language_code || 'ru',
+            username: username || '',
             firstName: first_name,
             lastName: last_name || '',
-            avatarPath
+            avatarPath,
         });
 
-        if (!await checkIsGroupMember(ctx)) return;
+        if (!(await checkIsGroupMember(ctx))) return;
 
-        ctx.replyWithHTML(greetingsMsg(first_name), { reply_markup: getMainMenu().reply_markup, parse_mode: 'Markdown' });
+        ctx.replyWithHTML(greetingsMsg(escapeTelegrafMarkdown(first_name)), {
+            reply_markup: getMainMenu().reply_markup,
+            parse_mode: 'Markdown',
+        });
 
         return ctx.scene.leave();
     } catch (e) {
-        console.error('Error msg', e);
-        return sendSomethingWentWrong(ctx);
+        console.error('startSceneStep -> catch', e);
+        const chatId = (ctx.from as ITGData).id.toString();
+        sendSomethingWentWrong(chatId);
+        return ctx.scene.leave();
     }
 };

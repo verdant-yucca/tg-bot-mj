@@ -27,5 +27,6 @@
     "textButton4": "\uD83D\uDD2E Экспериментировать",
     "textButton5": "\uD83D\uDCDE Help",
     "replayToGroup": false,
-    "needCheckIsGroupMember": false
+    "needCheckIsGroupMember": false,
+    "noRequestsAvailable": "У вас закончились все доступные запросы. \n10 бесплатных запросов начисляются каждый день в 03:00 мск. \nТакже вы можете приобрести их. Для покупки запросов отправьте команду /payments."
 }

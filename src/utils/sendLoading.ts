@@ -1,48 +1,79 @@
 import { Scenes } from 'telegraf';
+import path from 'path';
 import {
     badRequest,
     somethingWentWrong,
     hssOutstandingRequest,
     hssCompletedRequest,
-    waitMessageDownloadPhoto, waitMessageWithProgress, waitMessage
+    waitMessageDownloadPhoto,
+    waitMessageWithProgress,
+    waitMessage,
 } from '../constants/messages';
 import { getMainMenu } from '../constants/buttons';
-import path from 'path';
+import TelegramBot from '../setup/TelegramBot/init';
 
 export const sendHasOutstandingRequestMessage = async (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
-    const wp = await ctx.replyWithHTML(hssOutstandingRequest(), {
-        parse_mode: 'Markdown',
-        reply_markup: getMainMenu().reply_markup
-    });
-    setTimeout(async () => {
-        await ctx.deleteMessage(wp.message_id);
-    }, 30000); // 60000 миллисекунд = 1 минута
-    return ctx.scene.leave();
+    try {
+        const message = await ctx.replyWithHTML(hssOutstandingRequest(), {
+            parse_mode: 'Markdown',
+            reply_markup: getMainMenu().reply_markup,
+        });
+        setTimeout(async () => {
+            await ctx.deleteMessage(message.message_id);
+        }, 30000); // 30 секунд
+        return ctx.scene.leave();
+    } catch (e) {
+        console.error('sendHasOutstandingRequestMessage e', e);
+        return ctx.scene.leave();
+    }
 };
 
-export const sendHasCompletedRequestMessage = (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
-    ctx.replyWithHTML(hssCompletedRequest(), {
-        parse_mode: 'Markdown',
-        reply_markup: getMainMenu().reply_markup
-    });
-    return ctx.scene.leave();
+export const sendHasCompletedRequestMessage = async (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
+    try {
+        const message = await ctx.replyWithHTML(hssCompletedRequest(), {
+            parse_mode: 'Markdown',
+            reply_markup: getMainMenu().reply_markup,
+        });
+
+        setTimeout(async () => {
+            await ctx.deleteMessage(message.message_id);
+        }, 30000); // 30 секунд
+
+        return ctx.scene.leave();
+    } catch (e) {
+        console.error('sendHasCompletedRequestMessage e', e);
+        return ctx.scene.leave();
+    }
 };
 
-export const sendSomethingWentWrong = (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
-    const session = ctx.session as { isHasOutstandingRequest: boolean };
-    session.isHasOutstandingRequest = false;
-    ctx.replyWithHTML(somethingWentWrong(), {
-        parse_mode: 'Markdown',
-        reply_markup: getMainMenu().reply_markup
-    });
-    return ctx.scene.leave();
+export const sendSomethingWentWrong = async (chatId: string) => {
+    try {
+        const message = await TelegramBot.telegram.sendMessage(chatId, somethingWentWrong(), {
+            parse_mode: 'Markdown',
+            reply_markup: getMainMenu().reply_markup,
+        });
+
+        setTimeout(async () => {
+            await TelegramBot.telegram.deleteMessage(chatId, message.message_id);
+        }, 30000); // 30 секунд
+    } catch (e) {
+        console.error('sendSomethingWentWrong e', e);
+    }
 };
 
-export const sendBadRequestMessage = (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
-    const session = ctx.session as { isHasOutstandingRequest: boolean };
-    session.isHasOutstandingRequest = false;
-    ctx.replyWithHTML(badRequest(), { parse_mode: 'Markdown', reply_markup: getMainMenu().reply_markup });
-    return ctx.scene.leave();
+export const sendBadRequestMessage = async (chatId: string) => {
+    try {
+        const message = await TelegramBot.telegram.sendMessage(chatId, badRequest(), {
+            parse_mode: 'Markdown',
+            reply_markup: getMainMenu().reply_markup,
+        });
+
+        setTimeout(async () => {
+            await TelegramBot.telegram.deleteMessage(chatId, message.message_id);
+        }, 30000); // 30 секунд
+    } catch (e) {
+        console.error('sendBadRequestMessage e', e);
+    }
 };
 
 export const sendWaitMessage = async (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) =>
@@ -50,37 +81,30 @@ export const sendWaitMessage = async (ctx: Scenes.WizardContext<Scenes.WizardSes
     await ctx.replyWithDocument(
         {
             source: path.resolve(__dirname, '../static/loading.gif'),
-            filename: 'loading.gif'
+            filename: 'loading.gif',
         },
         {
             parse_mode: 'Markdown',
-            caption: waitMessage()
-        }
+            caption: waitMessage(),
+        },
     );
 
-export const sendLoadingMesage = (
-    ctx: Scenes.WizardContext<Scenes.WizardSessionData>,
-    message: any,
-    progress: string
-) => {
-    ctx.telegram.editMessageCaption(
-        message.chat.id,
-        message.message_id,
-        '0',
-        waitMessageWithProgress(progress),
-        { parse_mode: 'Markdown' }
-    );
+export const sendLoadingMesage = (chatId: string, messageId: number, progress: string) => {
+    try {
+        TelegramBot.telegram.editMessageCaption(chatId, messageId, '0', waitMessageWithProgress(progress), {
+            parse_mode: 'Markdown',
+        });
+    } catch (e) {
+        console.error('sendDownloadPhotoInProgressMesage e ', e);
+    }
 };
 
-export const sendDownloadPhotoInProgressMesage = (
-    ctx: Scenes.WizardContext<Scenes.WizardSessionData>,
-    message: any
-) => {
-    ctx.telegram.editMessageCaption(
-        message.chat.id,
-        message.message_id,
-        '0',
-        waitMessageDownloadPhoto(),
-        { parse_mode: 'Markdown' }
-    );
+export const sendDownloadPhotoInProgressMesage = (chatId: string, messageId: number) => {
+    try {
+        TelegramBot.telegram.editMessageCaption(chatId, messageId, '0', waitMessageDownloadPhoto(), {
+            parse_mode: 'Markdown',
+        });
+    } catch (e) {
+        console.error('sendDownloadPhotoInProgressMesage e ', e);
+    }
 };
