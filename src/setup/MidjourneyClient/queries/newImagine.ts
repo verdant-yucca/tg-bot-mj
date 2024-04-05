@@ -103,7 +103,38 @@ export const newImagine = ({
                         .deleteMessage(chatId, waitMessageId)
                         .catch(e => console.error('удаление сообщения неуспешно', e));
                     TelegramBot.telegram
-                        .sendMessage(chatId, `В вашем запросе переданы некорректные параметры:\n${e.message}`)
+                        .sendMessage(
+                            chatId,
+                            `В вашем запросе переданы некорректные параметры:\n${e.message}\nЕсли вам удобно писать параметры вручную, то рекомендуем убрать выбранные формат и размер в настройках.`
+                        )
+                        .catch(e => console.error('отправка сообщения неуспешна', e));
+                    updateTransaction({
+                        _id,
+                        stage: 'badRequest',
+                    }).catch(e => console.error('не удалось обновить транзакцию', e));
+                } else if (e.message.includes('Invalid aspect ratio')) {
+                    TelegramBot.telegram
+                        .deleteMessage(chatId, waitMessageId)
+                        .catch(e => console.error('удаление сообщения неуспешно', e));
+                    TelegramBot.telegram
+                        .sendMessage(
+                            chatId,
+                            `В вашем запросе переданы некорректные параметры:\n${e.message}\nЕсли вам удобно писать параметры вручную, то рекомендуем убрать выбранные формат и размер в настройках.`
+                        )
+                        .catch(e => console.error('отправка сообщения неуспешна', e));
+                    updateTransaction({
+                        _id,
+                        stage: 'badRequest',
+                    }).catch(e => console.error('не удалось обновить транзакцию', e));
+                } else if (e.message.includes('Invalid value provided for argument')) {
+                    TelegramBot.telegram
+                        .deleteMessage(chatId, waitMessageId)
+                        .catch(e => console.error('удаление сообщения неуспешно', e));
+                    TelegramBot.telegram
+                        .sendMessage(
+                            chatId,
+                            `В вашем запросе переданы некорректные параметры:\n${e.message}\nЕсли вам удобно писать параметры вручную, то рекомендуем убрать выбранные формат и размер в настройках.`
+                        )
                         .catch(e => console.error('отправка сообщения неуспешна', e));
                     updateTransaction({
                         _id,
