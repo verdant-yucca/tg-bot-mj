@@ -10,6 +10,7 @@ import { ITGData } from '../../../types';
 import { checkIsBadPrompt } from '../../../utils/checks/checkIsBadRequest';
 import { checkHasRunningTransactions } from '../../../utils/checks/checkHasRunningTransactions';
 import { getUserByIdFromDb } from '../../../utils/db/saveUserInDb';
+import { formatingPrompt } from '../../../utils/formatingPrompt';
 
 export const enterYourTextStep1 = async (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
     try {
@@ -48,12 +49,12 @@ export const generateImageByTextStep2 = async (ctx: Scenes.WizardContext<Scenes.
         const { selectedStyle, selectedSize } = await getUserByIdFromDb(ctx);
         await addNewTransaction({
             chatId,
-            translatedPrompt: `${translatedPrompt}${
+            translatedPrompt: `${formatingPrompt(translatedPrompt)}${
                 selectedStyle && selectedStyle !== 'Без стиля' ? selectedStyle : ''
             }${selectedSize && selectedSize !== 'Без формата' ? selectedSize : ''}`,
-            originPrompt: `${originPrompt}${selectedStyle && selectedStyle !== 'Без стиля' ? selectedStyle : ''}${
-                selectedSize && selectedSize !== 'Без формата' ? selectedSize : ''
-            }`,
+            originPrompt: `${formatingPrompt(originPrompt)}${
+                selectedStyle && selectedStyle !== 'Без стиля' ? selectedStyle : ''
+            }${selectedSize && selectedSize !== 'Без формата' ? selectedSize : ''}`,
             waitMessageId: waitMessage && 'message_id' in waitMessage ? waitMessage.message_id : -1,
             midjourneyClientId,
             action: 'generateImageByText',
