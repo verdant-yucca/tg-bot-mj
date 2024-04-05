@@ -48,7 +48,7 @@ export const newImagine = ({
                             {
                                 reply_markup: Markup.inlineKeyboard(getButtonsForFourPhoto(_id)).reply_markup,
                                 parse_mode: 'Markdown',
-                            },
+                            }
                         )
                         .catch(e => console.error('не удалось отправить фото, возможно пользователь удалил бота', e))
                         .finally(() => {
@@ -94,6 +94,17 @@ export const newImagine = ({
                         .deleteMessage(chatId, waitMessageId)
                         .catch(e => console.error('удаление сообщения неуспешно', e));
                     sendBadRequestMessage(chatId);
+                    updateTransaction({
+                        _id,
+                        stage: 'badRequest',
+                    }).catch(e => console.error('не удалось обновить транзакцию', e));
+                } else if (e.message.includes('Unrecognized parameter(s)')) {
+                    TelegramBot.telegram
+                        .deleteMessage(chatId, waitMessageId)
+                        .catch(e => console.error('удаление сообщения неуспешно', e));
+                    TelegramBot.telegram
+                        .sendMessage(chatId, `В вашем запросе переданы некорректные параметры:\n${e.message}`)
+                        .catch(e => console.error('отправка сообщения неуспешна', e));
                     updateTransaction({
                         _id,
                         stage: 'badRequest',

@@ -11,7 +11,6 @@ import _ from 'lodash';
 import { checkIsBadPrompt } from '../../../utils/checks/checkIsBadRequest';
 import { checkHasRunningTransactions } from '../../../utils/checks/checkHasRunningTransactions';
 import { getUserByIdFromDb } from '../../../utils/db/saveUserInDb';
-import { formatingPrompt } from '../../../utils/formatingPrompt';
 
 export const enterYourImageStep1 = async (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
     try {
@@ -71,10 +70,10 @@ export const stylingImageByTextStep3 = async (ctx: Scenes.WizardContext<Scenes.W
         const midjourneyClientId = await getFreeMidjourneyClient();
         await addNewTransaction({
             chatId,
-            translatedPrompt: `${imageUrl} ${formatingPrompt(translatedPrompt)}${
+            translatedPrompt: `${imageUrl} ${translatedPrompt}${
                 selectedStyle && selectedStyle !== 'Без стиля' ? selectedStyle : ''
             }${selectedSize && selectedSize !== 'Без формата' ? selectedSize : ''}`,
-            originPrompt: `${imageUrl} ${formatingPrompt(originPrompt)}${
+            originPrompt: `${imageUrl} ${originPrompt}${
                 selectedStyle && selectedStyle !== 'Без стиля' ? selectedStyle : ''
             }${selectedSize && selectedSize !== 'Без формата' ? selectedSize : ''}`,
             waitMessageId: 'message_id' in waitMessage ? waitMessage.message_id : -1,
