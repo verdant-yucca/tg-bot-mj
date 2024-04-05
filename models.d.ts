@@ -10,6 +10,9 @@ declare namespace ApiTypes {
         countFreeQueries?: string;
         lastAuth?: string;
         left?: boolean;
+        payments?: Array<{ date: string; count: string; price: string }>;
+        selectedStyle?: string;
+        selectedSize?: string;
     }
 
     export interface AuthResponse {
@@ -24,11 +27,14 @@ declare namespace ApiTypes {
         countFreeQueries?: string;
         lastAuth?: string;
         left?: boolean;
+        selectedStyle?: string;
+        selectedSize?: string;
     }
 
     export interface SaveQueryRequest {
         chatId: string;
         prompt?: string;
+        queryId?: string;
         originPrompt?: string;
         waitMessageId?: string;
         discordMsgId?: string;
@@ -59,7 +65,7 @@ declare namespace ApiTypes {
     }
 
     export interface GetQueryRequest {
-        _id: string;
+        queryId: string;
     }
 
     export interface GetQueryResponse {
@@ -70,6 +76,7 @@ declare namespace ApiTypes {
         chatId: string;
         prompt: string;
         originPrompt: string;
+        midjourneyClientId: string;
     }
 
     export interface FindQueryRequest {
@@ -103,6 +110,7 @@ declare namespace ApiTypes {
         stage: string;
         action?: string;
         discordMsgId?: string;
+        midjourneyClientId?: string;
     }
 
     export interface AddNewTransactionResponse {
@@ -142,5 +150,24 @@ declare namespace ApiTypes {
         dateUpdate: Date;
         leadTime: number;
         waitTime: number;
+        midjourneyClientId: string;
+    }
+    export interface Packages {
+        _id: string;
+        name: string;
+        price: number;
+        dateCreate: Date;
+        count: number;
+        title: string;
+        description: string;
+        photoUrl: string;
+        photoWidth: number;
+        photoHeight: number;
+    }
+
+    export interface Settings {
+        _id: string;
+        styles: Array<{ name: string; value: string; url: string }>;
+        sizes: Array<{ name: string; value: string; url: string }>;
     }
 }

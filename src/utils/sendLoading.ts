@@ -14,13 +14,9 @@ import TelegramBot from '../setup/TelegramBot/init';
 
 export const sendHasOutstandingRequestMessage = async (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
     try {
-        const message = await ctx.replyWithHTML(hssOutstandingRequest(), {
+        ctx.replyWithHTML(hssOutstandingRequest(), {
             parse_mode: 'Markdown',
-            reply_markup: getMainMenu().reply_markup,
-        });
-        setTimeout(async () => {
-            await ctx.deleteMessage(message.message_id);
-        }, 30000); // 30 секунд
+        }).catch(e => console.error('sendHasOutstandingRequestMessage e ', e));
         return ctx.scene.leave();
     } catch (e) {
         console.error('sendHasOutstandingRequestMessage e', e);
@@ -30,14 +26,9 @@ export const sendHasOutstandingRequestMessage = async (ctx: Scenes.WizardContext
 
 export const sendHasCompletedRequestMessage = async (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
     try {
-        const message = await ctx.replyWithHTML(hssCompletedRequest(), {
+        ctx.replyWithHTML(hssCompletedRequest(), {
             parse_mode: 'Markdown',
-            reply_markup: getMainMenu().reply_markup,
-        });
-
-        setTimeout(async () => {
-            await ctx.deleteMessage(message.message_id);
-        }, 30000); // 30 секунд
+        }).catch(e => console.error('sendHasCompletedRequestMessage e ', e));
 
         return ctx.scene.leave();
     } catch (e) {
@@ -48,14 +39,11 @@ export const sendHasCompletedRequestMessage = async (ctx: Scenes.WizardContext<S
 
 export const sendSomethingWentWrong = async (chatId: string) => {
     try {
-        const message = await TelegramBot.telegram.sendMessage(chatId, somethingWentWrong(), {
-            parse_mode: 'Markdown',
-            reply_markup: getMainMenu().reply_markup,
-        });
-
-        setTimeout(async () => {
-            await TelegramBot.telegram.deleteMessage(chatId, message.message_id);
-        }, 30000); // 30 секунд
+        TelegramBot.telegram
+            .sendMessage(chatId, somethingWentWrong(), {
+                parse_mode: 'Markdown',
+            })
+            .catch(e => console.error('sendSomethingWentWrong e ', e));
     } catch (e) {
         console.error('sendSomethingWentWrong e', e);
     }
@@ -63,14 +51,11 @@ export const sendSomethingWentWrong = async (chatId: string) => {
 
 export const sendBadRequestMessage = async (chatId: string) => {
     try {
-        const message = await TelegramBot.telegram.sendMessage(chatId, badRequest(), {
-            parse_mode: 'Markdown',
-            reply_markup: getMainMenu().reply_markup,
-        });
-
-        setTimeout(async () => {
-            await TelegramBot.telegram.deleteMessage(chatId, message.message_id);
-        }, 30000); // 30 секунд
+        TelegramBot.telegram
+            .sendMessage(chatId, badRequest(), {
+                parse_mode: 'Markdown',
+            })
+            .catch(e => console.error('sendBadRequestMessage e ', e));
     } catch (e) {
         console.error('sendBadRequestMessage e', e);
     }
@@ -86,14 +71,16 @@ export const sendWaitMessage = async (ctx: Scenes.WizardContext<Scenes.WizardSes
         {
             parse_mode: 'Markdown',
             caption: waitMessage(),
-        },
+        }
     );
 
 export const sendLoadingMesage = (chatId: string, messageId: number, progress: string) => {
     try {
-        TelegramBot.telegram.editMessageCaption(chatId, messageId, '0', waitMessageWithProgress(progress), {
-            parse_mode: 'Markdown',
-        });
+        TelegramBot.telegram
+            .editMessageCaption(chatId, messageId, '0', waitMessageWithProgress(progress), {
+                parse_mode: 'Markdown',
+            })
+            .catch(e => console.error('sendDownloadPhotoInProgressMesage e ', e));
     } catch (e) {
         console.error('sendDownloadPhotoInProgressMesage e ', e);
     }
@@ -101,9 +88,11 @@ export const sendLoadingMesage = (chatId: string, messageId: number, progress: s
 
 export const sendDownloadPhotoInProgressMesage = (chatId: string, messageId: number) => {
     try {
-        TelegramBot.telegram.editMessageCaption(chatId, messageId, '0', waitMessageDownloadPhoto(), {
-            parse_mode: 'Markdown',
-        });
+        TelegramBot.telegram
+            .editMessageCaption(chatId, messageId, '0', waitMessageDownloadPhoto(), {
+                parse_mode: 'Markdown',
+            })
+            .catch(e => console.error('sendDownloadPhotoInProgressMesage e ', e));
     } catch (e) {
         console.error('sendDownloadPhotoInProgressMesage e ', e);
     }

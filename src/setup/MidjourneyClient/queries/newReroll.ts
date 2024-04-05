@@ -1,12 +1,11 @@
 import { MJMessage } from 'midjourney';
 import { Markup } from 'telegraf';
 import TelegramBot from '../../TelegramBot/init';
-import MidjourneyClient from '../index';
+import { MidjourneyClient } from '../index';
 import {
     sendBadRequestMessage,
     sendDownloadPhotoInProgressMesage,
     sendLoadingMesage,
-    sendSomethingWentWrong,
 } from '../../../utils/sendLoading';
 import { getButtonsForFourPhoto, getDataButtonsForFourPhoto } from '../../../utils/getButtonsForFourPhoto';
 import { updateTransaction } from '../../../utils/db/saveTransactionsInDB';
@@ -14,12 +13,21 @@ import { getQuery } from '../../../api/query';
 
 export const newReroll = async ({ chatId, waitMessageId, _id, action }: ApiTypes.Transaction) => {
     try {
+        //обновляем данные о начале выполнения запроса в базе
+        updateTransaction({
+            _id,
+            stage: 'running',
+        });
         const queryId = action?.split('!!!')[0] || '';
-        const { prompt, originPrompt } = await getQuery({ _id: queryId });
+        const { prompt, originPrompt, midjourneyClientId = '1' } = await getQuery({ queryId });
 
-        MidjourneyClient.Imagine(prompt, (_, progress: string) => sendLoadingMesage(chatId, +waitMessageId, progress))
+        MidjourneyClient[midjourneyClientId]
+            .Imagine(prompt, (_, progress: string) => sendLoadingMesage(chatId, +waitMessageId, progress))
             .then((Imagine: MJMessage | null) => {
-                if (!Imagine) return sendSomethingWentWrong(chatId);
+                if (!Imagine) {
+                    console.error('нет Imagine в newUpscale -> 34 line');
+                    return;
+                }
                 if (Imagine.uri) {
                     sendDownloadPhotoInProgressMesage(chatId, +waitMessageId);
 
@@ -32,8 +40,11 @@ export const newReroll = async ({ chatId, waitMessageId, _id, action }: ApiTypes
                                 parse_mode: 'Markdown',
                             },
                         )
+                        .catch(e => console.error('не удалось отправить фото, возможно пользователь удалил бота', e))
                         .finally(() => {
-                            TelegramBot.telegram.deleteMessage(chatId, +waitMessageId);
+                            TelegramBot.telegram
+                                .deleteMessage(chatId, +waitMessageId)
+                                .catch(e => console.error('е удалось удалить ожидающее сообщение', e));
                         });
 
                     //снимаем со счёта пользователя запрос
@@ -48,7 +59,7 @@ export const newReroll = async ({ chatId, waitMessageId, _id, action }: ApiTypes
                         discordMsgId: Imagine.id || '',
                         flags: Imagine.flags.toString(),
                         stage: 'completed',
-                    });
+                    }).catch(e => console.error('updateTransaction неуспешно', e));
                 } else {
                     console.log('Я хз что тут будет, надо разобраться', Imagine);
                     throw new Error('Я хз что тут будет а ошибка, надо разобраться');
@@ -57,20 +68,45 @@ export const newReroll = async ({ chatId, waitMessageId, _id, action }: ApiTypes
             .catch(e => {
                 //скорее всего где то тут ошибка появляется, что в дискорде очередь забита
                 console.error('generateByText -> MidjourneyClient.Imagine -> catch ', e);
-                updateTransaction({
-                    _id,
-                    prompt,
-                    originPrompt,
-                    stage: 'badRequest',
-                });
-                TelegramBot.telegram.deleteMessage(chatId, +waitMessageId);
-                return sendBadRequestMessage(chatId);
+
+                if (
+                    e.message ===
+                        'Your job queue is full. Please wait for a job to finish first, then resubmit this one.' ||
+                    e.message === 'ImagineApi failed with status 429'
+                ) {
+                    console.log('e.message', e.message);
+                    updateTransaction({
+                        _id,
+                        prompt,
+                        originPrompt,
+                        stage: 'waiting start',
+                    });
+                } else if (e.message.includes('Banned prompt detected')) {
+                    updateTransaction({
+                        _id,
+                        prompt,
+                        originPrompt,
+                        stage: 'badRequest',
+                    }).catch(e => console.error('updateTransaction неуспешно', e));
+                    TelegramBot.telegram
+                        .deleteMessage(chatId, +waitMessageId)
+                        .catch(e => console.error('удаление сообщения неуспешно', e));
+                    sendBadRequestMessage(chatId);
+                } else {
+                    console.log('e.message undetected', e.message);
+                    updateTransaction({
+                        _id,
+                        prompt,
+                        originPrompt,
+                        stage: 'waiting start',
+                    });
+                }
             });
     } catch (e) {
         console.error('newReroll -> catch', e);
         updateTransaction({
             _id,
             stage: 'failed',
-        });
+        }).catch(e => console.error(e));
     }
 };

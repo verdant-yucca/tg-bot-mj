@@ -1,5 +1,5 @@
 import { Scenes } from 'telegraf';
-import { greetingsMsg, somethingWentWrong } from '../../../constants/messages';
+import { countFreeRequest, greetingsMsg, somethingWentWrong } from '../../../constants/messages';
 import { ITGData } from '../../../types';
 import { API } from '../../../api';
 import { getMainMenu } from '../../../constants/buttons';
@@ -31,6 +31,7 @@ export const startSceneStep = async (ctx: Scenes.WizardContext<Scenes.WizardSess
             firstName: first_name,
             lastName: last_name || '',
             avatarPath,
+            countFreeQueries: countFreeRequest(),
         });
 
         if (!(await checkIsGroupMember(ctx))) return;

@@ -12,7 +12,6 @@ export const checkHasAvailableQueries = async (ctx: Scenes.WizardContext<Scenes.
         } else {
             ctx.replyWithHTML(noRequestsAvailable(), {
                 parse_mode: 'Markdown',
-                reply_markup: getMainMenu().reply_markup,
             });
             ctx.scene.leave();
             return false;

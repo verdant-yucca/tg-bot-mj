@@ -1,5 +1,6 @@
-import MidjourneyClient from '../index';
+import { MidjourneyClient } from '../index';
 import {
+    sendBadRequestMessage,
     sendDownloadPhotoInProgressMesage,
     sendLoadingMesage,
     sendSomethingWentWrong,
@@ -16,31 +17,50 @@ dotenv.config();
 
 export const newVariation = async ({ chatId, waitMessageId, _id, action }: ApiTypes.Transaction) => {
     try {
+        //обновляем данные о начале выполнения запроса в базе
+        updateTransaction({
+            _id,
+            stage: 'running',
+        });
         const queryId = action?.split('!!!')[0] || '';
         const button = action?.split('!!!')[1] || '';
-        const { buttons, discordMsgId, prompt, originPrompt, flags } = await getQuery({ _id: queryId });
+        const {
+            buttons,
+            discordMsgId,
+            prompt,
+            originPrompt,
+            flags,
+            midjourneyClientId = '1',
+        } = await getQuery({ queryId });
         const allCustomButtons = JSON.parse(buttons) as Record<string, string>;
         const custom = allCustomButtons[button];
+        console.log('originPrompt', originPrompt);
 
-        MidjourneyClient.Custom({
-            msgId: discordMsgId,
-            flags: Number(flags),
-            customId: custom,
-            content: prompt, //remix mode require content
-            loading: (_, progress: string) => sendLoadingMesage(chatId, +waitMessageId, progress),
-        })
+        MidjourneyClient[midjourneyClientId]
+            .Custom({
+                msgId: discordMsgId,
+                flags: Number(flags),
+                customId: custom,
+                content: prompt, //remix mode require content
+                loading: (_, progress: string) => sendLoadingMesage(chatId, +waitMessageId, progress),
+            })
             .then(async (Variation: MJMessage | null) => {
-                if (!Variation) throw new Error('no Variation');
+                if (!Variation) {
+                    console.error('нет Variation в newUpscale -> 34 line');
+                    return;
+                }
                 sendDownloadPhotoInProgressMesage(chatId, +waitMessageId);
 
                 TelegramBot.telegram
                     .sendPhoto(chatId, { url: Variation.uri }, Markup.inlineKeyboard(getButtonsForFourPhoto(_id)))
                     .catch(e => {
                         console.log('не удалось отправить результат', e);
-                        return sendSomethingWentWrong(chatId);
+                        sendSomethingWentWrong(chatId);
                     })
                     .finally(() => {
-                        TelegramBot.telegram.deleteMessage(chatId, +waitMessageId);
+                        TelegramBot.telegram
+                            .deleteMessage(chatId, +waitMessageId)
+                            .catch(e => console.error('е удалось удалить ожидающее сообщение', e));
                     });
 
                 updateTransaction({
@@ -51,29 +71,49 @@ export const newVariation = async ({ chatId, waitMessageId, _id, action }: ApiTy
                     discordMsgId: Variation.id || '',
                     flags: Variation.flags.toString(),
                     stage: 'completed',
-                });
+                }).catch(e => console.error('не удалось обновить транзакцию', e));
             })
             .catch(e => {
                 //скорее всего где то тут ошибка появляется, что в дискорде очередь забита
                 console.log('NewUpscale -> MidjourneyClient.Custom -> catch', e);
-                updateTransaction({
-                    _id,
-                    prompt,
-                    originPrompt,
-                    buttons: '',
-                    discordMsgId: '',
-                    flags: '',
-                    stage: 'badRequest',
-                });
-
-                TelegramBot.telegram.deleteMessage(chatId, +waitMessageId);
-                sendSomethingWentWrong(chatId);
+                if (
+                    e.message ===
+                        'Your job queue is full. Please wait for a job to finish first, then resubmit this one.' ||
+                    e.message === 'ImagineApi failed with status 429'
+                ) {
+                    console.log('e.message', e.message);
+                    updateTransaction({
+                        _id,
+                        prompt,
+                        originPrompt,
+                        stage: 'waiting start',
+                    }).catch(e => console.error('не удалось обновить транзакцию', e));
+                } else if (e.message.includes('Banned prompt detected')) {
+                    TelegramBot.telegram
+                        .deleteMessage(chatId, +waitMessageId)
+                        .catch(e => console.error('удаление сообщения неуспешно', e));
+                    sendBadRequestMessage(chatId);
+                    updateTransaction({
+                        _id,
+                        prompt,
+                        originPrompt,
+                        stage: 'badRequest',
+                    }).catch(e => console.error('не удалось обновить транзакцию', e));
+                } else {
+                    console.log('e.message undetected', e.message);
+                    updateTransaction({
+                        _id,
+                        prompt,
+                        originPrompt,
+                        stage: 'waiting start',
+                    }).catch(e => console.error('не удалось обновить транзакцию', e));
+                }
             });
     } catch (e) {
         console.error('newVariation -> catch', e);
         updateTransaction({
             _id,
             stage: 'failed',
-        });
+        }).catch(e => console.error('не удалось обновить транзакцию', e));
     }
 };

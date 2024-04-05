@@ -1,7 +1,7 @@
 import { MJMessage } from 'midjourney';
 import { Markup } from 'telegraf';
 import TelegramBot from '../../TelegramBot/init';
-import MidjourneyClient from '../index';
+import { MidjourneyClient } from '../index';
 import {
     sendBadRequestMessage,
     sendDownloadPhotoInProgressMesage,
@@ -16,17 +16,28 @@ export const newImagine = ({
     chatId,
     waitMessageId,
     _id,
+    midjourneyClientId = '1',
 }: {
     prompt: string;
     chatId: string;
     waitMessageId: number;
     _id: string;
+    midjourneyClientId: string;
 }) => {
     try {
-        MidjourneyClient.Imagine(prompt, (_, progress: string) => sendLoadingMesage(chatId, waitMessageId, progress))
+        //обновляем данные о начале выполнения запроса в базе
+        updateTransaction({
+            _id,
+            stage: 'running',
+        }).catch(e => console.error('не удалось обновить транзакцию', e));
+
+        MidjourneyClient[midjourneyClientId]
+            .Imagine(prompt, (_, progress: string) => sendLoadingMesage(chatId, waitMessageId, progress))
             .then((Imagine: MJMessage | null) => {
-                console.log('Imagine', Imagine);
-                if (!Imagine) throw new Error('no Imagine at 29 line code');
+                if (!Imagine) {
+                    console.error('нет Imagine в newUpscale -> 38 line');
+                    return;
+                }
                 if (Imagine.uri) {
                     sendDownloadPhotoInProgressMesage(chatId, waitMessageId);
 
@@ -39,12 +50,15 @@ export const newImagine = ({
                                 parse_mode: 'Markdown',
                             },
                         )
+                        .catch(e => console.error('не удалось отправить фото, возможно пользователь удалил бота', e))
                         .finally(() => {
-                            TelegramBot.telegram.deleteMessage(chatId, waitMessageId);
+                            TelegramBot.telegram
+                                .deleteMessage(chatId, waitMessageId)
+                                .catch(e => console.error('е удалось удалить ожидающее сообщение', e));
                         });
 
                     //снимаем со счёта пользователя запрос
-                    writeOffRequestFromUser(chatId);
+                    writeOffRequestFromUser(chatId).catch(e => console.error('не удалось списать запрос', e));
                     //обновляем данные о выполненном запросе в базе
                     updateTransaction({
                         _id,
@@ -52,10 +66,9 @@ export const newImagine = ({
                         discordMsgId: Imagine.id || '',
                         flags: Imagine.flags.toString(),
                         stage: 'completed',
-                    });
+                    }).catch(e => console.error('не удалось обновить транзакцию', e));
                 } else {
                     console.log('Я хз что тут будет, надо разобраться', Imagine);
-                    throw new Error('Я хз что тут будет, надо разобраться');
                 }
             })
             .catch(e => {
@@ -69,37 +82,35 @@ export const newImagine = ({
                     console.log('e.message', e.message);
                     updateTransaction({
                         _id,
-                        buttons: '',
-                        discordMsgId: '',
-                        flags: '',
                         stage: 'waiting start',
-                    });
-                } else if (e.message.includes('Banned prompt detected')) {
-                    TelegramBot.telegram.deleteMessage(chatId, waitMessageId);
+                    }).catch(e => console.error('не удалось обновить транзакцию', e));
+                } else if (
+                    e.message.includes('Banned prompt detected') ||
+                    e.message.includes('Sorry! Our AI moderator thinks this prompt') ||
+                    e.message.includes('Error: You have triggered an abuse alert') ||
+                    e.message.includes('You have been blocked from accessing Midjourney')
+                ) {
+                    TelegramBot.telegram
+                        .deleteMessage(chatId, waitMessageId)
+                        .catch(e => console.error('удаление сообщения неуспешно', e));
                     sendBadRequestMessage(chatId);
                     updateTransaction({
                         _id,
                         stage: 'badRequest',
-                    });
+                    }).catch(e => console.error('не удалось обновить транзакцию', e));
                 } else {
                     console.log('e.message undetected', e.message);
                     updateTransaction({
                         _id,
-                        buttons: '',
-                        discordMsgId: '',
-                        flags: '',
                         stage: 'waiting start',
-                    });
+                    }).catch(e => console.error('не удалось обновить транзакцию', e));
                 }
             });
     } catch (e) {
         console.error('newImagine -> catch', e);
         updateTransaction({
             _id,
-            buttons: '',
-            discordMsgId: '',
-            flags: '',
             stage: 'failed',
-        });
+        }).catch(e => console.error('не удалось обновить транзакцию', e));
     }
 };

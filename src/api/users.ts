@@ -20,3 +20,8 @@ export const getUserById = async (chatId: string): Promise<ApiTypes.AuthResponse
     const { data } = await axios.post(`${baseUrl}/getUserById`, { chatId });
     return data;
 };
+
+export const getUsers = async (): Promise<{ users: ApiTypes.AuthResponse[] }> => {
+    const { data } = await axios.post(`${baseUrl}/getUsers`, {});
+    return data;
+};

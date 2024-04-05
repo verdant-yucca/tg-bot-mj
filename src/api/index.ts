@@ -3,6 +3,8 @@ import * as query from './query';
 import * as translate from './translate';
 import * as users from './users';
 import * as transactions from './transactions';
+import * as packages from './packages';
+import * as settings from './settings';
 
 export const API = {
     auth,
@@ -10,4 +12,6 @@ export const API = {
     translate,
     users,
     transactions,
+    packages,
+    settings,
 };

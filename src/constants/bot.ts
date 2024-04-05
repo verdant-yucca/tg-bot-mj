@@ -4,7 +4,7 @@ import {
     textButton3,
     textButton4,
     textButton5,
-    textButtonAlreadySubscribed
+    textButtonAlreadySubscribed,
 } from './messages';
 
 export const commands = {
@@ -18,7 +18,7 @@ export const commands = {
         title: textButton1(),
         description: '',
     },
-    experiment: {
+    settings: {
         command: textButton4(),
         title: textButton4(),
         description: '',

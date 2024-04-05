@@ -4,7 +4,7 @@ import { ITGData } from '../../types';
 
 export const updateUserInDb = async (
     ctx: Scenes.WizardContext<Scenes.WizardSessionData>,
-    dataForUpdate: ApiTypes.AuthDto,
+    dataForUpdate: Partial<ApiTypes.AuthDto>,
 ) => {
     const { id: chatId } = ctx.from as ITGData;
 

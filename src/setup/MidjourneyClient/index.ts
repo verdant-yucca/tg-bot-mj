@@ -1,15 +1,10 @@
-import * as dotenv from 'dotenv';
 import { Midjourney } from 'midjourney';
+import MidjourneyClient1 from './client1';
+import MidjourneyClient2 from './client2';
+import MidjourneyClient3 from './client3';
 
-dotenv.config();
-
-const MidjourneyClient = new Midjourney({
-    ServerId: process.env.SERVER_ID,
-    ChannelId: process.env.CHANNEL_ID,
-    SalaiToken: process.env.SALAI_TOKEN || '',
-    // Debug: true,
-    Ws: true, //enable ws is required for remix mode (and custom zoom)
-});
-MidjourneyClient.init();
-
-export default MidjourneyClient;
+export const MidjourneyClient: Record<string, Midjourney> = {
+    '1': MidjourneyClient1,
+    '2': MidjourneyClient2,
+    '3': MidjourneyClient3,
+};

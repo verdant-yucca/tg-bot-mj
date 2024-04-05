@@ -1,8 +1,8 @@
 import { API } from '../../api';
 
-export const saveQueryInDB = async (payloda: ApiTypes.SaveQueryRequest) => {
+export const saveQueryInDB = async (payloda: ApiTypes.SaveQueryRequest & { _id: string }) => {
     try {
-        return await API.query.saveQuery(payloda);
+        return await API.query.saveQuery({ ...payloda, queryId: payloda._id });
     } catch (e) {
         console.error('не удалось сохранить запрос в бд');
         return { _id: '' };

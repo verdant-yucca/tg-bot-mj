@@ -23,6 +23,11 @@ export const getTransactions = async (): Promise<ApiTypes.GetTransactionsRespons
     return data;
 };
 
+export const getTransactionsByUserId = async (chatId: string): Promise<ApiTypes.GetTransactionsResponse> => {
+    const { data } = await axios.post(`${baseUrl}/getTransactionsByUserId`, { chatId });
+    return data;
+};
+
 export const deleteTransaction = async (_id: string): Promise<any> => {
     const { data } = await axios.post(`${baseUrl}/deleteTransaction`, { _id });
     return data;

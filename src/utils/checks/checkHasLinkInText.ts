@@ -13,7 +13,6 @@ export const checkHasLinkInText = (ctx: Scenes.WizardContext<Scenes.WizardSessio
             isHasLinkInText = true;
             ctx.replyWithHTML(prohibitedSendingLinks(), {
                 parse_mode: 'Markdown',
-                reply_markup: getMainMenu().reply_markup,
             });
             ctx.scene.leave();
         }
