@@ -10,7 +10,7 @@ export const updateUserData = async (payload: ApiTypes.AuthDto): Promise<ApiType
 };
 
 export const writeOffRequestFromUser = async (
-    payload: ApiTypes.WriteOffRequestFromUserRequest,
+    payload: ApiTypes.WriteOffRequestFromUserRequest
 ): Promise<ApiTypes.WriteOffRequestFromUserResponse> => {
     const { data } = await axios.post(`${baseUrl}/writeOffRequestFromUser`, payload);
     return data;
@@ -23,5 +23,10 @@ export const getUserById = async (chatId: string): Promise<ApiTypes.AuthResponse
 
 export const getUsers = async (): Promise<{ users: ApiTypes.AuthResponse[] }> => {
     const { data } = await axios.post(`${baseUrl}/getUsers`, {});
+    return data;
+};
+
+export const updateCountFreeQueriesForAllUsers = async (count: string): Promise<{ users: ApiTypes.AuthResponse[] }> => {
+    const { data } = await axios.post(`${baseUrl}/updateCountFreeQueriesForAllUsers`, { count });
     return data;
 };

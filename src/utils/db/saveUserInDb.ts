@@ -4,7 +4,7 @@ import { ITGData } from '../../types';
 
 export const updateUserInDb = async (
     ctx: Scenes.WizardContext<Scenes.WizardSessionData>,
-    dataForUpdate: Partial<ApiTypes.AuthDto>,
+    dataForUpdate: Partial<ApiTypes.AuthDto>
 ) => {
     const { id: chatId } = ctx.from as ITGData;
 
@@ -24,3 +24,6 @@ export const getUserByIdFromDb = async (ctx: Scenes.WizardContext<Scenes.WizardS
     const { id: chatId } = ctx.from as ITGData;
     return await API.users.getUserById(chatId.toString());
 };
+
+export const updateCountFreeQueriesForAllUsers = async (count: string) =>
+    await API.users.updateCountFreeQueriesForAllUsers(count);

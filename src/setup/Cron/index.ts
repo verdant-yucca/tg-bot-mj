@@ -6,10 +6,20 @@ import { newUpscale } from '../MidjourneyClient/queries/newUpscale';
 import { newVariation } from '../MidjourneyClient/queries/newVariation';
 import { saveQueryInDB } from '../../utils/db/saveQueryInDB';
 import TelegramBot from '../TelegramBot/init';
-import { waitMessageWithQuines } from '../../constants/messages';
+import { countFreeRequest, waitMessageWithQuines } from '../../constants/messages';
 import _ from 'lodash';
+import { updateCountFreeQueriesForAllUsers } from '../../api/users';
 
 const LIMIT = 3;
+
+cron.schedule('0 0 * * *', async () => {
+    try {
+        console.log('start cron job');
+        updateCountFreeQueriesForAllUsers(countFreeRequest());
+    } catch (e) {
+        console.log(e);
+    }
+});
 
 // проверка очереди каждые 10 секунд
 cron.schedule('*/10 * * * * *', async () => {
