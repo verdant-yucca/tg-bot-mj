@@ -8,6 +8,7 @@ import { API } from '../../api';
 import App from './init';
 import TelegramBot, { restartTelegramBot } from '../TelegramBot/init';
 import { reloadJson as reloadJsonBunnedWords } from '../../constants/bannedWords';
+import { reloadJson as reloadJsonWordsForDelete } from '../../constants/wordsfordelete';
 
 dotenv.config();
 
@@ -25,6 +26,12 @@ App.use('/updateText', (req, res) => {
 App.use('/updateBannedWords', (req, res) => {
     delete require.cache[require.resolve('../../data/bannedWords.json')];
     reloadJsonBunnedWords();
+    res.send({ result: true });
+});
+
+App.use('/updateWordsForDelete', (req, res) => {
+    delete require.cache[require.resolve('../../data/Wordsfordelete.json')];
+    reloadJsonWordsForDelete();
     res.send({ result: true });
 });
 
