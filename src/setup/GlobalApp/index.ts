@@ -18,19 +18,16 @@ App.use(urlencoded({ extended: true }));
 App.use('/static', express.static('./src/static'));
 App.use(express.static('./src/static'));
 App.use('/updateText', (req, res) => {
-    delete require.cache[require.resolve('../../data/textMessages.json')];
     reloadJsonContent();
     res.send({ result: true });
 });
 
 App.use('/updateBannedWords', (req, res) => {
-    delete require.cache[require.resolve('../../data/bannedWords.json')];
     reloadJsonBunnedWords();
     res.send({ result: true });
 });
 
 App.use('/updateWordsForDelete', (req, res) => {
-    delete require.cache[require.resolve('../../data/Wordsfordelete.json')];
     reloadJsonWordsForDelete();
     res.send({ result: true });
 });
