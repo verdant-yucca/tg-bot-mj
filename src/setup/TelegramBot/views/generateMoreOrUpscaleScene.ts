@@ -28,6 +28,12 @@ export const generateMoreOrUpscaleStep = async (ctx: Scenes.WizardContext<Scenes
 
         const queryId = callbackData?.split('!!!')[0] || '';
         const { prompt, originPrompt, midjourneyClientId = '1' } = await getQuery({ queryId });
+        if (midjourneyClientId !== '3') {
+            const chatId = (ctx.from as ITGData).id.toString();
+            sendSomethingWentWrong(chatId);
+            return ctx.scene.leave();
+        }
+
         await addNewTransaction({
             chatId,
             translatedPrompt: prompt,

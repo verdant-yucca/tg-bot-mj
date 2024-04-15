@@ -22,7 +22,6 @@ export const enterYourImageStep1 = async (ctx: Scenes.WizardContext<Scenes.Wizar
         if (!(await checkIsGroupMember(ctx))) return;
         if (!(await checkHasAvailableQueries(ctx))) return;
         if (await checkHasRunningTransactions(ctx)) return;
-        //TODO добавить проверку на невыполненный запрос
         ctx.replyWithHTML(messageEnterImageForStylingImage(), { parse_mode: 'Markdown' });
         ctx.wizard.next();
     } catch (e) {
@@ -67,7 +66,7 @@ export const stylingImageByTextStep3 = async (ctx: Scenes.WizardContext<Scenes.W
 
         const { selectedStyle, selectedSize } = await getUserByIdFromDb(ctx);
         const waitMessage = await sendWaitMessage(ctx).catch(e => _.noop);
-        const midjourneyClientId = await getFreeMidjourneyClient();
+        // const midjourneyClientId = await getFreeMidjourneyClient();
         await addNewTransaction({
             chatId,
             translatedPrompt: `${imageUrl} ${translatedPrompt}${
@@ -77,7 +76,7 @@ export const stylingImageByTextStep3 = async (ctx: Scenes.WizardContext<Scenes.W
                 selectedStyle && selectedStyle !== 'Без стиля' ? selectedStyle : ''
             }${selectedSize && selectedSize !== 'Без формата' ? selectedSize : ''}`,
             waitMessageId: 'message_id' in waitMessage ? waitMessage.message_id : -1,
-            midjourneyClientId,
+            midjourneyClientId: '3',
             action: 'stylingImageByText',
         });
         return ctx.scene.leave();
