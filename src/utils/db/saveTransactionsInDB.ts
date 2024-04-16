@@ -1,14 +1,15 @@
 import { API } from '../../api';
+import { MidjourneyClient } from '../../setup/MidjourneyClient';
 
 export const addNewTransaction = async ({
-    chatId,
-    originPrompt,
-    translatedPrompt,
-    waitMessageId,
-    discordMsgId,
-    action,
-    midjourneyClientId,
-}: {
+                                            chatId,
+                                            originPrompt,
+                                            translatedPrompt,
+                                            waitMessageId,
+                                            discordMsgId,
+                                            action,
+                                            midjourneyClientId
+                                        }: {
     chatId: string;
     originPrompt?: string;
     translatedPrompt?: string;
@@ -26,7 +27,7 @@ export const addNewTransaction = async ({
             midjourneyClientId,
             stage: 'waiting start',
             waitMessageId: waitMessageId.toString(),
-            action,
+            action
         });
     } catch (e) {
         console.error('не удалось сохранить запрос в бд');
@@ -35,15 +36,15 @@ export const addNewTransaction = async ({
 };
 
 export const updateTransaction = async ({
-    _id,
-    buttons,
-    discordMsgId,
-    flags,
-    action,
-    stage,
-    originPrompt,
-    prompt,
-}: ApiTypes.UpdateTransactionRequest) => {
+                                            _id,
+                                            buttons,
+                                            discordMsgId,
+                                            flags,
+                                            action,
+                                            stage,
+                                            originPrompt,
+                                            prompt
+                                        }: ApiTypes.UpdateTransactionRequest) => {
     try {
         return await API.transactions.updateTransaction({
             _id,
@@ -53,7 +54,7 @@ export const updateTransaction = async ({
             action,
             stage,
             originPrompt,
-            prompt,
+            prompt
         });
     } catch (e) {
         console.error('не удалось обновить запись updateTransaction в бд', e);
@@ -95,19 +96,24 @@ export const getFreeMidjourneyClient = async () => {
                 ({ stage, midjourneyClientId }) => stage === 'running' || (stage === 'completed' && midjourneyClientId)
             )
             .map(({ midjourneyClientId, stage }) => ({ midjourneyClientId, stage }));
+        const allClients = Object.keys(MidjourneyClient);
+        const initObj: Record<string, number> = {};
+        allClients.forEach((key) => {
+            initObj[key] = 0;
+        });
 
         const result = filteredTransactions.reduce(
             (acc, { midjourneyClientId, stage }) => {
-                if (stage === 'running') {
+                if (typeof acc[midjourneyClientId] !== 'undefined') {
                     acc[midjourneyClientId] = (acc[midjourneyClientId] || 0) + 1;
                 }
                 return acc;
             },
-            { '1': 0, '2': 0, '3': 0 } as Record<string, number>
+            initObj
         );
 
         // Найдем клиент с наименьшей очередью
-        let minClientId = '1';
+        let minClientId = Object.keys(result)[0];
         let minValue = Infinity;
         for (const clientId in result) {
             if (result[clientId] < minValue) {

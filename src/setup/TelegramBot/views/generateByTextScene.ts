@@ -44,7 +44,7 @@ export const generateImageByTextStep2 = async (ctx: Scenes.WizardContext<Scenes.
 
         // const waitMessage = await sendWaitMessage(ctx).catch(e => _.noop);
         const waitMessage = await sendWaitMessage(ctx).catch(e => console.error('eeeeeeeeeeeeeeeeeeee', e));
-        // const midjourneyClientId = await getFreeMidjourneyClient();
+        const midjourneyClientId = await getFreeMidjourneyClient();
         const { selectedStyle, selectedSize } = await getUserByIdFromDb(ctx);
         await addNewTransaction({
             chatId,
@@ -55,8 +55,8 @@ export const generateImageByTextStep2 = async (ctx: Scenes.WizardContext<Scenes.
                 selectedSize && selectedSize !== 'Без формата' ? selectedSize : ''
             }`,
             waitMessageId: waitMessage && 'message_id' in waitMessage ? waitMessage.message_id : -1,
-            midjourneyClientId: '3',
-            action: 'generateImageByText',
+            midjourneyClientId,
+            action: 'generateImageByText'
         });
         return ctx.scene.leave();
     } catch (e) {

@@ -100,7 +100,8 @@ declare namespace ApiTypes {
         chatId: string;
     }
 
-    export interface WriteOffRequestFromUserResponse extends AuthResponse {}
+    export interface WriteOffRequestFromUserResponse extends AuthResponse {
+    }
 
     export interface AddNewTransactionRequest {
         chatId: string;
@@ -135,6 +136,7 @@ declare namespace ApiTypes {
     export interface GetTransactionsResponse {
         transactions: Transaction[];
     }
+
     export interface Transaction {
         _id: string;
         chatId: string;
@@ -152,6 +154,7 @@ declare namespace ApiTypes {
         waitTime: number;
         midjourneyClientId: string;
     }
+
     export interface Packages {
         _id: string;
         name: string;
@@ -169,5 +172,20 @@ declare namespace ApiTypes {
         _id: string;
         styles: Array<{ name: string; value: string; url: string }>;
         sizes: Array<{ name: string; value: string; url: string }>;
+    }
+
+    export interface GetAvailableAccountMidjourneyResponse {
+        accounts: Accounts[];
+    }
+
+    export interface Accounts {
+        _id: string;
+        name: string;
+        customId: string;
+        status: string;
+        ServerId: string;
+        ChannelId: string;
+        DiscordToken: string;
+        dateCreate: Date;
     }
 }

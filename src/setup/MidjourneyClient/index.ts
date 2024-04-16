@@ -1,10 +1,24 @@
 import { Midjourney } from 'midjourney';
-import MidjourneyClient1 from './client1';
-import MidjourneyClient2 from './client2';
-import MidjourneyClient3 from './client3';
+import { getAvailableAccountMidjourney } from '../../utils/db/availableAccountMidjourney';
 
-export const MidjourneyClient: Record<string, Midjourney> = {
-    // '1': MidjourneyClient1,
-    // '2': MidjourneyClient2,
-    '3': MidjourneyClient3,
+const getMidjourneyClients = async () => {
+    const result: Record<string, Midjourney> = {};
+    const { accounts } = await getAvailableAccountMidjourney();
+    accounts.forEach(({ ChannelId, customId, DiscordToken, ServerId, status }) => {
+        if (status === 'ready') {
+            result[customId] = new Midjourney({
+                ServerId,
+                ChannelId,
+                SalaiToken: DiscordToken,
+                // Debug: true,
+                Ws: true //enable ws is required for remix mode (and custom zoom)
+            });
+        }
+    });
+    return result;
 };
+
+export let MidjourneyClient: Record<string, Midjourney> = {};
+getMidjourneyClients().then((result) => {
+    MidjourneyClient = result;
+});
