@@ -80,17 +80,17 @@ cron.schedule('*/10 * * * * *', async () => {
                     //хз пока, наверное запустить по новой
                 } else if (transaction?.action && transaction.action.includes('!!!')) {
                     if (
-                        transaction.action.includes('U1') ||
-                        transaction.action.includes('U2') ||
-                        transaction.action.includes('U3') ||
-                        transaction.action.includes('U4')
+                        transaction.action.includes('!!!U1') ||
+                        transaction.action.includes('!!!U2') ||
+                        transaction.action.includes('!!!U3') ||
+                        transaction.action.includes('!!!U4')
                     ) {
                         newUpscale(transaction);
                     } else if (
-                        transaction.action.includes('V1') ||
-                        transaction.action.includes('V2') ||
-                        transaction.action.includes('V3') ||
-                        transaction.action.includes('V4')
+                        transaction.action.includes('!!!V1') ||
+                        transaction.action.includes('!!!V2') ||
+                        transaction.action.includes('!!!V3') ||
+                        transaction.action.includes('!!!V4')
                     ) {
                         newVariation(transaction);
                     } else {
@@ -106,5 +106,5 @@ cron.schedule('*/10 * * * * *', async () => {
                     .catch(() => _.noop);
             }
         }
-    })
+    });
 });

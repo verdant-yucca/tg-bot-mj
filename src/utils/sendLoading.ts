@@ -7,7 +7,7 @@ import {
     hssCompletedRequest,
     waitMessageDownloadPhoto,
     waitMessageWithProgress,
-    waitMessage,
+    waitMessage
 } from '../constants/messages';
 import { getMainMenu } from '../constants/buttons';
 import TelegramBot from '../setup/TelegramBot/init';
@@ -15,7 +15,7 @@ import TelegramBot from '../setup/TelegramBot/init';
 export const sendHasOutstandingRequestMessage = async (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
     try {
         ctx.replyWithHTML(hssOutstandingRequest(), {
-            parse_mode: 'Markdown',
+            parse_mode: 'Markdown'
         }).catch(e => console.error('sendHasOutstandingRequestMessage e ', e));
         return ctx.scene.leave();
     } catch (e) {
@@ -27,7 +27,7 @@ export const sendHasOutstandingRequestMessage = async (ctx: Scenes.WizardContext
 export const sendHasCompletedRequestMessage = async (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
     try {
         ctx.replyWithHTML(hssCompletedRequest(), {
-            parse_mode: 'Markdown',
+            parse_mode: 'Markdown'
         }).catch(e => console.error('sendHasCompletedRequestMessage e ', e));
 
         return ctx.scene.leave();
@@ -41,7 +41,7 @@ export const sendSomethingWentWrong = async (chatId: string) => {
     try {
         TelegramBot.telegram
             .sendMessage(chatId, somethingWentWrong(), {
-                parse_mode: 'Markdown',
+                parse_mode: 'Markdown'
             })
             .catch(e => console.error('sendSomethingWentWrong e ', e));
     } catch (e) {
@@ -53,7 +53,7 @@ export const sendBadRequestMessage = async (chatId: string) => {
     try {
         TelegramBot.telegram
             .sendMessage(chatId, badRequest(), {
-                parse_mode: 'Markdown',
+                parse_mode: 'Markdown'
             })
             .catch(e => console.error('sendBadRequestMessage e ', e));
     } catch (e) {
@@ -63,22 +63,30 @@ export const sendBadRequestMessage = async (chatId: string) => {
 
 export const sendWaitMessage = async (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) =>
     //https://i.yapx.ru/XFv9d.gif
-    await ctx.replyWithDocument(
+    await ctx.replyWithHTML(
+        waitMessage(),
         {
-            source: path.resolve(__dirname, '../static/loading.gif'),
-            filename: 'loading.gif',
-        },
-        {
-            parse_mode: 'Markdown',
-            caption: waitMessage(),
+            parse_mode: 'Markdown'
         }
     );
+// export const sendWaitMessage = async (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) =>
+//     //https://i.yapx.ru/XFv9d.gif
+//     await ctx.replyWithDocument(
+//         {
+//             source: path.resolve(__dirname, '../static/loading.gif'),
+//             filename: 'loading.gif',
+//         },
+//         {
+//             parse_mode: 'Markdown',
+//             caption: waitMessage(),
+//         }
+//     );
 
 export const sendLoadingMesage = (chatId: string, messageId: number, progress: string) => {
     try {
         TelegramBot.telegram
             .editMessageCaption(chatId, messageId, '0', waitMessageWithProgress(progress), {
-                parse_mode: 'Markdown',
+                parse_mode: 'Markdown'
             })
             .catch(e => console.error('sendDownloadPhotoInProgressMesage e ', e));
     } catch (e) {
@@ -90,7 +98,7 @@ export const sendDownloadPhotoInProgressMesage = (chatId: string, messageId: num
     try {
         TelegramBot.telegram
             .editMessageCaption(chatId, messageId, '0', waitMessageDownloadPhoto(), {
-                parse_mode: 'Markdown',
+                parse_mode: 'Markdown'
             })
             .catch(e => console.error('sendDownloadPhotoInProgressMesage e ', e));
     } catch (e) {

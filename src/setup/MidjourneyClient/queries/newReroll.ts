@@ -5,7 +5,7 @@ import { MidjourneyClient } from '../index';
 import {
     sendBadRequestMessage,
     sendDownloadPhotoInProgressMesage,
-    sendLoadingMesage,
+    sendLoadingMesage
 } from '../../../utils/sendLoading';
 import { getButtonsForFourPhoto, getDataButtonsForFourPhoto } from '../../../utils/getButtonsForFourPhoto';
 import { updateTransaction } from '../../../utils/db/saveTransactionsInDB';
@@ -16,10 +16,10 @@ export const newReroll = async ({ chatId, waitMessageId, _id, action }: ApiTypes
         //обновляем данные о начале выполнения запроса в базе
         updateTransaction({
             _id,
-            stage: 'running',
+            stage: 'running'
         });
         const queryId = action?.split('!!!')[0] || '';
-        const { prompt, originPrompt, midjourneyClientId = '1' } = await getQuery({ queryId });
+        const { prompt = 'asd', originPrompt, midjourneyClientId = '1' } = await getQuery({ queryId });
 
         MidjourneyClient[midjourneyClientId]
             .Imagine(prompt, (_, progress: string) => sendLoadingMesage(chatId, +waitMessageId, progress))
@@ -37,8 +37,8 @@ export const newReroll = async ({ chatId, waitMessageId, _id, action }: ApiTypes
                             { url: Imagine.uri },
                             {
                                 reply_markup: Markup.inlineKeyboard(getButtonsForFourPhoto(_id)).reply_markup,
-                                parse_mode: 'Markdown',
-                            },
+                                parse_mode: 'Markdown'
+                            }
                         )
                         .catch(e => console.error('не удалось отправить фото, возможно пользователь удалил бота', e))
                         .finally(() => {
@@ -58,7 +58,7 @@ export const newReroll = async ({ chatId, waitMessageId, _id, action }: ApiTypes
                         buttons: JSON.stringify(getDataButtonsForFourPhoto(Imagine)),
                         discordMsgId: Imagine.id || '',
                         flags: Imagine.flags.toString(),
-                        stage: 'completed',
+                        stage: 'completed'
                     }).catch(e => console.error('updateTransaction неуспешно', e));
                 } else {
                     console.log('Я хз что тут будет, надо разобраться', Imagine);
@@ -71,7 +71,7 @@ export const newReroll = async ({ chatId, waitMessageId, _id, action }: ApiTypes
 
                 if (
                     e.message ===
-                        'Your job queue is full. Please wait for a job to finish first, then resubmit this one.' ||
+                    'Your job queue is full. Please wait for a job to finish first, then resubmit this one.' ||
                     e.message === 'ImagineApi failed with status 429'
                 ) {
                     console.log('e.message', e.message);
@@ -79,14 +79,14 @@ export const newReroll = async ({ chatId, waitMessageId, _id, action }: ApiTypes
                         _id,
                         prompt,
                         originPrompt,
-                        stage: 'waiting start',
+                        stage: 'waiting start'
                     });
                 } else if (e.message.includes('Banned prompt detected')) {
                     updateTransaction({
                         _id,
                         prompt,
                         originPrompt,
-                        stage: 'badRequest',
+                        stage: 'badRequest'
                     }).catch(e => console.error('updateTransaction неуспешно', e));
                     TelegramBot.telegram
                         .deleteMessage(chatId, +waitMessageId)
@@ -98,7 +98,7 @@ export const newReroll = async ({ chatId, waitMessageId, _id, action }: ApiTypes
                         _id,
                         prompt,
                         originPrompt,
-                        stage: 'waiting start',
+                        stage: 'waiting start'
                     });
                 }
             });
@@ -106,7 +106,7 @@ export const newReroll = async ({ chatId, waitMessageId, _id, action }: ApiTypes
         console.error('newReroll -> catch', e);
         updateTransaction({
             _id,
-            stage: 'failed',
+            stage: 'failed'
         }).catch(e => console.error(e));
     }
 };

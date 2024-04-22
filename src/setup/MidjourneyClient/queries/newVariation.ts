@@ -3,7 +3,7 @@ import {
     sendBadRequestMessage,
     sendDownloadPhotoInProgressMesage,
     sendLoadingMesage,
-    sendSomethingWentWrong,
+    sendSomethingWentWrong
 } from '../../../utils/sendLoading';
 import { MJMessage } from 'midjourney';
 import TelegramBot from '../../TelegramBot/init';
@@ -20,7 +20,7 @@ export const newVariation = async ({ chatId, waitMessageId, _id, action }: ApiTy
         //обновляем данные о начале выполнения запроса в базе
         updateTransaction({
             _id,
-            stage: 'running',
+            stage: 'running'
         });
         const queryId = action?.split('!!!')[0] || '';
         const button = action?.split('!!!')[1] || '';
@@ -30,11 +30,16 @@ export const newVariation = async ({ chatId, waitMessageId, _id, action }: ApiTy
             prompt,
             originPrompt,
             flags,
-            midjourneyClientId = '1',
+            midjourneyClientId = '1'
         } = await getQuery({ queryId });
+        if (!buttons) {
+            updateTransaction({
+                _id,
+                stage: 'waiting start'
+            });
+        }
         const allCustomButtons = JSON.parse(buttons) as Record<string, string>;
         const custom = allCustomButtons[button];
-        console.log('originPrompt', originPrompt);
 
         MidjourneyClient[midjourneyClientId]
             .Custom({
@@ -42,7 +47,7 @@ export const newVariation = async ({ chatId, waitMessageId, _id, action }: ApiTy
                 flags: Number(flags),
                 customId: custom,
                 content: prompt, //remix mode require content
-                loading: (_, progress: string) => sendLoadingMesage(chatId, +waitMessageId, progress),
+                loading: (_, progress: string) => sendLoadingMesage(chatId, +waitMessageId, progress)
             })
             .then(async (Variation: MJMessage | null) => {
                 if (!Variation) {
@@ -70,7 +75,7 @@ export const newVariation = async ({ chatId, waitMessageId, _id, action }: ApiTy
                     buttons: JSON.stringify(getDataButtonsForFourPhoto(Variation)),
                     discordMsgId: Variation.id || '',
                     flags: Variation.flags.toString(),
-                    stage: 'completed',
+                    stage: 'completed'
                 }).catch(e => console.error('не удалось обновить транзакцию', e));
             })
             .catch(e => {
@@ -78,7 +83,7 @@ export const newVariation = async ({ chatId, waitMessageId, _id, action }: ApiTy
                 console.log('NewUpscale -> MidjourneyClient.Custom -> catch', e);
                 if (
                     e.message ===
-                        'Your job queue is full. Please wait for a job to finish first, then resubmit this one.' ||
+                    'Your job queue is full. Please wait for a job to finish first, then resubmit this one.' ||
                     e.message === 'ImagineApi failed with status 429'
                 ) {
                     console.log('e.message', e.message);
@@ -86,7 +91,7 @@ export const newVariation = async ({ chatId, waitMessageId, _id, action }: ApiTy
                         _id,
                         prompt,
                         originPrompt,
-                        stage: 'waiting start',
+                        stage: 'waiting start'
                     }).catch(e => console.error('не удалось обновить транзакцию', e));
                 } else if (e.message.includes('Banned prompt detected')) {
                     TelegramBot.telegram
@@ -97,7 +102,7 @@ export const newVariation = async ({ chatId, waitMessageId, _id, action }: ApiTy
                         _id,
                         prompt,
                         originPrompt,
-                        stage: 'badRequest',
+                        stage: 'badRequest'
                     }).catch(e => console.error('не удалось обновить транзакцию', e));
                 } else {
                     console.log('e.message undetected', e.message);
@@ -105,7 +110,7 @@ export const newVariation = async ({ chatId, waitMessageId, _id, action }: ApiTy
                         _id,
                         prompt,
                         originPrompt,
-                        stage: 'waiting start',
+                        stage: 'waiting start'
                     }).catch(e => console.error('не удалось обновить транзакцию', e));
                 }
             });
@@ -113,7 +118,7 @@ export const newVariation = async ({ chatId, waitMessageId, _id, action }: ApiTy
         console.error('newVariation -> catch', e);
         updateTransaction({
             _id,
-            stage: 'failed',
+            stage: 'failed'
         }).catch(e => console.error('не удалось обновить транзакцию', e));
     }
 };

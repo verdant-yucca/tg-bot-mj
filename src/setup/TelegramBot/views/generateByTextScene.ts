@@ -20,7 +20,8 @@ export const enterYourTextStep1 = async (ctx: Scenes.WizardContext<Scenes.Wizard
         }
         if (!(await checkIsGroupMember(ctx))) return;
         if (!(await checkHasAvailableQueries(ctx))) return;
-        if (await checkHasRunningTransactions(ctx)) return;
+        const { isHasRunningTransactions, transactions } = await checkHasRunningTransactions(ctx);
+        if (isHasRunningTransactions) return;
         ctx.replyWithHTML(messageEnterYourTextForGenerateImage(), { parse_mode: 'Markdown' });
         ctx.wizard.next();
     } catch (e) {

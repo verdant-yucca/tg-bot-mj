@@ -12,9 +12,9 @@ dotenv.config();
 export const newUpscale = async ({ chatId, waitMessageId, _id, action }: ApiTypes.Transaction) => {
     try {
         //обновляем данные о начале выполнения запроса в базе
-        updateTransaction({
+        await updateTransaction({
             _id,
-            stage: 'running',
+            stage: 'running'
         });
         const queryId = action?.split('!!!')[0] || '';
         const button = action?.split('!!!')[1] || '';
@@ -24,15 +24,21 @@ export const newUpscale = async ({ chatId, waitMessageId, _id, action }: ApiType
             prompt,
             originPrompt,
             flags,
-            midjourneyClientId = '1',
+            midjourneyClientId = '1'
         } = await getQuery({ queryId });
+        if (!buttons) {
+            await updateTransaction({
+                _id,
+                stage: 'waiting start'
+            });
+        }
         const allCustomButtons = JSON.parse(buttons) as Record<string, string>;
         const custom = allCustomButtons[button];
         MidjourneyClient[midjourneyClientId]
             .Custom({
                 msgId: discordMsgId,
                 flags: Number(flags),
-                customId: custom,
+                customId: custom
             })
             .then(async (Upscale: MJMessage | null) => {
                 if (!Upscale) {
@@ -49,8 +55,8 @@ export const newUpscale = async ({ chatId, waitMessageId, _id, action }: ApiType
                         { url: Upscale.uri },
                         {
                             parse_mode: 'Markdown',
-                            caption: messageResult(originPrompt),
-                        },
+                            caption: messageResult(originPrompt)
+                        }
                     )
                     .then(resultMessage => {
                         const groupChatId = process.env.GROUP_ID as string;
@@ -76,7 +82,7 @@ export const newUpscale = async ({ chatId, waitMessageId, _id, action }: ApiType
                     buttons: '',
                     discordMsgId: Upscale.id || '',
                     flags: Upscale.flags.toString(),
-                    stage: 'completed',
+                    stage: 'completed'
                 }).catch(e => console.error('не удалось обновить транзакцию', e));
             })
             .catch(e => {
@@ -84,7 +90,7 @@ export const newUpscale = async ({ chatId, waitMessageId, _id, action }: ApiType
                 console.log('NewUpscale -> MidjourneyClient.Custom -> catch', e);
                 if (
                     e.message ===
-                        'Your job queue is full. Please wait for a job to finish first, then resubmit this one.' ||
+                    'Your job queue is full. Please wait for a job to finish first, then resubmit this one.' ||
                     e.message === 'ImagineApi failed with status 429'
                 ) {
                     console.log('e.message', e.message);
@@ -92,7 +98,7 @@ export const newUpscale = async ({ chatId, waitMessageId, _id, action }: ApiType
                         _id,
                         prompt,
                         originPrompt,
-                        stage: 'waiting start',
+                        stage: 'waiting start'
                     }).catch(e => console.error('не удалось обновить транзакцию', e));
                 } else if (e.message.includes('Banned prompt detected')) {
                     TelegramBot.telegram
@@ -103,7 +109,7 @@ export const newUpscale = async ({ chatId, waitMessageId, _id, action }: ApiType
                         _id,
                         prompt,
                         originPrompt,
-                        stage: 'badRequest',
+                        stage: 'badRequest'
                     }).catch(e => console.error('не удалось обновить транзакцию', e));
                 } else {
                     console.log('e.message undetected', e.message);
@@ -111,7 +117,7 @@ export const newUpscale = async ({ chatId, waitMessageId, _id, action }: ApiType
                         _id,
                         prompt,
                         originPrompt,
-                        stage: 'waiting start',
+                        stage: 'waiting start'
                     }).catch(e => console.error('не удалось обновить транзакцию', e));
                 }
             });
@@ -119,7 +125,7 @@ export const newUpscale = async ({ chatId, waitMessageId, _id, action }: ApiType
         console.error('newUpscale -> catch', e);
         updateTransaction({
             _id,
-            stage: 'failed',
+            stage: 'failed'
         }).catch(e => console.error('не удалось обновить транзакцию', e));
     }
 };
