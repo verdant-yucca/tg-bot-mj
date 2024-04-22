@@ -5,19 +5,20 @@ import { MidjourneyClient } from '../index';
 import {
     sendBadRequestMessage,
     sendDownloadPhotoInProgressMesage,
-    sendLoadingMesage,
+    sendLoadingMesage
 } from '../../../utils/sendLoading';
 import { getButtonsForFourPhoto, getDataButtonsForFourPhoto } from '../../../utils/getButtonsForFourPhoto';
 import { writeOffRequestFromUser } from '../../../utils/db/saveUserInDb';
 import { updateTransaction } from '../../../utils/db/saveTransactionsInDB';
+import _ from 'lodash';
 
 export const newImagine = ({
-    prompt,
-    chatId,
-    waitMessageId,
-    _id,
-    midjourneyClientId = '1',
-}: {
+                               prompt,
+                               chatId,
+                               waitMessageId,
+                               _id,
+                               midjourneyClientId = '1'
+                           }: {
     prompt: string;
     chatId: string;
     waitMessageId: number;
@@ -28,7 +29,7 @@ export const newImagine = ({
         //обновляем данные о начале выполнения запроса в базе
         updateTransaction({
             _id,
-            stage: 'running',
+            stage: 'running'
         }).catch(e => console.error('не удалось обновить транзакцию', e));
 
         MidjourneyClient[midjourneyClientId]
@@ -47,7 +48,7 @@ export const newImagine = ({
                             { url: Imagine.uri },
                             {
                                 reply_markup: Markup.inlineKeyboard(getButtonsForFourPhoto(_id)).reply_markup,
-                                parse_mode: 'Markdown',
+                                parse_mode: 'Markdown'
                             }
                         )
                         .catch(e => console.error('не удалось отправить фото, возможно пользователь удалил бота', e))
@@ -65,7 +66,7 @@ export const newImagine = ({
                         buttons: JSON.stringify(getDataButtonsForFourPhoto(Imagine)),
                         discordMsgId: Imagine.id || '',
                         flags: Imagine.flags.toString(),
-                        stage: 'completed',
+                        stage: 'completed'
                     }).catch(e => console.error('не удалось обновить транзакцию', e));
                 } else {
                     console.log('Я хз что тут будет, надо разобраться', Imagine);
@@ -76,14 +77,15 @@ export const newImagine = ({
                 console.error('newImagine -> MidjourneyClient.Imagine -> catch ', e);
                 if (
                     e.message ===
-                        'Your job queue is full. Please wait for a job to finish first, then resubmit this one.' ||
+                    'Your job queue is full. Please wait for a job to finish first, then resubmit this one.' ||
                     e.message === 'ImagineApi failed with status 429'
                 ) {
                     console.log('e.message', e.message);
                     updateTransaction({
                         _id,
-                        stage: 'waiting start',
+                        stage: 'waiting start'
                     }).catch(e => console.error('не удалось обновить транзакцию', e));
+
                 } else if (
                     e.message.includes('Banned prompt detected') ||
                     e.message.includes('Sorry! Our AI moderator thinks this prompt') ||
@@ -96,8 +98,9 @@ export const newImagine = ({
                     sendBadRequestMessage(chatId);
                     updateTransaction({
                         _id,
-                        stage: 'badRequest',
+                        stage: 'badRequest'
                     }).catch(e => console.error('не удалось обновить транзакцию', e));
+
                 } else if (e.message.includes('Unrecognized parameter(s)')) {
                     TelegramBot.telegram
                         .deleteMessage(chatId, waitMessageId)
@@ -110,8 +113,9 @@ export const newImagine = ({
                         .catch(e => console.error('отправка сообщения неуспешна', e));
                     updateTransaction({
                         _id,
-                        stage: 'badRequest',
+                        stage: 'badRequest'
                     }).catch(e => console.error('не удалось обновить транзакцию', e));
+
                 } else if (e.message.includes('Invalid aspect ratio')) {
                     TelegramBot.telegram
                         .deleteMessage(chatId, waitMessageId)
@@ -124,8 +128,9 @@ export const newImagine = ({
                         .catch(e => console.error('отправка сообщения неуспешна', e));
                     updateTransaction({
                         _id,
-                        stage: 'badRequest',
+                        stage: 'badRequest'
                     }).catch(e => console.error('не удалось обновить транзакцию', e));
+
                 } else if (e.message.includes('Invalid value provided for argument')) {
                     TelegramBot.telegram
                         .deleteMessage(chatId, waitMessageId)
@@ -138,13 +143,15 @@ export const newImagine = ({
                         .catch(e => console.error('отправка сообщения неуспешна', e));
                     updateTransaction({
                         _id,
-                        stage: 'badRequest',
+                        stage: 'badRequest'
                     }).catch(e => console.error('не удалось обновить транзакцию', e));
+
                 } else {
                     console.log('e.message undetected', e.message);
+                    TelegramBot.telegram.sendMessage(1343412914, e.message).catch(() => _.noop);
                     updateTransaction({
                         _id,
-                        stage: 'waiting start',
+                        stage: 'waiting start'
                     }).catch(e => console.error('не удалось обновить транзакцию', e));
                 }
             });
@@ -152,7 +159,7 @@ export const newImagine = ({
         console.error('newImagine -> catch', e);
         updateTransaction({
             _id,
-            stage: 'failed',
+            stage: 'failed'
         }).catch(e => console.error('не удалось обновить транзакцию', e));
     }
 };
