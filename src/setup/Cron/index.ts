@@ -1,5 +1,5 @@
 import cron from 'node-cron';
-import { deleteTransaction, getTransactions } from '../../utils/db/saveTransactionsInDB';
+import { deleteTransaction, getTransactions, updateTransaction } from '../../utils/db/saveTransactionsInDB';
 import { newImagine } from '../MidjourneyClient/queries/newImagine';
 import { newReroll } from '../MidjourneyClient/queries/newReroll';
 import { newUpscale } from '../MidjourneyClient/queries/newUpscale';
@@ -68,6 +68,20 @@ cron.schedule('*/10 * * * * *', async () => {
         const waitingStartTransactionsClient = waitingStartTransactions.filter(
             ({ midjourneyClientId }) => midjourneyClientId === key
         );
+
+        //если что то зависло больше чем на 20 мин, то перезапускаем
+        runningTransactionsClient.forEach(({ _id, dateUpdate }) => {
+            const dateRunning = new Date(dateUpdate);
+            const dateNow = new Date();
+            const leadTime = dateNow.getTime() - dateRunning.getTime();
+            if (leadTime > 1000 * 60 * 20) {
+                updateTransaction({
+                    _id,
+                    stage: 'waiting start'
+                }).catch(e => console.error('не удалось обновить транзакцию', e));
+            }
+        });
+
         //если есть ожидающие запуска и запущено меньше 3, то запускаем ещё
         if (waitingStartTransactionsClient.length && runningTransactionsClient.length < LIMIT) {
             const availableLimitTransactionsForStart = LIMIT - runningTransactionsClient.length;
