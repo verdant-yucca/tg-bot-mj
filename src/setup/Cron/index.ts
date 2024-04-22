@@ -102,7 +102,7 @@ cron.schedule('*/10 * * * * *', async () => {
             for (let i = availableLimitTransactionsForStart; i < waitingStartTransactions.length; i++) {
                 const { chatId, waitMessageId } = waitingStartTransactionsClient[i] || {};
                 TelegramBot.telegram
-                    .editMessageCaption(chatId, +waitMessageId, '0', waitMessageWithQuines(i.toString()))
+                    .editMessageText(chatId, +waitMessageId, '0', waitMessageWithQuines(i.toString()))
                     .catch(() => _.noop);
             }
         }

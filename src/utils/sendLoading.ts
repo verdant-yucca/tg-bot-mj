@@ -84,8 +84,13 @@ export const sendWaitMessage = async (ctx: Scenes.WizardContext<Scenes.WizardSes
 
 export const sendLoadingMesage = (chatId: string, messageId: number, progress: string) => {
     try {
+        // TelegramBot.telegram
+        //     .editMessageCaption(chatId, messageId, '0', waitMessageWithProgress(progress), {
+        //         parse_mode: 'Markdown'
+        //     })
+        //     .catch(e => console.error('sendDownloadPhotoInProgressMesage e ', e));
         TelegramBot.telegram
-            .editMessageCaption(chatId, messageId, '0', waitMessageWithProgress(progress), {
+            .editMessageText(chatId, messageId, '0', waitMessageWithProgress(progress), {
                 parse_mode: 'Markdown'
             })
             .catch(e => console.error('sendDownloadPhotoInProgressMesage e ', e));
@@ -96,8 +101,13 @@ export const sendLoadingMesage = (chatId: string, messageId: number, progress: s
 
 export const sendDownloadPhotoInProgressMesage = (chatId: string, messageId: number) => {
     try {
+        // TelegramBot.telegram
+        //     .editMessageCaption(chatId, messageId, '0', waitMessageDownloadPhoto(), {
+        //         parse_mode: 'Markdown'
+        //     })
+        //     .catch(e => console.error('sendDownloadPhotoInProgressMesage e ', e));
         TelegramBot.telegram
-            .editMessageCaption(chatId, messageId, '0', waitMessageDownloadPhoto(), {
+            .editMessageText(chatId, messageId, '0', waitMessageDownloadPhoto(), {
                 parse_mode: 'Markdown'
             })
             .catch(e => console.error('sendDownloadPhotoInProgressMesage e ', e));

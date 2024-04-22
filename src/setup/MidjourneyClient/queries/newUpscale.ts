@@ -47,7 +47,7 @@ export const newUpscale = async ({ chatId, waitMessageId, _id, action }: ApiType
                 }
 
                 TelegramBot.telegram
-                    .editMessageCaption(chatId, +waitMessageId, '0', `Download photo...`)
+                    .editMessageText(chatId, +waitMessageId, '0', `Download photo...`)
                     .catch(e => console.error('е удалось удалить ожидающее сообщение', e));
                 TelegramBot.telegram
                     .sendPhoto(
