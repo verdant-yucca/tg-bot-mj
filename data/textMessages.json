@@ -29,7 +29,7 @@
     "textButton5": "\uD83D\uDCDE Help",
     "replayToGroup": false,
     "needCheckIsGroupMember": true,
-    "noRequestsAvailable": "У вас закончились все доступные запросы. \nБесплатных запросов начисляются каждый день в 03:00 мск. \nТакже вы можете приобрести их. Для покупки запросов нажмите кнопку Настройки и выберите Платежи.",
+    "noRequestsAvailable": "У вас закончились все доступные запросы. \n50 бесплатных запросов начисляются каждый день в 03:00 мск. \nТакже вы можете приобрести их. Для покупки запросов нажмите кнопку Настройки и выберите Платежи.",
     "engineeringWorks": "Идут технические работы. Сорян.",
     "isEngineeringWorks": false,
     "package1": "Пакет «Холст»",
@@ -40,7 +40,7 @@
     "settingsMenuMessage": "Настройки: \n\nВыбранный стиль: {{style}} \nВыбранный размер изображений: {{size}} \n\nКоличество бесплатных запросов: {{countFreeQueries}} \nКоличество платных запросов: {{countQueries}} \n\n{{countFreeRequestBonus}} бесплатных запросов начисляются каждый день в 03:00 по МСК.",
     "sizesMenuMessage": "Выберите формат изображений:",
     "stylesMenuMessage": "Выберите стиль изображений:",
-    "successfulPaymentMessage": "Пакет {{packageName}}. Приобретено {{count}} запросов за {{price}} рублей",
-    "countFreeRequest": 1000,
+    "successfulPaymentMessage": "{{packageName}}. Приобретено {{count}} запросов за {{price}} рублей. Номер транзакции {{paymentId}}",
+    "countFreeRequest": 50,
     "hidePayments": false
 }
