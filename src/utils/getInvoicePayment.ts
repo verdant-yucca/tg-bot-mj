@@ -14,11 +14,29 @@ export const getInvoicePayments = async (id: number): Promise<any[]> => {
         photo_url: photoUrl, // URL фотографии товара для счета-фактуры. Это может быть фотография товара или рекламное изображение услуги. Людям больше нравится, когда они видят, за что платят.
         photo_width: photoWidth, // Ширина фото
         photo_height: photoHeight, // Длина фото
+        need_email: true,
+        send_email_to_provider: true,
+        provider_data: {
+            receipt: {
+                items: [{
+                    description: `Покупка ${title} в телеграм боте`,
+                    quantity: '1.00',
+                    measure: 'piece',
+                    payment_subject: 'service', // 'commodity' || 'service' = Товар || Услуга
+                    payment_mode: 'full_payment ',
+                    amount: {
+                        value: `${(price * (offer || 1))}.00`,
+                        currency: 'RUB'
+                    },
+                    vat_code: 1
+                }]
+            }
+        },
         payload: {
             // Полезные данные счета-фактуры, определенные ботом, 1–128 байт. Это не будет отображаться пользователю, используйте его для своих внутренних процессов.
             packageName: name,
             price: price,
-            count: count,
-        },
+            count: count
+        }
     }));
 };

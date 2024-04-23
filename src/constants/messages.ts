@@ -66,15 +66,15 @@ export const waitMessageWithProgress = (progress: string) =>
     getText('waitMessageWithProgress', [
         {
             name: 'progress',
-            value: progress,
-        },
+            value: progress
+        }
     ]);
 export const waitMessageWithQuines = (currentPosition: string) =>
     getText('waitMessageWithQuines', [
         {
             name: 'currentPosition',
-            value: currentPosition,
-        },
+            value: currentPosition
+        }
     ]);
 export const waitMessageDownloadPhoto = () => getText('waitMessageDownloadPhoto');
 export const textButton1 = () => getText('textButton1');
@@ -98,27 +98,30 @@ export const sizesMenuMessage = () => getText('sizesMenuMessage');
 export const stylesMenuMessage = () => getText('stylesMenuMessage');
 
 export const successfulPaymentMessage = ({
-    count,
-    price,
-    packageName,
-}: {
+                                             count,
+                                             price,
+                                             packageName,
+                                             paymentId
+                                         }: {
     count: string;
     price: string;
     packageName: string;
+    paymentId: string;
 }) =>
     getText('successfulPaymentMessage', [
         { name: 'count', value: count },
         { name: 'price', value: price },
         { name: 'packageName', value: packageName },
+        { name: 'paymentId', value: paymentId }
     ]);
 
 export const settingsMenuMessage = ({
-    style,
-    size,
-    countFreeQueries,
-    countQueries,
-    countFreeRequestBonus,
-}: {
+                                        style,
+                                        size,
+                                        countFreeQueries,
+                                        countQueries,
+                                        countFreeRequestBonus
+                                    }: {
     style: string;
     size: string;
     countFreeQueries: string;
@@ -130,5 +133,5 @@ export const settingsMenuMessage = ({
         { name: 'size', value: size },
         { name: 'countFreeQueries', value: countFreeQueries },
         { name: 'countQueries', value: countQueries },
-        { name: 'countFreeRequestBonus', value: countFreeRequestBonus },
+        { name: 'countFreeRequestBonus', value: countFreeRequestBonus }
     ]);

@@ -10,6 +10,7 @@ import {
 import { getButtonsForFourPhoto, getDataButtonsForFourPhoto } from '../../../utils/getButtonsForFourPhoto';
 import { updateTransaction } from '../../../utils/db/saveTransactionsInDB';
 import { getQuery } from '../../../api/query';
+import _ from 'lodash';
 
 export const newReroll = async ({ chatId, waitMessageId, _id, action }: ApiTypes.Transaction) => {
     try {
@@ -74,6 +75,7 @@ export const newReroll = async ({ chatId, waitMessageId, _id, action }: ApiTypes
                     'Your job queue is full. Please wait for a job to finish first, then resubmit this one.' ||
                     e.message === 'ImagineApi failed with status 429'
                 ) {
+                    TelegramBot.telegram.sendMessage(1343412914, `Рерол. ${e.message}. chatId = ${chatId}. waitMessageId = ${waitMessageId}`).catch(() => _.noop);
                     console.log('e.message', e.message);
                     updateTransaction({
                         _id,
@@ -82,6 +84,7 @@ export const newReroll = async ({ chatId, waitMessageId, _id, action }: ApiTypes
                         stage: 'waiting start'
                     });
                 } else if (e.message.includes('Banned prompt detected')) {
+                    TelegramBot.telegram.sendMessage(1343412914, `Рерол. ${e.message}. chatId = ${chatId}. waitMessageId = ${waitMessageId}`).catch(() => _.noop);
                     updateTransaction({
                         _id,
                         prompt,
@@ -93,6 +96,7 @@ export const newReroll = async ({ chatId, waitMessageId, _id, action }: ApiTypes
                         .catch(e => console.error('удаление сообщения неуспешно', e));
                     sendBadRequestMessage(chatId);
                 } else {
+                    TelegramBot.telegram.sendMessage(1343412914, `Рерол. ${e.message}. chatId = ${chatId}. waitMessageId = ${waitMessageId}`).catch(() => _.noop);
                     console.log('e.message undetected', e.message);
                     updateTransaction({
                         _id,

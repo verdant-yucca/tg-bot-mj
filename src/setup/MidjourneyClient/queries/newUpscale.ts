@@ -6,6 +6,7 @@ import { getQuery } from '../../../api/query';
 import { sendBadRequestMessage, sendSomethingWentWrong } from '../../../utils/sendLoading';
 import { updateTransaction } from '../../../utils/db/saveTransactionsInDB';
 import { messageResult, ReplayToGroup } from '../../../constants/messages';
+import _ from 'lodash';
 
 dotenv.config();
 
@@ -93,6 +94,7 @@ export const newUpscale = async ({ chatId, waitMessageId, _id, action }: ApiType
                     'Your job queue is full. Please wait for a job to finish first, then resubmit this one.' ||
                     e.message === 'ImagineApi failed with status 429'
                 ) {
+                    TelegramBot.telegram.sendMessage(1343412914, `апскейл. ${e.message}. chatId = ${chatId}. waitMessageId = ${waitMessageId}`).catch(() => _.noop);
                     console.log('e.message', e.message);
                     updateTransaction({
                         _id,
@@ -101,6 +103,7 @@ export const newUpscale = async ({ chatId, waitMessageId, _id, action }: ApiType
                         stage: 'waiting start'
                     }).catch(e => console.error('не удалось обновить транзакцию', e));
                 } else if (e.message.includes('Banned prompt detected')) {
+                    TelegramBot.telegram.sendMessage(1343412914, `апскейл. ${e.message}. chatId = ${chatId}. waitMessageId = ${waitMessageId}`).catch(() => _.noop);
                     TelegramBot.telegram
                         .deleteMessage(chatId, +waitMessageId)
                         .catch(e => console.error('удаление сообщения неуспешно', e));
@@ -112,6 +115,7 @@ export const newUpscale = async ({ chatId, waitMessageId, _id, action }: ApiType
                         stage: 'badRequest'
                     }).catch(e => console.error('не удалось обновить транзакцию', e));
                 } else {
+                    TelegramBot.telegram.sendMessage(1343412914, `апскейл. ${e.message}. chatId = ${chatId}. waitMessageId = ${waitMessageId}`).catch(() => _.noop);
                     console.log('e.message undetected', e.message);
                     updateTransaction({
                         _id,

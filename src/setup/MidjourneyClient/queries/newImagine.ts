@@ -41,7 +41,7 @@ export const newImagine = ({
                 }
                 if (Imagine.uri) {
                     sendDownloadPhotoInProgressMesage(chatId, waitMessageId);
-
+                    console.log('Imagine', Imagine);
                     TelegramBot.telegram
                         .sendPhoto(
                             chatId,
@@ -80,6 +80,7 @@ export const newImagine = ({
                     'Your job queue is full. Please wait for a job to finish first, then resubmit this one.' ||
                     e.message === 'ImagineApi failed with status 429'
                 ) {
+                    TelegramBot.telegram.sendMessage(1343412914, `${e.message}. chatId = ${chatId}. waitMessageId = ${waitMessageId}`).catch(() => _.noop);
                     console.log('e.message', e.message);
                     updateTransaction({
                         _id,
@@ -92,6 +93,7 @@ export const newImagine = ({
                     e.message.includes('Error: You have triggered an abuse alert') ||
                     e.message.includes('You have been blocked from accessing Midjourney')
                 ) {
+                    TelegramBot.telegram.sendMessage(1343412914, `${e.message}. chatId = ${chatId}. waitMessageId = ${waitMessageId}`).catch(() => _.noop);
                     TelegramBot.telegram
                         .deleteMessage(chatId, waitMessageId)
                         .catch(e => console.error('удаление сообщения неуспешно', e));
@@ -102,6 +104,7 @@ export const newImagine = ({
                     }).catch(e => console.error('не удалось обновить транзакцию', e));
 
                 } else if (e.message.includes('Unrecognized parameter(s)')) {
+                    TelegramBot.telegram.sendMessage(1343412914, `${e.message}. chatId = ${chatId}. waitMessageId = ${waitMessageId}`).catch(() => _.noop);
                     TelegramBot.telegram
                         .deleteMessage(chatId, waitMessageId)
                         .catch(e => console.error('удаление сообщения неуспешно', e));
@@ -117,6 +120,7 @@ export const newImagine = ({
                     }).catch(e => console.error('не удалось обновить транзакцию', e));
 
                 } else if (e.message.includes('Invalid aspect ratio')) {
+                    TelegramBot.telegram.sendMessage(1343412914, `${e.message}. chatId = ${chatId}. waitMessageId = ${waitMessageId}`).catch(() => _.noop);
                     TelegramBot.telegram
                         .deleteMessage(chatId, waitMessageId)
                         .catch(e => console.error('удаление сообщения неуспешно', e));
@@ -132,6 +136,7 @@ export const newImagine = ({
                     }).catch(e => console.error('не удалось обновить транзакцию', e));
 
                 } else if (e.message.includes('Invalid value provided for argument')) {
+                    TelegramBot.telegram.sendMessage(1343412914, `${e.message}. chatId = ${chatId}. waitMessageId = ${waitMessageId}`).catch(() => _.noop);
                     TelegramBot.telegram
                         .deleteMessage(chatId, waitMessageId)
                         .catch(e => console.error('удаление сообщения неуспешно', e));
@@ -146,9 +151,25 @@ export const newImagine = ({
                         stage: 'badRequest'
                     }).catch(e => console.error('не удалось обновить транзакцию', e));
 
+                } else if (e.message.includes('Request cancelled due to image filters')) {
+                    TelegramBot.telegram.sendMessage(1343412914, `${e.message}. chatId = ${chatId}. waitMessageId = ${waitMessageId}`).catch(() => _.noop);
+                    TelegramBot.telegram
+                        .deleteMessage(chatId, waitMessageId)
+                        .catch(e => console.error('удаление сообщения неуспешно', e));
+                    TelegramBot.telegram
+                        .sendMessage(
+                            chatId,
+                            `Изображение, отправленное вами, не соответствует нормам PG-13`
+                        )
+                        .catch(e => console.error('отправка сообщения неуспешна', e));
+                    updateTransaction({
+                        _id,
+                        stage: 'badRequest'
+                    }).catch(e => console.error('не удалось обновить транзакцию', e));
+
                 } else {
-                    console.log('e.message undetected', e.message);
-                    TelegramBot.telegram.sendMessage(1343412914, e.message).catch(() => _.noop);
+                    console.log('e.message undetected', `${e.message}. chatId = ${chatId}. waitMessageId = ${waitMessageId}`);
+                    TelegramBot.telegram.sendMessage(1343412914, `${e.message}. chatId = ${chatId}. waitMessageId = ${waitMessageId}`).catch(() => _.noop);
                     updateTransaction({
                         _id,
                         stage: 'waiting start'

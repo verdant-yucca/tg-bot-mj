@@ -11,7 +11,7 @@ import {
     package2,
     package3,
     package4,
-    successfulPaymentMessage,
+    successfulPaymentMessage
 } from '../../constants/messages';
 import { getMainMenu } from '../../constants/buttons';
 import { ITGData } from '../../types';
@@ -26,7 +26,7 @@ import {
     sendSizesMenu,
     sendStylesMenu,
     updateSizesMenu,
-    updateStylesMenu,
+    updateStylesMenu
 } from './views/settingsScene';
 
 dotenv.config();
@@ -47,14 +47,15 @@ stage
     .on('successful_payment', async (ctx, next) => {
         // ответ в случае положительной оплаты
         const payload = ctx.update.message.successful_payment.invoice_payload as string;
+        const paymentId = ctx.update.message.successful_payment.provider_payment_charge_id;
         const { price, count, packageName } = JSON.parse(payload) as unknown as {
             packageName: string;
             price: string;
             count: string;
         };
-        await ctx.reply(successfulPaymentMessage({ count, packageName, price }));
+        await ctx.reply(successfulPaymentMessage({ count, packageName, price, paymentId }));
         updateUserInDb(ctx, {
-            payments: [{ count, price, date: new Date().toLocaleString() }],
+            payments: [{ count, price, date: new Date().toLocaleString() }]
         });
     })
     .on('callback_query', ctx => {
@@ -66,7 +67,7 @@ stage
                     const { first_name } = ctx.from as ITGData;
                     ctx.replyWithHTML(greetingsMsg(escapeTelegrafMarkdown(first_name)), {
                         reply_markup: getMainMenu().reply_markup,
-                        parse_mode: 'Markdown',
+                        parse_mode: 'Markdown'
                     });
                 }
             });
