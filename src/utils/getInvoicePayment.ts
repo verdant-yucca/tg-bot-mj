@@ -23,7 +23,7 @@ export const getInvoicePayments = async (id: number): Promise<any[]> => {
                     quantity: '1.00',
                     measure: 'piece',
                     payment_subject: 'service', // 'commodity' || 'service' = Товар || Услуга
-                    payment_mode: 'full_payment ',
+                    payment_mode: 'full_payment',
                     amount: {
                         value: `${(price * (offer || 1))}.00`,
                         currency: 'RUB'
