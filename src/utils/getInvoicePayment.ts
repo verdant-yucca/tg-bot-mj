@@ -19,10 +19,9 @@ export const getInvoicePayments = async (id: number): Promise<any[]> => {
             receipt: {
                 items: [{
                     description: `Покупка ${title} в телеграм боте`,
-                    quantity: '1.00',
+                    quantity: 1,
                     measure: 'piece',
                     payment_subject: 'service', // Услуга
-                    payment_mode: 'full_payment',
                     amount: {
                         value: `${price}.00`,
                         currency: 'RUB'
