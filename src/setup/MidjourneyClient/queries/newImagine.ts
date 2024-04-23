@@ -42,8 +42,8 @@ export const newImagine = ({
                 }
                 if (Imagine.uri) {
                     sendDownloadPhotoInProgressMesage(chatId, waitMessageId);
-                    console.log('Imagine', Imagine);
                     compressImage(Imagine.uri).then(result => {
+                        console.log('result compressImage === 1', result === 1);
                         if (result === 1) {
                             TelegramBot.telegram
                                 .sendPhoto(
