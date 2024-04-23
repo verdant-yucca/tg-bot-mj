@@ -42,9 +42,11 @@ stage
     })
     .on('pre_checkout_query', ctx => {
         ctx.answerPreCheckoutQuery(true);
+        console.log('ctx 123', ctx);
     }) // ответ на предварительный запрос по оплате
 
     .on('successful_payment', async (ctx, next) => {
+        console.log('ctx 123123', ctx);
         // ответ в случае положительной оплаты
         const payload = ctx.update.message.successful_payment.invoice_payload as string;
         const paymentId = ctx.update.message.successful_payment.provider_payment_charge_id;
