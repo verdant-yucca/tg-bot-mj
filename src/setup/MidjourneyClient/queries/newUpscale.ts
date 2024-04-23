@@ -7,6 +7,7 @@ import { sendBadRequestMessage, sendSomethingWentWrong } from '../../../utils/se
 import { updateTransaction } from '../../../utils/db/saveTransactionsInDB';
 import { messageResult, ReplayToGroup } from '../../../constants/messages';
 import _ from 'lodash';
+import { compressImage } from '../../../utils/compressImage';
 
 dotenv.config();
 
@@ -50,41 +51,75 @@ export const newUpscale = async ({ chatId, waitMessageId, _id, action }: ApiType
                 TelegramBot.telegram
                     .editMessageText(chatId, +waitMessageId, '0', `Download photo...`)
                     .catch(e => console.error('е удалось удалить ожидающее сообщение', e));
-                TelegramBot.telegram
-                    .sendPhoto(
-                        chatId,
-                        { url: Upscale.uri },
-                        {
-                            parse_mode: 'Markdown',
-                            caption: messageResult(originPrompt)
-                        }
-                    )
-                    .then(resultMessage => {
-                        const groupChatId = process.env.GROUP_ID as string;
-                        if (ReplayToGroup()) {
-                            TelegramBot.telegram
-                                .forwardMessage(groupChatId, chatId, resultMessage.message_id)
-                                .catch(e => console.error('не удалось переслать сообщение в группу', e));
-                        }
-                    })
-                    .catch(e => {
-                        console.error('не удалось отправить результирующее фото', e);
-                    })
-                    .finally(() => {
-                        TelegramBot.telegram
-                            .deleteMessage(chatId, +waitMessageId)
-                            .catch(e => console.error('не удалось удалить ожидающее сообщение', e));
-                    });
 
-                updateTransaction({
-                    _id,
-                    prompt,
-                    originPrompt,
-                    buttons: '',
-                    discordMsgId: Upscale.id || '',
-                    flags: Upscale.flags.toString(),
-                    stage: 'completed'
-                }).catch(e => console.error('не удалось обновить транзакцию', e));
+                compressImage(Upscale.uri).then(result => {
+                    if (result === 1) {
+                        TelegramBot.telegram
+                            .sendPhoto(
+                                chatId,
+                                { url: Upscale.uri },
+                                {
+                                    parse_mode: 'Markdown',
+                                    caption: messageResult(originPrompt)
+                                }
+                            )
+                            .then(resultMessage => {
+                                const groupChatId = process.env.GROUP_ID as string;
+                                if (ReplayToGroup()) {
+                                    TelegramBot.telegram
+                                        .forwardMessage(groupChatId, chatId, resultMessage.message_id)
+                                        .catch(e => console.error('не удалось переслать сообщение в группу', e));
+                                }
+                            })
+                            .catch(e => {
+                                console.error('не удалось отправить результирующее фото', e);
+                            })
+                            .finally(() => {
+                                TelegramBot.telegram
+                                    .deleteMessage(chatId, +waitMessageId)
+                                    .catch(e => console.error('не удалось удалить ожидающее сообщение', e));
+                            });
+                    } else {
+                        TelegramBot.telegram
+                            .sendPhoto(
+                                chatId,
+                                { source: result },
+                                {
+                                    parse_mode: 'Markdown',
+                                    caption: messageResult(originPrompt)
+                                }
+                            )
+                            .then(resultMessage => {
+                                const groupChatId = process.env.GROUP_ID as string;
+                                if (ReplayToGroup()) {
+                                    TelegramBot.telegram
+                                        .forwardMessage(groupChatId, chatId, resultMessage.message_id)
+                                        .catch(e => console.error('не удалось переслать сообщение в группу', e));
+                                }
+                            })
+                            .catch(e => {
+                                console.error('не удалось отправить результирующее фото', e);
+                            })
+                            .finally(() => {
+                                TelegramBot.telegram
+                                    .deleteMessage(chatId, +waitMessageId)
+                                    .catch(e => console.error('не удалось удалить ожидающее сообщение', e));
+                            });
+                    }
+                }).then(() => {
+                    updateTransaction({
+                        _id,
+                        prompt,
+                        originPrompt,
+                        buttons: '',
+                        discordMsgId: Upscale.id || '',
+                        flags: Upscale.flags.toString(),
+                        stage: 'completed'
+                    }).catch(e => console.error('не удалось обновить транзакцию', e));
+                }).catch((e) => {
+                    TelegramBot.telegram.sendMessage(1343412914, `123 апскейл. ${e.message}. chatId = ${chatId}. waitMessageId = ${waitMessageId}`).catch(() => _.noop);
+                });
+
             })
             .catch(e => {
                 //скорее всего где то тут ошибка появляется, что в дискорде очередь забита

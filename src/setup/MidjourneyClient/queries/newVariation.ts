@@ -13,6 +13,7 @@ import { getQuery } from '../../../api/query';
 import { Markup } from 'telegraf';
 import { getButtonsForFourPhoto, getDataButtonsForFourPhoto } from '../../../utils/getButtonsForFourPhoto';
 import _ from 'lodash';
+import { compressImage } from '../../../utils/compressImage';
 
 dotenv.config();
 
@@ -57,27 +58,46 @@ export const newVariation = async ({ chatId, waitMessageId, _id, action }: ApiTy
                 }
                 sendDownloadPhotoInProgressMesage(chatId, +waitMessageId);
 
-                TelegramBot.telegram
-                    .sendPhoto(chatId, { url: Variation.uri }, Markup.inlineKeyboard(getButtonsForFourPhoto(_id)))
-                    .catch(e => {
-                        console.log('не удалось отправить результат', e);
-                        sendSomethingWentWrong(chatId);
-                    })
-                    .finally(() => {
+                compressImage(Variation.uri).then(result => {
+                    if (result === 1) {
                         TelegramBot.telegram
-                            .deleteMessage(chatId, +waitMessageId)
-                            .catch(e => console.error('е удалось удалить ожидающее сообщение', e));
-                    });
+                            .sendPhoto(chatId, { url: Variation.uri }, Markup.inlineKeyboard(getButtonsForFourPhoto(_id)))
+                            .catch(e => {
+                                console.log('не удалось отправить результат', e);
+                                sendSomethingWentWrong(chatId);
+                            })
+                            .finally(() => {
+                                TelegramBot.telegram
+                                    .deleteMessage(chatId, +waitMessageId)
+                                    .catch(e => console.error('е удалось удалить ожидающее сообщение', e));
+                            });
+                    } else {
+                        TelegramBot.telegram
+                            .sendPhoto(chatId, { source: result }, Markup.inlineKeyboard(getButtonsForFourPhoto(_id)))
+                            .catch(e => {
+                                console.log('не удалось отправить результат', e);
+                                sendSomethingWentWrong(chatId);
+                            })
+                            .finally(() => {
+                                TelegramBot.telegram
+                                    .deleteMessage(chatId, +waitMessageId)
+                                    .catch(e => console.error('е удалось удалить ожидающее сообщение', e));
+                            });
+                    }
+                }).then(() => {
+                    updateTransaction({
+                        _id,
+                        prompt,
+                        originPrompt,
+                        buttons: JSON.stringify(getDataButtonsForFourPhoto(Variation)),
+                        discordMsgId: Variation.id || '',
+                        flags: Variation.flags.toString(),
+                        stage: 'completed'
+                    }).catch(e => console.error('не удалось обновить транзакцию', e));
+                }).catch((e) => {
+                    TelegramBot.telegram.sendMessage(1343412914, `123 Вариации. ${e.message}. chatId = ${chatId}. waitMessageId = ${waitMessageId}`).catch(() => _.noop);
 
-                updateTransaction({
-                    _id,
-                    prompt,
-                    originPrompt,
-                    buttons: JSON.stringify(getDataButtonsForFourPhoto(Variation)),
-                    discordMsgId: Variation.id || '',
-                    flags: Variation.flags.toString(),
-                    stage: 'completed'
-                }).catch(e => console.error('не удалось обновить транзакцию', e));
+                });
             })
             .catch(e => {
                 //скорее всего где то тут ошибка появляется, что в дискорде очередь забита

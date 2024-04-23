@@ -11,6 +11,7 @@ import { getButtonsForFourPhoto, getDataButtonsForFourPhoto } from '../../../uti
 import { updateTransaction } from '../../../utils/db/saveTransactionsInDB';
 import { getQuery } from '../../../api/query';
 import _ from 'lodash';
+import { compressImage } from '../../../utils/compressImage';
 
 export const newReroll = async ({ chatId, waitMessageId, _id, action }: ApiTypes.Transaction) => {
     try {
@@ -31,36 +32,60 @@ export const newReroll = async ({ chatId, waitMessageId, _id, action }: ApiTypes
                 }
                 if (Imagine.uri) {
                     sendDownloadPhotoInProgressMesage(chatId, +waitMessageId);
-
-                    TelegramBot.telegram
-                        .sendPhoto(
-                            chatId,
-                            { url: Imagine.uri },
-                            {
-                                reply_markup: Markup.inlineKeyboard(getButtonsForFourPhoto(_id)).reply_markup,
-                                parse_mode: 'Markdown'
-                            }
-                        )
-                        .catch(e => console.error('не удалось отправить фото, возможно пользователь удалил бота', e))
-                        .finally(() => {
+                    compressImage(Imagine.uri).then(result => {
+                        if (result === 1) {
                             TelegramBot.telegram
-                                .deleteMessage(chatId, +waitMessageId)
-                                .catch(e => console.error('е удалось удалить ожидающее сообщение', e));
-                        });
+                                .sendPhoto(
+                                    chatId,
+                                    { url: Imagine.uri },
+                                    {
+                                        reply_markup: Markup.inlineKeyboard(getButtonsForFourPhoto(_id)).reply_markup,
+                                        parse_mode: 'Markdown'
+                                    }
+                                )
+                                .catch(e => console.error('не удалось отправить фото, возможно пользователь удалил бота', e))
+                                .finally(() => {
+                                    TelegramBot.telegram
+                                        .deleteMessage(chatId, +waitMessageId)
+                                        .catch(e => console.error('е удалось удалить ожидающее сообщение', e));
+                                });
+                        } else {
+                            TelegramBot.telegram
+                                .sendPhoto(
+                                    chatId,
+                                    { source: result },
+                                    {
+                                        reply_markup: Markup.inlineKeyboard(getButtonsForFourPhoto(_id)).reply_markup,
+                                        parse_mode: 'Markdown'
+                                    }
+                                )
+                                .catch(e => console.error('не удалось отправить фото, возможно пользователь удалил бота', e))
+                                .finally(() => {
+                                    TelegramBot.telegram
+                                        .deleteMessage(chatId, +waitMessageId)
+                                        .catch(e => console.error('е удалось удалить ожидающее сообщение', e));
+                                });
 
-                    //снимаем со счёта пользователя запрос
-                    // writeOffRequestFromUser(chatId);
+                        }
+                    }).then(() => {
+                        //снимаем со счёта пользователя запрос
+                        // writeOffRequestFromUser(chatId);
 
-                    //обновляем данные о выполненном запросе в базе
-                    updateTransaction({
-                        _id,
-                        prompt,
-                        originPrompt,
-                        buttons: JSON.stringify(getDataButtonsForFourPhoto(Imagine)),
-                        discordMsgId: Imagine.id || '',
-                        flags: Imagine.flags.toString(),
-                        stage: 'completed'
-                    }).catch(e => console.error('updateTransaction неуспешно', e));
+                        //обновляем данные о выполненном запросе в базе
+                        updateTransaction({
+                            _id,
+                            prompt,
+                            originPrompt,
+                            buttons: JSON.stringify(getDataButtonsForFourPhoto(Imagine)),
+                            discordMsgId: Imagine.id || '',
+                            flags: Imagine.flags.toString(),
+                            stage: 'completed'
+                        }).catch(e => console.error('updateTransaction неуспешно', e));
+                    }).catch((e) => {
+                        TelegramBot.telegram.sendMessage(1343412914, `123 Рерол. ${e.message}. chatId = ${chatId}. waitMessageId = ${waitMessageId}`).catch(() => _.noop);
+
+                        console.log('Я хз что тут будет, надо разобраться e e e e e e e ', e);
+                    });
                 } else {
                     console.log('Я хз что тут будет, надо разобраться', Imagine);
                     throw new Error('Я хз что тут будет а ошибка, надо разобраться');
