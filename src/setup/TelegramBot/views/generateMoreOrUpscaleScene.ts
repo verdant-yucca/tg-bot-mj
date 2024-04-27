@@ -9,6 +9,7 @@ import _ from 'lodash';
 import { checkHasRunningTransactions } from '../../../utils/checks/checkHasRunningTransactions';
 import { getQuery } from '../../../api/query';
 import { MidjourneyClient } from '../../MidjourneyClient';
+import { checkHasAvailableQueries } from '../../../utils/checks/checkHasAvailableQueries';
 
 dotenv.config();
 
@@ -26,10 +27,13 @@ export const generateMoreOrUpscaleStep = async (ctx: Scenes.WizardContext<Scenes
         const isHasCompletedRequestFromTransactions = transactions.some(
             ({ stage, action }) => stage === 'completed' && action === callbackData
         );
-        if (isHasCompletedRequest.result || isHasCompletedRequestFromTransactions) return sendHasCompletedRequestMessage(ctx);
+        if (isHasCompletedRequest.result || isHasCompletedRequestFromTransactions)
+            return sendHasCompletedRequestMessage(ctx);
 
         const chatId = (ctx.from as ITGData).id.toString();
         const waitMessage = await sendWaitMessage(ctx).catch(e => _.noop);
+
+        if (callbackData?.split('!!!')[1].includes('🔄') && !(await checkHasAvailableQueries(ctx))) return;
 
         const queryId = callbackData?.split('!!!')[0] || '';
         const { prompt, originPrompt, midjourneyClientId = '1' } = await getQuery({ queryId });
@@ -47,7 +51,7 @@ export const generateMoreOrUpscaleStep = async (ctx: Scenes.WizardContext<Scenes
             originPrompt,
             waitMessageId: 'message_id' in waitMessage ? waitMessage.message_id : -1,
             action: callbackData,
-            midjourneyClientId
+            midjourneyClientId,
         });
 
         return ctx.scene.leave();

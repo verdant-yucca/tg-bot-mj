@@ -5,20 +5,21 @@ import { MidjourneyClient } from '../index';
 import {
     sendBadRequestMessage,
     sendDownloadPhotoInProgressMesage,
-    sendLoadingMesage
+    sendLoadingMesage,
 } from '../../../utils/sendLoading';
 import { getButtonsForFourPhoto, getDataButtonsForFourPhoto } from '../../../utils/getButtonsForFourPhoto';
 import { updateTransaction } from '../../../utils/db/saveTransactionsInDB';
 import { getQuery } from '../../../api/query';
 import _ from 'lodash';
 import { compressImage } from '../../../utils/compressImage';
+import { writeOffRequestFromUser } from '../../../utils/db/saveUserInDb';
 
 export const newReroll = async ({ chatId, waitMessageId, _id, action }: ApiTypes.Transaction) => {
     try {
         //обновляем данные о начале выполнения запроса в базе
         updateTransaction({
             _id,
-            stage: 'running'
+            stage: 'running',
         });
         const queryId = action?.split('!!!')[0] || '';
         const { prompt = 'asd', originPrompt, midjourneyClientId = '1' } = await getQuery({ queryId });
@@ -32,60 +33,73 @@ export const newReroll = async ({ chatId, waitMessageId, _id, action }: ApiTypes
                 }
                 if (Imagine.uri) {
                     sendDownloadPhotoInProgressMesage(chatId, +waitMessageId);
-                    compressImage(Imagine.uri).then(result => {
-                        if (result === 1) {
+                    compressImage(Imagine.uri)
+                        .then(result => {
+                            if (result === 1) {
+                                TelegramBot.telegram
+                                    .sendPhoto(
+                                        chatId,
+                                        { url: Imagine.uri },
+                                        {
+                                            reply_markup: Markup.inlineKeyboard(getButtonsForFourPhoto(_id))
+                                                .reply_markup,
+                                            parse_mode: 'Markdown',
+                                        }
+                                    )
+                                    .catch(e =>
+                                        console.error('не удалось отправить фото, возможно пользователь удалил бота', e)
+                                    )
+                                    .finally(() => {
+                                        TelegramBot.telegram
+                                            .deleteMessage(chatId, +waitMessageId)
+                                            .catch(e => console.error('е удалось удалить ожидающее сообщение', e));
+                                    });
+                            } else {
+                                TelegramBot.telegram
+                                    .sendPhoto(
+                                        chatId,
+                                        { source: result },
+                                        {
+                                            reply_markup: Markup.inlineKeyboard(getButtonsForFourPhoto(_id))
+                                                .reply_markup,
+                                            parse_mode: 'Markdown',
+                                        }
+                                    )
+                                    .catch(e =>
+                                        console.error('не удалось отправить фото, возможно пользователь удалил бота', e)
+                                    )
+                                    .finally(() => {
+                                        TelegramBot.telegram
+                                            .deleteMessage(chatId, +waitMessageId)
+                                            .catch(e => console.error('е удалось удалить ожидающее сообщение', e));
+                                    });
+                            }
+                        })
+                        .then(() => {
+                            //снимаем со счёта пользователя запрос
+                            writeOffRequestFromUser(chatId).catch(e => console.error('не удалось списать запрос', e));
+
+                            //обновляем данные о выполненном запросе в базе
+                            updateTransaction({
+                                _id,
+                                prompt,
+                                originPrompt,
+                                buttons: JSON.stringify(getDataButtonsForFourPhoto(Imagine)),
+                                discordMsgId: Imagine.id || '',
+                                flags: Imagine.flags.toString(),
+                                stage: 'completed',
+                            }).catch(e => console.error('updateTransaction неуспешно', e));
+                        })
+                        .catch(e => {
                             TelegramBot.telegram
-                                .sendPhoto(
-                                    chatId,
-                                    { url: Imagine.uri },
-                                    {
-                                        reply_markup: Markup.inlineKeyboard(getButtonsForFourPhoto(_id)).reply_markup,
-                                        parse_mode: 'Markdown'
-                                    }
+                                .sendMessage(
+                                    1343412914,
+                                    `123 Рерол. ${e.message}. chatId = ${chatId}. waitMessageId = ${waitMessageId}`
                                 )
-                                .catch(e => console.error('не удалось отправить фото, возможно пользователь удалил бота', e))
-                                .finally(() => {
-                                    TelegramBot.telegram
-                                        .deleteMessage(chatId, +waitMessageId)
-                                        .catch(e => console.error('е удалось удалить ожидающее сообщение', e));
-                                });
-                        } else {
-                            TelegramBot.telegram
-                                .sendPhoto(
-                                    chatId,
-                                    { source: result },
-                                    {
-                                        reply_markup: Markup.inlineKeyboard(getButtonsForFourPhoto(_id)).reply_markup,
-                                        parse_mode: 'Markdown'
-                                    }
-                                )
-                                .catch(e => console.error('не удалось отправить фото, возможно пользователь удалил бота', e))
-                                .finally(() => {
-                                    TelegramBot.telegram
-                                        .deleteMessage(chatId, +waitMessageId)
-                                        .catch(e => console.error('е удалось удалить ожидающее сообщение', e));
-                                });
+                                .catch(() => _.noop);
 
-                        }
-                    }).then(() => {
-                        //снимаем со счёта пользователя запрос
-                        // writeOffRequestFromUser(chatId);
-
-                        //обновляем данные о выполненном запросе в базе
-                        updateTransaction({
-                            _id,
-                            prompt,
-                            originPrompt,
-                            buttons: JSON.stringify(getDataButtonsForFourPhoto(Imagine)),
-                            discordMsgId: Imagine.id || '',
-                            flags: Imagine.flags.toString(),
-                            stage: 'completed'
-                        }).catch(e => console.error('updateTransaction неуспешно', e));
-                    }).catch((e) => {
-                        TelegramBot.telegram.sendMessage(1343412914, `123 Рерол. ${e.message}. chatId = ${chatId}. waitMessageId = ${waitMessageId}`).catch(() => _.noop);
-
-                        console.log('Я хз что тут будет, надо разобраться e e e e e e e ', e);
-                    });
+                            console.log('Я хз что тут будет, надо разобраться e e e e e e e ', e);
+                        });
                 } else {
                     console.log('Я хз что тут будет, надо разобраться', Imagine);
                     throw new Error('Я хз что тут будет а ошибка, надо разобраться');
@@ -97,37 +111,69 @@ export const newReroll = async ({ chatId, waitMessageId, _id, action }: ApiTypes
 
                 if (
                     e.message ===
-                    'Your job queue is full. Please wait for a job to finish first, then resubmit this one.' ||
+                        'Your job queue is full. Please wait for a job to finish first, then resubmit this one.' ||
                     e.message === 'ImagineApi failed with status 429'
                 ) {
-                    TelegramBot.telegram.sendMessage(1343412914, `Рерол. ${e.message}. chatId = ${chatId}. waitMessageId = ${waitMessageId}`).catch(() => _.noop);
+                    TelegramBot.telegram
+                        .sendMessage(
+                            1343412914,
+                            `Рерол. ${e.message}. chatId = ${chatId}. waitMessageId = ${waitMessageId}`
+                        )
+                        .catch(() => _.noop);
                     console.log('e.message', e.message);
                     updateTransaction({
                         _id,
                         prompt,
                         originPrompt,
-                        stage: 'waiting start'
+                        stage: 'waiting start',
                     });
                 } else if (e.message.includes('Banned prompt detected')) {
-                    TelegramBot.telegram.sendMessage(1343412914, `Рерол. ${e.message}. chatId = ${chatId}. waitMessageId = ${waitMessageId}`).catch(() => _.noop);
+                    TelegramBot.telegram
+                        .sendMessage(
+                            1343412914,
+                            `Рерол. ${e.message}. chatId = ${chatId}. waitMessageId = ${waitMessageId}`
+                        )
+                        .catch(() => _.noop);
                     updateTransaction({
                         _id,
                         prompt,
                         originPrompt,
-                        stage: 'badRequest'
+                        stage: 'badRequest',
+                    }).catch(e => console.error('updateTransaction неуспешно', e));
+                    TelegramBot.telegram
+                        .deleteMessage(chatId, +waitMessageId)
+                        .catch(e => console.error('удаление сообщения неуспешно', e));
+                    sendBadRequestMessage(chatId);
+                } else if (e.message.includes('You have been blocked')) {
+                    TelegramBot.telegram
+                        .sendMessage(
+                            1343412914,
+                            `Рерол. ${e.message}. chatId = ${chatId}. waitMessageId = ${waitMessageId}`
+                        )
+                        .catch(() => _.noop);
+                    updateTransaction({
+                        _id,
+                        prompt,
+                        originPrompt,
+                        stage: 'badRequest',
                     }).catch(e => console.error('updateTransaction неуспешно', e));
                     TelegramBot.telegram
                         .deleteMessage(chatId, +waitMessageId)
                         .catch(e => console.error('удаление сообщения неуспешно', e));
                     sendBadRequestMessage(chatId);
                 } else {
-                    TelegramBot.telegram.sendMessage(1343412914, `Рерол. ${e.message}. chatId = ${chatId}. waitMessageId = ${waitMessageId}`).catch(() => _.noop);
+                    TelegramBot.telegram
+                        .sendMessage(
+                            1343412914,
+                            `Рерол. ${e.message}. chatId = ${chatId}. waitMessageId = ${waitMessageId}`
+                        )
+                        .catch(() => _.noop);
                     console.log('e.message undetected', e.message);
                     updateTransaction({
                         _id,
                         prompt,
                         originPrompt,
-                        stage: 'waiting start'
+                        stage: 'waiting start',
                     });
                 }
             });
@@ -135,7 +181,7 @@ export const newReroll = async ({ chatId, waitMessageId, _id, action }: ApiTypes
         console.error('newReroll -> catch', e);
         updateTransaction({
             _id,
-            stage: 'failed'
+            stage: 'failed',
         }).catch(e => console.error(e));
     }
 };
