@@ -25,11 +25,11 @@ export const generateMoreOrUpscaleStep = async (ctx: Scenes.WizardContext<Scenes
         const session = ctx.session as { isHasOutstandingRequest?: boolean };
         console.log('session.isHasOutstandingRequest1', session.isHasOutstandingRequest);
         if (session?.isHasOutstandingRequest) return sendHasOutstandingRequestMessage(ctx);
-        session.isHasOutstandingRequest = true;
-        console.log('session.isHasOutstandingRequest2', session.isHasOutstandingRequest);
 
         const { isHasRunningTransactions, transactions } = await checkHasRunningTransactions(ctx);
         if (isHasRunningTransactions) return;
+        session.isHasOutstandingRequest = true;
+        console.log('session.isHasOutstandingRequest2', session.isHasOutstandingRequest);
 
         const callback = ctx.update && 'callback_query' in ctx.update ? ctx.update.callback_query : undefined;
         const callbackData = callback && 'data' in callback ? callback.data : '';
