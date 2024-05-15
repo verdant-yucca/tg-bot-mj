@@ -1,6 +1,7 @@
 import express, { Application } from 'express';
 import * as dotenv from 'dotenv';
 import cors from 'cors';
+import { exec } from 'child_process';
 import { json, urlencoded } from 'body-parser';
 import { join } from 'path';
 import { reloadJson as reloadJsonContent } from '../../constants/messages';
@@ -33,8 +34,25 @@ App.use('/updateWordsForDelete', (req, res) => {
 });
 
 App.use('/restartTelegramBot', (req, res) => {
-    restartTelegramBot();
-    res.send({ result: true });
+    try {
+        exec('pm2 restart 0', (error, stdout, stderr) => {
+            if (error) {
+                console.error(`Ошибка при выполнении команды: ${error.message}`);
+                return res.status(500).send(`Ошибка при выполнении команды: ${error.message}`);
+            }
+            if (stderr) {
+                console.error(`Ошибка в процессе выполнения: ${stderr}`);
+                return res.status(500).send(`Ошибка в процессе выполнения: ${stderr}`);
+            }
+            console.log(`Результат: ${stdout}`);
+            res.send(`Команда выполнена успешно: ${stdout}`);
+        });
+        // restartTelegramBot();
+        res.send({ result: true });
+    } catch (e) {
+        // @ts-ignore
+        console.log(`/restartTelegramBot error: ${e?.message || e}`);
+    }
 });
 
 App.use('/massMailing', async (req, res) => {

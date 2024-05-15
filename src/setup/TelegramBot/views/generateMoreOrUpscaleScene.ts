@@ -1,6 +1,11 @@
 import * as dotenv from 'dotenv';
 import { Scenes } from 'telegraf';
-import { sendHasCompletedRequestMessage, sendSomethingWentWrong, sendWaitMessage } from '../../../utils/sendLoading';
+import {
+    sendHasCompletedRequestMessage,
+    sendHasOutstandingRequestMessage,
+    sendSomethingWentWrong,
+    sendWaitMessage
+} from '../../../utils/sendLoading';
 import { checkIsGroupMember } from '../../../utils/checks/checkIsGroupMember';
 import { findQueryInDB } from '../../../utils/db/saveQueryInDB';
 import { addNewTransaction, getFreeMidjourneyClient } from '../../../utils/db/saveTransactionsInDB';
@@ -16,6 +21,11 @@ dotenv.config();
 export const generateMoreOrUpscaleStep = async (ctx: Scenes.WizardContext<Scenes.WizardSessionData>) => {
     try {
         if (!(await checkIsGroupMember(ctx))) return;
+
+        const session = ctx.session as { isHasOutstandingRequest?: boolean };
+        if (session?.isHasOutstandingRequest) return sendHasOutstandingRequestMessage(ctx);
+        session.isHasOutstandingRequest = true;
+
         const { isHasRunningTransactions, transactions } = await checkHasRunningTransactions(ctx);
         if (isHasRunningTransactions) return;
 
@@ -51,13 +61,17 @@ export const generateMoreOrUpscaleStep = async (ctx: Scenes.WizardContext<Scenes
             originPrompt,
             waitMessageId: 'message_id' in waitMessage ? waitMessage.message_id : -1,
             action: callbackData,
-            midjourneyClientId,
+            midjourneyClientId
         });
-
+        session.isHasOutstandingRequest = false;
         return ctx.scene.leave();
     } catch (e) {
         console.error('generateMoreOrUpscaleStep -> catch', e);
         const chatId = (ctx.from as ITGData).id.toString();
+
+        const session = ctx.session as { isHasOutstandingRequest?: boolean };
+        session.isHasOutstandingRequest = false;
+
         sendSomethingWentWrong(chatId);
         return ctx.scene.leave();
     }
