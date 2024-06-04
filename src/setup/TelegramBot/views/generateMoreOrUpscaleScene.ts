@@ -4,7 +4,7 @@ import {
     sendHasCompletedRequestMessage,
     sendHasOutstandingRequestMessage,
     sendSomethingWentWrong,
-    sendWaitMessage
+    sendWaitMessage,
 } from '../../../utils/sendLoading';
 import { checkIsGroupMember } from '../../../utils/checks/checkIsGroupMember';
 import { findQueryInDB } from '../../../utils/db/saveQueryInDB';
@@ -22,14 +22,14 @@ export const generateMoreOrUpscaleStep = async (ctx: Scenes.WizardContext<Scenes
     try {
         if (!(await checkIsGroupMember(ctx))) return;
 
-        const session = ctx.session as { isHasOutstandingRequest?: boolean };
-        console.log('session.isHasOutstandingRequest1', session.isHasOutstandingRequest);
-        if (session?.isHasOutstandingRequest) return sendHasOutstandingRequestMessage(ctx);
+        // const session = ctx.session as { isHasOutstandingRequest?: boolean };
+        // console.log('session.isHasOutstandingRequest1', session.isHasOutstandingRequest);
+        // if (session?.isHasOutstandingRequest) return sendHasOutstandingRequestMessage(ctx);
 
         const { isHasRunningTransactions, transactions } = await checkHasRunningTransactions(ctx);
         if (isHasRunningTransactions) return;
-        session.isHasOutstandingRequest = true;
-        console.log('session.isHasOutstandingRequest2', session.isHasOutstandingRequest);
+        // session.isHasOutstandingRequest = true;
+        // console.log('session.isHasOutstandingRequest2', session.isHasOutstandingRequest);
 
         const callback = ctx.update && 'callback_query' in ctx.update ? ctx.update.callback_query : undefined;
         const callbackData = callback && 'data' in callback ? callback.data : '';
@@ -48,7 +48,7 @@ export const generateMoreOrUpscaleStep = async (ctx: Scenes.WizardContext<Scenes
         if (callbackData?.split('!!!')[1].includes('🔄') && !(await checkHasAvailableQueries(ctx))) return;
 
         const queryId = callbackData?.split('!!!')[0] || '';
-        const { prompt, originPrompt, midjourneyClientId = '1' } = await getQuery({ queryId });
+        const { prompt, originPrompt, midjourneyClientId = '-1' } = await getQuery({ queryId });
 
         const allClients = Object.keys(MidjourneyClient);
         if (!allClients.includes(midjourneyClientId)) {
@@ -63,10 +63,10 @@ export const generateMoreOrUpscaleStep = async (ctx: Scenes.WizardContext<Scenes
             originPrompt,
             waitMessageId: 'message_id' in waitMessage ? waitMessage.message_id : -1,
             action: callbackData,
-            midjourneyClientId
+            midjourneyClientId,
         });
-        session.isHasOutstandingRequest = false;
-        console.log('session.isHasOutstandingRequest3', session.isHasOutstandingRequest);
+        // session.isHasOutstandingRequest = false;
+        // console.log('session.isHasOutstandingRequest3', session.isHasOutstandingRequest);
         return ctx.scene.leave();
     } catch (e) {
         console.error('generateMoreOrUpscaleStep -> catch', e);
