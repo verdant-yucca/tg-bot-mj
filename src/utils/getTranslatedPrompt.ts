@@ -16,9 +16,9 @@ export const getTranslatedPrompt = async (
         if (textTgMessage) {
             translatedTgMessage = await getTranslate(textTgMessage);
         }
-        return { originPrompt: textTgMessage, translatedPrompt: translatedTgMessage };
+        return { originPrompt: textTgMessage || 'empty', translatedPrompt: translatedTgMessage || 'empty' };
     } catch (e) {
         console.error('log checkHasLinkInText', e);
-        return { originPrompt: textTgMessage, translatedPrompt: translatedTgMessage || '' };
+        return { originPrompt: textTgMessage || 'empty', translatedPrompt: translatedTgMessage || 'empty' };
     }
 };

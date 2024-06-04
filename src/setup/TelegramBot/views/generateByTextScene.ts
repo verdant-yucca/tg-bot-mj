@@ -47,17 +47,15 @@ export const generateImageByTextStep2 = async (ctx: Scenes.WizardContext<Scenes.
         const waitMessage = await sendWaitMessage(ctx).catch(e => console.error('eeeeeeeeeeeeeeeeeeee', e));
         const midjourneyClientId = await getFreeMidjourneyClient();
         const { selectedStyle, selectedSize } = await getUserByIdFromDb(ctx);
+        const currentStyle = selectedStyle && selectedStyle !== 'Без стиля' ? selectedStyle : '';
+        const currentSize = selectedSize && selectedSize !== 'Без формата' ? selectedSize : '';
         await addNewTransaction({
             chatId,
-            translatedPrompt: `${translatedPrompt}${
-                selectedStyle && selectedStyle !== 'Без стиля' ? selectedStyle : ''
-            }${selectedSize && selectedSize !== 'Без формата' ? selectedSize : ''}`,
-            originPrompt: `${originPrompt}${selectedStyle && selectedStyle !== 'Без стиля' ? selectedStyle : ''}${
-                selectedSize && selectedSize !== 'Без формата' ? selectedSize : ''
-            }`,
+            translatedPrompt: `${translatedPrompt}${currentStyle}${currentSize}`,
+            originPrompt: `${originPrompt}${currentStyle}${currentSize}`,
             waitMessageId: waitMessage && 'message_id' in waitMessage ? waitMessage.message_id : -1,
-            midjourneyClientId,
-            action: 'generateImageByText'
+            midjourneyClientId: midjourneyClientId || '-1',
+            action: 'generateImageByText',
         });
         return ctx.scene.leave();
     } catch (e) {
